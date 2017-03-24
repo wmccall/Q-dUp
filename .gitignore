@@ -7,10 +7,3 @@
 /build
 /captures
 .externalNativeBuild
-app/build.gradle
-*.gradle
-app/build.gradle
-app/build.gradle
-*.apk
-app/app-release.apk
-app/app-release.apk

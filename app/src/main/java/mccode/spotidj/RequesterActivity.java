@@ -56,7 +56,6 @@ public class RequesterActivity extends Activity implements
         final SearchListener listener = new SearchListener() {
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
-                System.out.println("OKOKO");
                 searchResult = result;
                 String resultstring = new String();
                 for(Iterator<String> i = searchResult.iterator(); i.hasNext();){
@@ -118,8 +117,6 @@ public class RequesterActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-
-        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
     }
 
     @Override

@@ -25,12 +25,9 @@ public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> 
     @Override
     protected ArrayList<String> doInBackground(String... strings) {
         URL url = null;
-        System.out.println("11111");
         try {
-            //url = new URL("https://api.spotify.com/v1/search?q=" + p + "&type=track");
             url = new URL(strings[0]);
         } catch (MalformedURLException e) {
-            System.out.println("22222");
             e.printStackTrace();
         }
         System.out.println(url.toString());
@@ -57,7 +54,6 @@ public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> 
     }
     protected void onPostExecute(ArrayList<String> result) {
         //called after doInBackground() has finished
-        System.out.println("WOWOWOW");
         listener.onSearchSucceeded(result);
     }
 

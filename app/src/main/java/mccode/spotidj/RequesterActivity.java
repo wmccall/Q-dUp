@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -32,6 +33,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static mccode.spotidj.MainActivity.mPlayer;
+
 public class RequesterActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
@@ -44,7 +47,7 @@ public class RequesterActivity extends Activity implements
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
 
-    private Player mPlayer;
+    //private Player mPlayer;
     private ArrayList<String> searchResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,31 +56,52 @@ public class RequesterActivity extends Activity implements
         final Button find = (Button) findViewById(R.id.find_button);
         final EditText search = (EditText) findViewById(R.id.search_bar);
         final EditText searchResultView = (EditText) findViewById(R.id.search_result);
+        final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
+        loadingCircle.setVisibility(View.GONE);
+        final TrackCreaterListener createrListener= new TrackCreaterListener() {
+            @Override
+            public void onCreateSucceeded(View v, final TrackSearchResult t) {
+                searchResultView.setText("artist: "+ t.getArtistName() +"\ntrackID: " + t.getTrackID() +"\ntrackName"+ t.getTrackName());
+                searchResultView.setOnClickListener(new View.OnClickListener(){
+                    public void onClick(View v) {
+                        mPlayer.playUri(null, "spotify:track:" + t.getTrackID(), 0, 0);
+                    }
+                });
+            }
+        };
         final SearchListener listener = new SearchListener() {
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
                 searchResult = result;
-                String resultstring = new String();
-                for(Iterator<String> i = searchResult.iterator(); i.hasNext();){
-                    String line = i.next();
-                    resultstring += line;
-                    resultstring += '\n';
-                    System.out.println(line);
-                }
-                searchResultView.setText(resultstring);
+//                String resultstring = new String();
+//                String rsnoline = new String();
+//                for(Iterator<String> i = searchResult.iterator(); i.hasNext();){
+//                    String line = i.next();
+//                    resultstring += line;
+//                    resultstring += '\n';
+//                }
+//                loadingCircle.setVisibility(View.GONE);
+//                searchResultView.setText(resultstring);
+//                System.out.println(rsnoline);
+                loadingCircle.setVisibility(View.GONE);
+                TrackSearchResult track = new TrackSearchResult(searchResult, createrListener, searchResultView);
+
+
             }
         };
         find.setOnClickListener(new View.OnClickListener() {
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
+                mPlayer.pause(null);
+                loadingCircle.setVisibility(View.VISIBLE);
                 String p = search.getText().toString();
                 System.out.println(p);
                 p = p.replaceAll("\\s{2,}", " ").trim();
                 p = p.replaceAll(" ", "%20");
                 SearchReader search = new SearchReader();
                 search.setOnSearchListener(listener);
-                search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track&limit=2");
             }
         });
     }

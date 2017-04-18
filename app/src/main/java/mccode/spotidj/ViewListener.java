@@ -1,6 +1,10 @@
-import data.tracks.Item;
+package mccode.spotidj;
+
+
 
 import java.io.IOException;
+
+import mccode.spotidj.models.Item;
 
 /**
  * The controller interface that tells the model when the

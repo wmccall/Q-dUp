@@ -3,7 +3,9 @@ package mccode.spotidj;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.view.View;
@@ -20,11 +22,19 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+
 public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
     private static final String REDIRECT_URI = "mccode-spotidj://callback";
+    public static final String HOST = "mammothtr0n.student.rit.edu";
+    public static int PORT = 5000;
+    public static ModelProxy mp;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -108,25 +118,41 @@ public class MainActivity extends Activity implements
         final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
         final Button confirmType = (Button) findViewById(R.id.confirmType);
         final EditText keySearch = (EditText) findViewById(R.id.key_search);
+        final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
+
+
+        final ConnectListener listener = new ConnectListener() {
+            @Override
+            public void onConnectSucceeded(ArrayList<String> result) {
+                //is checked means it is server, not is client
+                if(serverOrClient.isChecked()){
+                    if(result.get(0)=="Y"){
+                        System.out.println("TEST1");
+                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
+                        startActivity(intent);
+                    }
+                }else{
+                    if(result.get(0)=="Y") {
+                        System.out.println("TEST2");
+                        Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
+                        startActivity(intent);
+                    }
+                }
+            }
+        };
 
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //is checked means it is server, not is client
-                if(serverOrClient.isChecked()){
-                    Intent intent = new Intent(MainActivity.this, ServerActivity.class);
-
-                    startActivity(intent);
-                }else{
-                    Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
-
-                    startActivity(intent);
-                }
+                Connecter c = new Connecter();
+                c.setOnConnectListener(listener);
+                c.execute();
             }
         });
 
         serverOrClient.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                TransitionManager.beginDelayedTransition(mainView);
                 if(serverOrClient.isChecked()){
                     keySearch.setVisibility(View.GONE);
                 }else{

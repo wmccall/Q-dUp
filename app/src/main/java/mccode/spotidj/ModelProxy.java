@@ -1,7 +1,11 @@
+package mccode.spotidj;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
+
+import mccode.spotidj.models.Item;
 
 /**
  * Client side model representation that communicates with
@@ -46,42 +50,24 @@ public class ModelProxy implements ViewListener{
      * @exception  IOException
      *     Thrown if an I/O error occurred.
      */
-    public void join(ViewProxy proxy, String name) throws IOException {
-        out.printf("join %s%n", name);
+//    public void join(ViewProxy proxy, String name) throws IOException {
+//        out.printf("join %s%n", name);
+//    }
+
+
+    @Override
+    public void addSong(Item song) throws IOException {
+
     }
 
-
-    /**
-     * stops the game if the window of a player is closed
-     *
-     * @exception  IOException
-     *     Thrown if an I/O error occurred.
-     */
     @Override
-    public void stop() throws IOException {
-        out.printf("stop%n");
+    public void removeSong(Item song) throws IOException {
+
     }
 
-    /**
-     * guess a letter
-     * @param name the name of the player guessing
-     * @param letter the guessed letter
-     * @exception  IOException
-     *     Thrown if an I/O error occurred.
-     */
     @Override
-    public void guess(String name, char letter) throws IOException {
-        out.printf("guess %s %c%n", name, letter);
-    }
+    public void moveSong(Item song, int newPosition) throws IOException {
 
-    /**
-     * starts a new game between two players
-     * @exception  IOException
-     *     Thrown if an I/O error occurred.
-     */
-    @Override
-    public void newGame() throws IOException {
-        out.printf("new%n");
     }
 
     /**
@@ -102,39 +88,11 @@ public class ModelProxy implements ViewListener{
                     String message = in.nextLine();
                     Scanner scanner = new Scanner (message);
                     String s = scanner.next();
-                    switch (s)
-                    {
-                        case "guess":
-                            String correct = scanner.next();
-                            String incorrect = scanner.next();
-                            String name = scanner.next();
-                            modelListener.guessed(correct, incorrect, name);
-                            break;
-                        case "new":
-                            correct = scanner.next();
-                            String currPlayer = scanner.next();
-                            modelListener.newGame(correct, currPlayer);
-                            break;
-                        case "close":
-                            modelListener.close();
-                            break;
-                        case "win":
-                            correct = scanner.next();
-                            String player = scanner.next();
-                            modelListener.winner(correct, player);
-                            break;
-                        case "wait":
-                            modelListener.waiting();
-                            break;
-                        default:
-                            System.err.println ("Bad message");
-                            break;
-                    }
                 }
             }
-            catch (IOException exc)
-            {
-            }
+//            catch (IOException exc)
+//            {
+//            }
             finally
             {
                 try

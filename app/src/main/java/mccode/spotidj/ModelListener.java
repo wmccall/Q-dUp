@@ -1,7 +1,10 @@
+package mccode.spotidj;
 
-import data.tracks.Item;
+
 
 import java.io.IOException;
+
+import mccode.spotidj.models.Item;
 
 /**
  * The controller interface that tells the view what the model changed

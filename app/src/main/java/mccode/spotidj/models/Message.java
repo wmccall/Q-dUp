@@ -1,4 +1,4 @@
-package data;
+package mccode.spotidj.models;
 
 import java.io.Serializable;
 

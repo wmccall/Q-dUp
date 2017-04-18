@@ -2,64 +2,31 @@
 package mccode.spotidj.models;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+import java.util.Map;
 
-public class Item implements Serializable, Parcelable
+public class Item implements Serializable
 {
 
     private Album album;
     private List<Artist_> artists = null;
-    private List<String> availableMarkets = null;
-    private Integer discNumber;
-    private Integer durationMs;
+    private List<String> available_markets = null;
+    private Integer disc_number;
+    private Integer duration_ms;
     private Boolean explicit;
-    private ExternalIds externalIds;
-    private ExternalUrls___ externalUrls;
+    private External_ids external_ids;
+    private External_urls___ external_urls;
     private String href;
     private String id;
     private String name;
     private Integer popularity;
-    private String previewUrl;
-    private Integer trackNumber;
+    private String preview_url;
+    private Integer track_number;
     private String type;
     private String uri;
-    public final static Parcelable.Creator<Item> CREATOR = new Creator<Item>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public Item createFromParcel(Parcel in) {
-            Item instance = new Item();
-            instance.album = ((Album) in.readValue((Album.class.getClassLoader())));
-            in.readList(instance.artists, (mccode.spotidj.models.Artist_.class.getClassLoader()));
-            in.readList(instance.availableMarkets, (java.lang.String.class.getClassLoader()));
-            instance.discNumber = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.durationMs = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.explicit = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.externalIds = ((ExternalIds) in.readValue((ExternalIds.class.getClassLoader())));
-            instance.externalUrls = ((ExternalUrls___) in.readValue((ExternalUrls___.class.getClassLoader())));
-            instance.href = ((String) in.readValue((String.class.getClassLoader())));
-            instance.id = ((String) in.readValue((String.class.getClassLoader())));
-            instance.name = ((String) in.readValue((String.class.getClassLoader())));
-            instance.popularity = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.previewUrl = ((String) in.readValue((String.class.getClassLoader())));
-            instance.trackNumber = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.type = ((String) in.readValue((String.class.getClassLoader())));
-            instance.uri = ((String) in.readValue((String.class.getClassLoader())));
-            return instance;
-        }
-
-        public Item[] newArray(int size) {
-            return (new Item[size]);
-        }
-
-    }
-    ;
-    private final static long serialVersionUID = -385979408704187575L;
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final static long serialVersionUID = 3815739687441664603L;
 
     /**
      * No args constructor for use in serialization
@@ -70,39 +37,39 @@ public class Item implements Serializable, Parcelable
 
     /**
      * 
-     * @param externalIds
+     * @param external_urls
+     * @param available_markets
+     * @param preview_url
+     * @param external_ids
      * @param album
-     * @param trackNumber
+     * @param duration_ms
      * @param type
      * @param uri
-     * @param discNumber
-     * @param previewUrl
+     * @param track_number
      * @param id
      * @param artists
-     * @param durationMs
+     * @param disc_number
      * @param explicit
-     * @param externalUrls
      * @param name
-     * @param availableMarkets
      * @param href
      * @param popularity
      */
-    public Item(Album album, List<Artist_> artists, List<String> availableMarkets, Integer discNumber, Integer durationMs, Boolean explicit, ExternalIds externalIds, ExternalUrls___ externalUrls, String href, String id, String name, Integer popularity, String previewUrl, Integer trackNumber, String type, String uri) {
+    public Item(Album album, List<Artist_> artists, List<String> available_markets, Integer disc_number, Integer duration_ms, Boolean explicit, External_ids external_ids, External_urls___ external_urls, String href, String id, String name, Integer popularity, String preview_url, Integer track_number, String type, String uri) {
         super();
         this.album = album;
         this.artists = artists;
-        this.availableMarkets = availableMarkets;
-        this.discNumber = discNumber;
-        this.durationMs = durationMs;
+        this.available_markets = available_markets;
+        this.disc_number = disc_number;
+        this.duration_ms = duration_ms;
         this.explicit = explicit;
-        this.externalIds = externalIds;
-        this.externalUrls = externalUrls;
+        this.external_ids = external_ids;
+        this.external_urls = external_urls;
         this.href = href;
         this.id = id;
         this.name = name;
         this.popularity = popularity;
-        this.previewUrl = previewUrl;
-        this.trackNumber = trackNumber;
+        this.preview_url = preview_url;
+        this.track_number = track_number;
         this.type = type;
         this.uri = uri;
     }
@@ -115,6 +82,11 @@ public class Item implements Serializable, Parcelable
         this.album = album;
     }
 
+    public Item withAlbum(Album album) {
+        this.album = album;
+        return this;
+    }
+
     public List<Artist_> getArtists() {
         return artists;
     }
@@ -123,28 +95,48 @@ public class Item implements Serializable, Parcelable
         this.artists = artists;
     }
 
-    public List<String> getAvailableMarkets() {
-        return availableMarkets;
+    public Item withArtists(List<Artist_> artists) {
+        this.artists = artists;
+        return this;
     }
 
-    public void setAvailableMarkets(List<String> availableMarkets) {
-        this.availableMarkets = availableMarkets;
+    public List<String> getAvailable_markets() {
+        return available_markets;
     }
 
-    public Integer getDiscNumber() {
-        return discNumber;
+    public void setAvailable_markets(List<String> available_markets) {
+        this.available_markets = available_markets;
     }
 
-    public void setDiscNumber(Integer discNumber) {
-        this.discNumber = discNumber;
+    public Item withAvailable_markets(List<String> available_markets) {
+        this.available_markets = available_markets;
+        return this;
     }
 
-    public Integer getDurationMs() {
-        return durationMs;
+    public Integer getDisc_number() {
+        return disc_number;
     }
 
-    public void setDurationMs(Integer durationMs) {
-        this.durationMs = durationMs;
+    public void setDisc_number(Integer disc_number) {
+        this.disc_number = disc_number;
+    }
+
+    public Item withDisc_number(Integer disc_number) {
+        this.disc_number = disc_number;
+        return this;
+    }
+
+    public Integer getDuration_ms() {
+        return duration_ms;
+    }
+
+    public void setDuration_ms(Integer duration_ms) {
+        this.duration_ms = duration_ms;
+    }
+
+    public Item withDuration_ms(Integer duration_ms) {
+        this.duration_ms = duration_ms;
+        return this;
     }
 
     public Boolean getExplicit() {
@@ -155,20 +147,35 @@ public class Item implements Serializable, Parcelable
         this.explicit = explicit;
     }
 
-    public ExternalIds getExternalIds() {
-        return externalIds;
+    public Item withExplicit(Boolean explicit) {
+        this.explicit = explicit;
+        return this;
     }
 
-    public void setExternalIds(ExternalIds externalIds) {
-        this.externalIds = externalIds;
+    public External_ids getExternal_ids() {
+        return external_ids;
     }
 
-    public ExternalUrls___ getExternalUrls() {
-        return externalUrls;
+    public void setExternal_ids(External_ids external_ids) {
+        this.external_ids = external_ids;
     }
 
-    public void setExternalUrls(ExternalUrls___ externalUrls) {
-        this.externalUrls = externalUrls;
+    public Item withExternal_ids(External_ids external_ids) {
+        this.external_ids = external_ids;
+        return this;
+    }
+
+    public External_urls___ getExternal_urls() {
+        return external_urls;
+    }
+
+    public void setExternal_urls(External_urls___ external_urls) {
+        this.external_urls = external_urls;
+    }
+
+    public Item withExternal_urls(External_urls___ external_urls) {
+        this.external_urls = external_urls;
+        return this;
     }
 
     public String getHref() {
@@ -179,12 +186,22 @@ public class Item implements Serializable, Parcelable
         this.href = href;
     }
 
+    public Item withHref(String href) {
+        this.href = href;
+        return this;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Item withId(String id) {
+        this.id = id;
+        return this;
     }
 
     public String getName() {
@@ -195,6 +212,11 @@ public class Item implements Serializable, Parcelable
         this.name = name;
     }
 
+    public Item withName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public Integer getPopularity() {
         return popularity;
     }
@@ -203,20 +225,35 @@ public class Item implements Serializable, Parcelable
         this.popularity = popularity;
     }
 
-    public String getPreviewUrl() {
-        return previewUrl;
+    public Item withPopularity(Integer popularity) {
+        this.popularity = popularity;
+        return this;
     }
 
-    public void setPreviewUrl(String previewUrl) {
-        this.previewUrl = previewUrl;
+    public String getPreview_url() {
+        return preview_url;
     }
 
-    public Integer getTrackNumber() {
-        return trackNumber;
+    public void setPreview_url(String preview_url) {
+        this.preview_url = preview_url;
     }
 
-    public void setTrackNumber(Integer trackNumber) {
-        this.trackNumber = trackNumber;
+    public Item withPreview_url(String preview_url) {
+        this.preview_url = preview_url;
+        return this;
+    }
+
+    public Integer getTrack_number() {
+        return track_number;
+    }
+
+    public void setTrack_number(Integer track_number) {
+        this.track_number = track_number;
+    }
+
+    public Item withTrack_number(Integer track_number) {
+        this.track_number = track_number;
+        return this;
     }
 
     public String getType() {
@@ -227,6 +264,11 @@ public class Item implements Serializable, Parcelable
         this.type = type;
     }
 
+    public Item withType(String type) {
+        this.type = type;
+        return this;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -235,27 +277,22 @@ public class Item implements Serializable, Parcelable
         this.uri = uri;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(album);
-        dest.writeList(artists);
-        dest.writeList(availableMarkets);
-        dest.writeValue(discNumber);
-        dest.writeValue(durationMs);
-        dest.writeValue(explicit);
-        dest.writeValue(externalIds);
-        dest.writeValue(externalUrls);
-        dest.writeValue(href);
-        dest.writeValue(id);
-        dest.writeValue(name);
-        dest.writeValue(popularity);
-        dest.writeValue(previewUrl);
-        dest.writeValue(trackNumber);
-        dest.writeValue(type);
-        dest.writeValue(uri);
+    public Item withUri(String uri) {
+        this.uri = uri;
+        return this;
     }
 
-    public int describeContents() {
-        return  0;
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public Item withAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

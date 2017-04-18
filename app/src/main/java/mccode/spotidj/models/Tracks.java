@@ -2,12 +2,11 @@
 package mccode.spotidj.models;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+import java.util.Map;
 
-public class Tracks implements Serializable, Parcelable
+public class Tracks implements Serializable
 {
 
     private String href;
@@ -17,31 +16,8 @@ public class Tracks implements Serializable, Parcelable
     private Integer offset;
     private Object previous;
     private Integer total;
-    public final static Parcelable.Creator<Tracks> CREATOR = new Creator<Tracks>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public Tracks createFromParcel(Parcel in) {
-            Tracks instance = new Tracks();
-            instance.href = ((String) in.readValue((String.class.getClassLoader())));
-            in.readList(instance.items, (mccode.spotidj.models.Item.class.getClassLoader()));
-            instance.limit = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.next = ((String) in.readValue((String.class.getClassLoader())));
-            instance.offset = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.previous = ((Object) in.readValue((Object.class.getClassLoader())));
-            instance.total = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            return instance;
-        }
-
-        public Tracks[] newArray(int size) {
-            return (new Tracks[size]);
-        }
-
-    }
-    ;
-    private final static long serialVersionUID = 3690002167447563252L;
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final static long serialVersionUID = 6530690084933129786L;
 
     /**
      * No args constructor for use in serialization
@@ -79,12 +55,22 @@ public class Tracks implements Serializable, Parcelable
         this.href = href;
     }
 
+    public Tracks withHref(String href) {
+        this.href = href;
+        return this;
+    }
+
     public List<Item> getItems() {
         return items;
     }
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public Tracks withItems(List<Item> items) {
+        this.items = items;
+        return this;
     }
 
     public Integer getLimit() {
@@ -95,12 +81,22 @@ public class Tracks implements Serializable, Parcelable
         this.limit = limit;
     }
 
+    public Tracks withLimit(Integer limit) {
+        this.limit = limit;
+        return this;
+    }
+
     public String getNext() {
         return next;
     }
 
     public void setNext(String next) {
         this.next = next;
+    }
+
+    public Tracks withNext(String next) {
+        this.next = next;
+        return this;
     }
 
     public Integer getOffset() {
@@ -111,12 +107,22 @@ public class Tracks implements Serializable, Parcelable
         this.offset = offset;
     }
 
+    public Tracks withOffset(Integer offset) {
+        this.offset = offset;
+        return this;
+    }
+
     public Object getPrevious() {
         return previous;
     }
 
     public void setPrevious(Object previous) {
         this.previous = previous;
+    }
+
+    public Tracks withPrevious(Object previous) {
+        this.previous = previous;
+        return this;
     }
 
     public Integer getTotal() {
@@ -127,18 +133,22 @@ public class Tracks implements Serializable, Parcelable
         this.total = total;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(href);
-        dest.writeList(items);
-        dest.writeValue(limit);
-        dest.writeValue(next);
-        dest.writeValue(offset);
-        dest.writeValue(previous);
-        dest.writeValue(total);
+    public Tracks withTotal(Integer total) {
+        this.total = total;
+        return this;
     }
 
-    public int describeContents() {
-        return  0;
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public Tracks withAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

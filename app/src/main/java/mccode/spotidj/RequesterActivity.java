@@ -2,36 +2,29 @@ package mccode.spotidj;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.spotify.sdk.android.authentication.AuthenticationRequest;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.player.Config;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
+
+import mccode.spotidj.models.Artist_;
+import mccode.spotidj.models.Item;
+import mccode.spotidj.models.ResponseWrapper;
+import mccode.spotidj.models.TrackResponse;
 
 import static mccode.spotidj.MainActivity.mPlayer;
 
@@ -55,24 +48,47 @@ public class RequesterActivity extends Activity implements
         setContentView(R.layout.type_requester);
         final Button find = (Button) findViewById(R.id.find_button);
         final EditText search = (EditText) findViewById(R.id.search_bar);
-        final EditText searchResultView = (EditText) findViewById(R.id.search_result);
+        //final EditText searchResultView = (EditText) findViewById(R.id.search_result);
+        final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
         loadingCircle.setVisibility(View.GONE);
-        final TrackCreaterListener createrListener= new TrackCreaterListener() {
+        final TrackCreaterListener createrListener = new TrackCreaterListener() {
             @Override
-            public void onCreateSucceeded(View v, final TrackSearchResult t) {
-                searchResultView.setText("artist: "+ t.getArtistName() +"\ntrackID: " + t.getTrackID() +"\ntrackName"+ t.getTrackName());
-                searchResultView.setOnClickListener(new View.OnClickListener(){
-                    public void onClick(View v) {
-                        mPlayer.playUri(null, "spotify:track:" + t.getTrackID(), 0, 0);
+            public void onCreateSucceeded(View v, final TrackResponse t) {
+                int j = 0;
+                for(final Item i: t.getTracks().getItems()){
+                    System.out.println(i.getId());
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    Button btn = new Button(getApplicationContext());
+                    btn.setId(j);
+                    String artists = "";
+                    int size = i.getArtists().size();
+                    artists = i.getArtists().get(0).getName();
+                    if(size > 1){
+                        for(int k = 1; k < size; k++){
+                            artists += ", " + i.getArtists().get(k).getName();
+                        }
                     }
-                });
+                    btn.setText(artists + ": " +i.getName());
+                    btn.setBackgroundColor(Color.rgb(60, 242, 118));
+                    btn.setTextColor(Color.rgb(35, 35, 35));
+                    searchResultView.addView(btn, params);
+                    Button tmpbtn = ((Button) findViewById(j));
+                    tmpbtn.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View view){
+                            mPlayer.playUri(null, i.getUri(), 0, 0);
+                        }
+                    });
+                    j++;
+                }
             }
         };
         final SearchListener listener = new SearchListener() {
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
-                searchResult = result;
+                new ResponseWrapper(result, createrListener, searchResultView);
 //                String resultstring = new String();
 //                String rsnoline = new String();
 //                for(Iterator<String> i = searchResult.iterator(); i.hasNext();){
@@ -84,8 +100,7 @@ public class RequesterActivity extends Activity implements
 //                searchResultView.setText(resultstring);
 //                System.out.println(rsnoline);
                 loadingCircle.setVisibility(View.GONE);
-                TrackSearchResult track = new TrackSearchResult(searchResult, createrListener, searchResultView);
-
+                //TrackSearchResult track = new TrackSearchResult(searchResult, createrListener, searchResultView);
 
             }
         };
@@ -93,15 +108,18 @@ public class RequesterActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                mPlayer.pause(null);
-                loadingCircle.setVisibility(View.VISIBLE);
-                String p = search.getText().toString();
-                System.out.println(p);
-                p = p.replaceAll("\\s{2,}", " ").trim();
-                p = p.replaceAll(" ", "%20");
-                SearchReader search = new SearchReader();
-                search.setOnSearchListener(listener);
-                search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track&limit=2");
+                String p = search.getText().toString().trim();
+                if (p.length()>0) {
+                    mPlayer.pause(null);
+                    searchResultView.removeAllViews();
+                    loadingCircle.setVisibility(View.VISIBLE);
+                    System.out.println(p);
+                    p = p.replaceAll("\\s{2,}", " ").trim();
+                    p = p.replaceAll(" ", "%20");
+                    SearchReader search = new SearchReader();
+                    search.setOnSearchListener(listener);
+                    search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                }
             }
         });
     }

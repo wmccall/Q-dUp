@@ -2,43 +2,20 @@
 package mccode.spotidj.models;
 
 import java.io.Serializable;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Artist implements Serializable, Parcelable
+public class Artist implements Serializable
 {
 
-    private ExternalUrls externalUrls;
+    private External_urls external_urls;
     private String href;
     private String id;
     private String name;
     private String type;
     private String uri;
-    public final static Parcelable.Creator<Artist> CREATOR = new Creator<Artist>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public Artist createFromParcel(Parcel in) {
-            Artist instance = new Artist();
-            instance.externalUrls = ((ExternalUrls) in.readValue((ExternalUrls.class.getClassLoader())));
-            instance.href = ((String) in.readValue((String.class.getClassLoader())));
-            instance.id = ((String) in.readValue((String.class.getClassLoader())));
-            instance.name = ((String) in.readValue((String.class.getClassLoader())));
-            instance.type = ((String) in.readValue((String.class.getClassLoader())));
-            instance.uri = ((String) in.readValue((String.class.getClassLoader())));
-            return instance;
-        }
-
-        public Artist[] newArray(int size) {
-            return (new Artist[size]);
-        }
-
-    }
-    ;
-    private final static long serialVersionUID = -2030510602818306146L;
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final static long serialVersionUID = 4408550435184883578L;
 
     /**
      * No args constructor for use in serialization
@@ -50,15 +27,15 @@ public class Artist implements Serializable, Parcelable
     /**
      * 
      * @param id
-     * @param externalUrls
+     * @param external_urls
      * @param name
      * @param type
      * @param uri
      * @param href
      */
-    public Artist(ExternalUrls externalUrls, String href, String id, String name, String type, String uri) {
+    public Artist(External_urls external_urls, String href, String id, String name, String type, String uri) {
         super();
-        this.externalUrls = externalUrls;
+        this.external_urls = external_urls;
         this.href = href;
         this.id = id;
         this.name = name;
@@ -66,12 +43,17 @@ public class Artist implements Serializable, Parcelable
         this.uri = uri;
     }
 
-    public ExternalUrls getExternalUrls() {
-        return externalUrls;
+    public External_urls getExternal_urls() {
+        return external_urls;
     }
 
-    public void setExternalUrls(ExternalUrls externalUrls) {
-        this.externalUrls = externalUrls;
+    public void setExternal_urls(External_urls external_urls) {
+        this.external_urls = external_urls;
+    }
+
+    public Artist withExternal_urls(External_urls external_urls) {
+        this.external_urls = external_urls;
+        return this;
     }
 
     public String getHref() {
@@ -82,12 +64,22 @@ public class Artist implements Serializable, Parcelable
         this.href = href;
     }
 
+    public Artist withHref(String href) {
+        this.href = href;
+        return this;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Artist withId(String id) {
+        this.id = id;
+        return this;
     }
 
     public String getName() {
@@ -98,12 +90,22 @@ public class Artist implements Serializable, Parcelable
         this.name = name;
     }
 
+    public Artist withName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Artist withType(String type) {
+        this.type = type;
+        return this;
     }
 
     public String getUri() {
@@ -114,17 +116,22 @@ public class Artist implements Serializable, Parcelable
         this.uri = uri;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(externalUrls);
-        dest.writeValue(href);
-        dest.writeValue(id);
-        dest.writeValue(name);
-        dest.writeValue(type);
-        dest.writeValue(uri);
+    public Artist withUri(String uri) {
+        this.uri = uri;
+        return this;
     }
 
-    public int describeContents() {
-        return  0;
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public Artist withAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

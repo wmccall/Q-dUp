@@ -4,10 +4,12 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import mccode.spotidj.models.TrackResponse;
+
 /**
  * Created by mammo on 3/24/2017.
  */
 
 public interface TrackCreaterListener {
-    public void onCreateSucceeded(View result, TrackSearchResult t);
+    public void onCreateSucceeded(View result, TrackResponse t);
 }

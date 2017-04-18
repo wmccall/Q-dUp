@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import mccode.spotidj.TrackCreaterListener;
 
+import static mccode.spotidj.MainActivity.mapper;
+
 /**
  * Created by mammo on 4/17/2017.
  */
@@ -27,7 +29,7 @@ public class ResponseWrapper {
             tot += s;
         }
         System.out.println(tot);
-        ObjectMapper mapper = new ObjectMapper();
+//        ObjectMapper mapper = new ObjectMapper();
         try{
             response = mapper.readValue(tot, TrackResponse.class);
         }catch (JsonParseException e) { e.printStackTrace();}

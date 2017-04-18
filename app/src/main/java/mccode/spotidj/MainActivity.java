@@ -22,9 +22,8 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.util.ArrayList;
 
 public class MainActivity extends Activity implements
@@ -32,14 +31,14 @@ public class MainActivity extends Activity implements
 {
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
     private static final String REDIRECT_URI = "mccode-spotidj://callback";
-    public static final String HOST = "mammothtr0n.student.rit.edu";
-    public static int PORT = 5000;
+    private static final String HOST = "mammothtr0n.student.rit.edu";
+    private static int PORT = 5000;
     public static ModelProxy mp;
+    public static ObjectMapper mapper = new ObjectMapper();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
-
     public static Player mPlayer;
 
     @Override
@@ -120,20 +119,19 @@ public class MainActivity extends Activity implements
         final EditText keySearch = (EditText) findViewById(R.id.key_search);
         final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
 
-
         final ConnectListener listener = new ConnectListener() {
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
                 //is checked means it is server, not is client
                 if(serverOrClient.isChecked()){
                     if(result.get(0)=="Y"){
-                        System.out.println("TEST1");
                         Intent intent = new Intent(MainActivity.this, ServerActivity.class);
                         startActivity(intent);
                     }
                 }else{
                     if(result.get(0)=="Y") {
-                        System.out.println("TEST2");
+                        //TODO:Relocate so no network on main
+                        //mp.join("ABF$S");
                         Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
                         startActivity(intent);
                     }
@@ -144,7 +142,7 @@ public class MainActivity extends Activity implements
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Connecter c = new Connecter();
+                Connector c = new Connector();
                 c.setOnConnectListener(listener);
                 c.execute();
             }
@@ -153,11 +151,7 @@ public class MainActivity extends Activity implements
         serverOrClient.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 TransitionManager.beginDelayedTransition(mainView);
-                if(serverOrClient.isChecked()){
-                    keySearch.setVisibility(View.GONE);
-                }else{
-                    keySearch.setVisibility(View.VISIBLE);
-                }
+                keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
             }
         });
     }
@@ -180,5 +174,13 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
+    }
+
+    public static String getHost(){
+        return HOST;
+    }
+
+    public static int getPort(){
+        return PORT;
     }
 }

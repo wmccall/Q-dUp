@@ -6,6 +6,9 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import mccode.spotidj.models.Item;
+import mccode.spotidj.models.Message;
+
+import static mccode.spotidj.MainActivity.mapper;
 
 /**
  * Client side model representation that communicates with
@@ -43,16 +46,25 @@ public class ModelProxy implements ViewListener{
         new ReaderThread() .start();
     }
 
-    /**
-     * joins a session
-     * @param proxy reference to a viewProxy
-     * @param name name of the player
-     * @exception  IOException
-     *     Thrown if an I/O error occurred.
-     */
+//    /**
+//     * joins a session
+//     * @param proxy reference to a viewProxy
+//     * @param name name of the player
+//     * @exception  IOException
+//     *     Thrown if an I/O error occurred.
+//     */
 //    public void join(ViewProxy proxy, String name) throws IOException {
 //        out.printf("join %s%n", name);
 //    }
+    public void join(String key){
+        try {
+            Message m = new Message(2, "", key);
+            String json = mapper.writeValueAsString(m);
+            this.out.write(json.getBytes(), 0, json.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
@@ -69,13 +81,10 @@ public class ModelProxy implements ViewListener{
     public void moveSong(Item song, int newPosition) throws IOException {
 
     }
-
     /**
      * class used to read the commands from the clients
      */
-    private class ReaderThread
-            extends Thread
-    {
+    private class ReaderThread extends Thread{
         /**
          * runs the thread that is constantly reading incoming messages
          */

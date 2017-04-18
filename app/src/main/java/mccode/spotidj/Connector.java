@@ -11,14 +11,14 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static mccode.spotidj.MainActivity.HOST;
-import static mccode.spotidj.MainActivity.PORT;
+import static mccode.spotidj.MainActivity.getHost;
+import static mccode.spotidj.MainActivity.getPort;
 import static mccode.spotidj.MainActivity.mp;
 /**
  * Created by mammo on 3/24/2017.
  */
 
-public class Connecter extends AsyncTask<String, Integer, ArrayList<String>> {
+public class Connector extends AsyncTask<String, Integer, ArrayList<String>> {
 
     private ArrayList<String> response = new ArrayList<String>();
     ConnectListener listener;
@@ -31,17 +31,15 @@ public class Connecter extends AsyncTask<String, Integer, ArrayList<String>> {
     protected ArrayList<String> doInBackground(String... strings) {
         Socket socket = new Socket();
         try {
-            socket.connect(new InetSocketAddress(HOST, PORT));
+            socket.connect(new InetSocketAddress(getHost(), getPort()));
             mp = new ModelProxy(socket);
-            System.out.println("TEST");
+            mp.join("ABF$S");
             //TODO: connor needs to do server work here
-            ArrayList<String> list = new ArrayList<String>();
-            list.add("Y");
-            return list;
+            response.add("Y");
+            return response;
         } catch (IOException e) {
-            ArrayList<String> list = new ArrayList<String>();
-            list.add("N");
-            return list;
+            response.add("N");
+            return response;
         }
     }
     protected void onProgressUpdate() {

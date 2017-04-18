@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.view.View;
+import android.widget.EditText;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -106,6 +107,7 @@ public class MainActivity extends Activity implements
 
         final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
         final Button confirmType = (Button) findViewById(R.id.confirmType);
+        final EditText keySearch = (EditText) findViewById(R.id.key_search);
 
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,23 +115,25 @@ public class MainActivity extends Activity implements
                 //is checked means it is server, not is client
                 if(serverOrClient.isChecked()){
                     Intent intent = new Intent(MainActivity.this, ServerActivity.class);
+
                     startActivity(intent);
                 }else{
                     Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
+
                     startActivity(intent);
                 }
             }
         });
 
-//        serverOrClient.setOnClickListener(new View.OnClickListener(){
-//            public void onClick(View v){
-//                if(serverOrClient.isChecked()){
-//                    mPlayer.pause(null);
-//                }else{
-//                    mPlayer.resume(null);
-//                }
-//            }
-//        });
+        serverOrClient.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                if(serverOrClient.isChecked()){
+                    keySearch.setVisibility(View.GONE);
+                }else{
+                    keySearch.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override

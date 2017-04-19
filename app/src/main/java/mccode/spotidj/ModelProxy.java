@@ -59,7 +59,7 @@ public class ModelProxy implements ViewListener{
     public void join(String key){
         try {
             Message m = new Message(2, "", key);
-            String json = mapper.writeValueAsString(m);
+            String json = mapper.writeValueAsString(m) + "\n";
             this.out.write(json.getBytes(), 0, json.length());
         } catch (IOException e) {
             e.printStackTrace();

@@ -2,17 +2,15 @@ package mccode.spotidj;
 
 import android.os.AsyncTask;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
 import java.util.ArrayList;
 
+import mccode.spotidj.Utils.ModelProxy;
+
 import static mccode.spotidj.MainActivity.getHost;
-import static mccode.spotidj.MainActivity.getPort;
+import static mccode.spotidj.MainActivity.getCPort;
 import static mccode.spotidj.MainActivity.mp;
 /**
  * Created by mammo on 3/24/2017.
@@ -31,7 +29,8 @@ public class Connector extends AsyncTask<String, Integer, ArrayList<String>> {
     protected ArrayList<String> doInBackground(String... strings) {
         Socket socket = new Socket();
         try {
-            socket.connect(new InetSocketAddress(getHost(), getPort()));
+            socket.connect(new InetSocketAddress(getHost(), getCPort()));
+            socket.getOutputStream();
             mp = new ModelProxy(socket);
             mp.join("ABF$S");
             //TODO: connor needs to do server work here

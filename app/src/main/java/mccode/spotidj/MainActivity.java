@@ -24,6 +24,7 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import java.net.Socket;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientConnector;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity implements
     public static String key = "";
     public static ModelProxy mp;
     public static ObjectMapper mapper = new ObjectMapper();
+    public static Socket routerSocket = new Socket();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -131,9 +133,9 @@ public class MainActivity extends Activity implements
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
                 //is checked means it is server, not is client
-                if(result.get(0)!="NA") {
+                if(!result.get(0).equals("NA")) {
+                    key = result.get(0);
                     if(serverOrClient.isChecked()){
-                        key = result.get(0);
                         Intent intent = new Intent(MainActivity.this, ServerActivity.class);
                         startActivity(intent);
                     }else{

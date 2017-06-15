@@ -18,6 +18,7 @@ import mccode.spotidj.Utils.ModelProxy;
 import static mccode.spotidj.MainActivity.getCPort;
 import static mccode.spotidj.MainActivity.getHost;
 import static mccode.spotidj.MainActivity.mp;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/12/2017.
@@ -41,16 +42,18 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
-        String connectKey = strings[0];
-        Socket socket = new Socket();
+        //String connectKey = strings[0];
+        //Socket socket = new Socket();
         boolean connected = false;
         boolean attempted = false;
         int port = 0;
+        boolean exists = false;
+        String routerResponse = "";
         while(!connected)
         {
             try
             {
-                socket.connect(new InetSocketAddress(getHost(), getCPort()));
+                routerSocket.connect(new InetSocketAddress(getHost(), getCPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone
@@ -76,28 +79,40 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
 
             if(connected)
             {
+                System.out.println("1");
                 try
                 {
-                    PrintStream out = new PrintStream(socket.getOutputStream());
-                    out.write(("client:"+connectKey).getBytes());
-                    Scanner in = new Scanner(socket.getInputStream());
-                    String routerResponse = in.nextLine();
+                    System.out.println("2");
+                    PrintStream out = new PrintStream(routerSocket.getOutputStream());
+                    System.out.println("3");
+                    out.write((this.key).getBytes());
+                    System.out.println("4");
+                    Scanner in = new Scanner(routerSocket.getInputStream());
+                    System.out.println("5");
+                    routerResponse = in.nextLine();
+                    System.out.println("6");
                     if (routerResponse.equals("NA"))
                     {
+                        System.out.println("7");
                         response.add(routerResponse);
                         in.close();
-                        socket.close();
+                        out.close();
+                        routerSocket.close();
+                        routerSocket = new Socket();
                         return response;
                     }
                     else
                     {
-                        port = Integer.parseInt( routerResponse);
+                        System.out.println("8");
+                        response.add(routerResponse);
                     }
                     in.close();
-                    socket.close();
+                    out.close();
                 }
                 catch (IOException e)
                 {
+                    System.out.println("9");
+                    System.out.println(e.toString());
                     if(!attempted)
                     {
                         System.out.println("Waiting for router");
@@ -115,7 +130,6 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 }
             }
         }
-        response.add("" + port);
         return response;
     }
     protected void onProgressUpdate()

@@ -14,6 +14,7 @@ import mccode.spotidj.ConnectListener;
 
 import static mccode.spotidj.MainActivity.getSPort;
 import static mccode.spotidj.MainActivity.getHost;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/13/2017.
@@ -22,7 +23,7 @@ import static mccode.spotidj.MainActivity.getHost;
 public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String>> {
     private ArrayList<String> response = new ArrayList<String>();
     ConnectListener listener;
-
+    private static int localPort = 50000;
     public void setOnConnectListener(ConnectListener listener){
         this.listener = listener;
     }
@@ -30,7 +31,7 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
-        Socket socket = new Socket();
+        //Socket socket = new Socket();
         boolean connected = false;
         boolean attempted = false;
         String connectKey = "";
@@ -38,7 +39,9 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
         {
             try
             {
-                socket.connect(new InetSocketAddress(getHost(), getSPort()));
+                System.out.println(getHost());
+                System.out.println(getSPort());
+                routerSocket.connect(new InetSocketAddress(getHost(), getSPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone
@@ -47,19 +50,20 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             }
             catch (IOException e)
             {
+                System.out.println("0");
                 if(!attempted)
                 {
                     System.out.println("Waiting for router");
                     attempted = true;
                 }
-                try
-                {
-                    this.wait(1000);
-                }
-                catch(InterruptedException f)
-                {
-
-                }
+//                try
+//                {
+//                    this.wait(1000);
+//                }
+//                catch(InterruptedException f)
+//                {
+//
+//                }
             }
             System.out.println("1");
             if(connected)
@@ -68,11 +72,11 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                 try
                 {
                     System.out.println("3");
-                    PrintStream out = new PrintStream(socket.getOutputStream());
+                    PrintStream out = new PrintStream(routerSocket.getOutputStream());
                     System.out.println("4");
                     out.write(("server").getBytes());
                     System.out.println("5");
-                    Scanner in = new Scanner(socket.getInputStream());
+                    Scanner in = new Scanner(routerSocket.getInputStream());
                     System.out.println("6");
                     String routerResponse = in.nextLine();
                     System.out.println("7");
@@ -81,7 +85,8 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                         System.out.println("8");
                         response.add(routerResponse);
                         in.close();
-                        socket.close();
+                        routerSocket.close();
+                        routerSocket = new Socket();
                         return response;
                     }
                     else
@@ -91,7 +96,6 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                         System.out.println(connectKey);
                     }
                     in.close();
-                    socket.close();
                 }
                 catch (IOException e)
                 {

@@ -24,17 +24,27 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import java.net.Socket;
 import java.util.ArrayList;
+
+import mccode.spotidj.Utils.Client.ClientConnector;
+import mccode.spotidj.Utils.ModelProxy;
+import mccode.spotidj.Utils.Server.ServerConnector;
 
 public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
     private static final String REDIRECT_URI = "mccode-spotidj://callback";
-    private static final String HOST = "mammothtr0n.student.rit.edu";
-    private static int PORT = 5000;
+    //private static final String HOST = "mammothtr0n.student.rit.edu";
+    private static final String HOST = "spotidjrouter.ddns.net";
+    //private static int CPORT = 5000;
+    private static int CPORT = 16455;
+    private static int SPORT = 16456;
+    public static String key = "";
     public static ModelProxy mp;
     public static ObjectMapper mapper = new ObjectMapper();
+    public static Socket routerSocket = new Socket();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -123,15 +133,12 @@ public class MainActivity extends Activity implements
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
                 //is checked means it is server, not is client
-                if(serverOrClient.isChecked()){
-                    if(result.get(0)=="Y"){
+                if(!result.get(0).equals("NA")) {
+                    key = result.get(0);
+                    if(serverOrClient.isChecked()){
                         Intent intent = new Intent(MainActivity.this, ServerActivity.class);
                         startActivity(intent);
-                    }
-                }else{
-                    if(result.get(0)=="Y") {
-                        //TODO:Relocate so no network on main
-                        //mp.join("ABF$S");
+                    }else{
                         Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
                         startActivity(intent);
                     }
@@ -142,9 +149,16 @@ public class MainActivity extends Activity implements
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Connector c = new Connector();
-                c.setOnConnectListener(listener);
-                c.execute();
+                if(serverOrClient.isChecked()){
+                    ServerConnector s = new ServerConnector();
+                    s.setOnConnectListener(listener);
+                    s.execute();
+                }else{
+                    key = keySearch.getText().toString();
+                    ClientConnector c = new ClientConnector(key);
+                    c.setOnConnectListener(listener);
+                    c.execute();
+                }
             }
         });
 
@@ -180,7 +194,9 @@ public class MainActivity extends Activity implements
         return HOST;
     }
 
-    public static int getPort(){
-        return PORT;
+    public static int getCPort(){
+        return CPORT;
     }
+
+    public static int getSPort() { return SPORT;}
 }

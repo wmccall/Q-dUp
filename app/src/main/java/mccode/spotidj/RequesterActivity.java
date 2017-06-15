@@ -21,12 +21,14 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.ArrayList;
 
+import mccode.spotidj.Utils.Client.ClientWriter;
 import mccode.spotidj.models.Artist_;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
 
 import static mccode.spotidj.MainActivity.mPlayer;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 public class RequesterActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -51,6 +53,7 @@ public class RequesterActivity extends Activity implements
         //final EditText searchResultView = (EditText) findViewById(R.id.search_result);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
+        final ClientWriter w = new ClientWriter(routerSocket);
         loadingCircle.setVisibility(View.GONE);
         final TrackCreaterListener createrListener = new TrackCreaterListener() {
             @Override
@@ -71,14 +74,15 @@ public class RequesterActivity extends Activity implements
                             artists += ", " + i.getArtists().get(k).getName();
                         }
                     }
-                    btn.setText(artists + ": " +i.getName());
+                    btn.setText(j + ". " + artists + ": " +i.getName());
                     btn.setBackgroundColor(Color.rgb(60, 242, 118));
                     btn.setTextColor(Color.rgb(35, 35, 35));
                     searchResultView.addView(btn, params);
                     Button tmpbtn = ((Button) findViewById(j));
                     tmpbtn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                            mPlayer.playUri(null, i.getUri(), 0, 0);
+                            //mPlayer.playUri(null, i.getUri(), 0, 0);
+                            //w.execute(i.getUri());
                         }
                     });
                     j++;

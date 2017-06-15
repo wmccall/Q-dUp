@@ -51,7 +51,6 @@
         android:layout_marginTop="5dp"
         android:ems="10"
         android:hint="Server Key"
-        android:inputType="textCapCharacters"
         android:textAlignment="center"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"

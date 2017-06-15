@@ -1,10 +1,12 @@
-package mccode.spotidj;
+package mccode.spotidj.Utils;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
+import mccode.spotidj.ModelListener;
+import mccode.spotidj.ViewListener;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.Message;
 
@@ -16,7 +18,7 @@ import static mccode.spotidj.MainActivity.mapper;
  * @author Connor McAuliffe
  * @version 4/2/2017
  */
-public class ModelProxy implements ViewListener{
+public class ModelProxy implements ViewListener {
 
     private ModelListener modelListener;
     private Socket socket;

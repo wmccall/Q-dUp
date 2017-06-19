@@ -13,7 +13,12 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import mccode.spotidj.Utils.MessageListener;
+import mccode.spotidj.Utils.Server.ServerListener;
+
 import static mccode.spotidj.MainActivity.key;
+import static mccode.spotidj.MainActivity.mPlayer;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -25,7 +30,7 @@ public class ServerActivity extends Activity implements
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
 
-    private Player mPlayer;
+    //private Player mPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,18 @@ public class ServerActivity extends Activity implements
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
         System.out.println("WOW" +key);
         serverKey.setText(key);
+        final MessageListener ml = new MessageListener(){
+
+            @Override
+            public void onMessageSucceeded(String result) {
+                mPlayer.playUri(null, result, 0, 0);
+            }
+        };
+
+        ServerListener listener = new ServerListener();
+        listener.setOnServerListnerListener(ml);
+
+        listener.execute();
     }
 
     @Override

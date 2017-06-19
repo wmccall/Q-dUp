@@ -22,23 +22,28 @@ import static mccode.spotidj.MainActivity.routerSocket;
 public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
 {
     private ArrayList<String> response = new ArrayList<String>();
-    Socket socket;
-    ConnectListener listener;
+    //ConnectListener listener;
 
-    public ClientWriter(Socket s)
-    {
-        this.socket = s;
+    public ClientWriter(){
     }
 
-    public void setOnClientWriterListener(ConnectListener listener){
-        this.listener = listener;
-    }
+    //public void setOnClientWriterListener(ConnectListener listener){
+    //    this.listener = listener;
+    //}
 
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
+        PrintStream out;
+        try {
+            out = new PrintStream(routerSocket.getOutputStream());
+            System.out.println(strings[0]);
+            out.write(strings[0].getBytes());
+        } catch (IOException e) {
+            System.out.println("whoops");
+        }
 
-       return response;
+        return response;
     }
     protected void onProgressUpdate()
     {
@@ -52,6 +57,6 @@ public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
     protected void onPostExecute(ArrayList<String> result)
     {
         //called after doInBackground() has finished
-        listener.onConnectSucceeded(result);
+        //listener.onConnectSucceeded(result);
     }
 }

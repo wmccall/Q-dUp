@@ -46,6 +46,7 @@ public class MainActivity extends Activity implements
     public static ObjectMapper mapper = new ObjectMapper();
     public static Socket routerSocket;
     public static String responseToken = "";
+    public static boolean stopped = false;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer

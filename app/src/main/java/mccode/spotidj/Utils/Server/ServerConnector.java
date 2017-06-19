@@ -95,7 +95,7 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                         connectKey = routerResponse;
                         System.out.println(connectKey);
                     }
-                    in.close();
+                    //in.close();
                 }
                 catch (IOException e)
                 {
@@ -105,14 +105,14 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                         attempted = true;
                         connected = false;
                     }
-                    try
-                    {
-                        this.wait(1000);
-                    }
-                    catch(InterruptedException f)
-                    {
-
-                    }
+//                    try
+//                    {
+//                        this.wait(1000);
+//                    }
+//                    catch(InterruptedException f)
+//                    {
+//
+//                    }
                 }
             }
         }

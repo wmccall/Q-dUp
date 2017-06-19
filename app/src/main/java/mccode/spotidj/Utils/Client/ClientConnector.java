@@ -99,8 +99,8 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                     {
                         response.add(routerResponse);
                     }
-                    in.close();
-                    out.close();
+//                    in.close();
+//                    out.close();
                 }
                 catch (IOException e)
                 {
@@ -111,14 +111,14 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                         attempted = true;
                         connected = false;
                     }
-                    try
-                    {
-                        this.wait(1000);
-                    }
-                    catch(InterruptedException f)
-                    {
-
-                    }
+//                    try
+//                    {
+//                        this.wait(1000);
+//                    }
+//                    catch(InterruptedException f)
+//                    {
+//
+//                    }
                 }
             }
         }

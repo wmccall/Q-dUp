@@ -53,7 +53,7 @@ public class RequesterActivity extends Activity implements
         //final EditText searchResultView = (EditText) findViewById(R.id.search_result);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
-        final ClientWriter w = new ClientWriter();
+        //final ClientWriter w = new ClientWriter();
         loadingCircle.setVisibility(View.GONE);
         final TrackCreaterListener createrListener = new TrackCreaterListener() {
             @Override
@@ -81,6 +81,7 @@ public class RequesterActivity extends Activity implements
                     tmpbtn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
                             //mPlayer.playUri(null, i.getUri(), 0, 0);
+                            ClientWriter w = new ClientWriter();
                             w.execute(i.getUri());
                         }
                     });

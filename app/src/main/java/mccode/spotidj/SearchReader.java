@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,18 +28,20 @@ public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> 
         URL url = null;
         try {
             url = new URL(strings[0]);
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        System.out.println(url.toString());
         try{
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("Authorization", "Bearer " + MainActivity.responseToken);
             BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
+                    new InputStreamReader(conn.getInputStream()));
 
             String inputLine;
-            while ((inputLine = in.readLine()) != null)
-                //System.out.println(inputLine);
+            while ((inputLine = in.readLine()) != null) {
                 response.add(inputLine);
+            }
             in.close();
         } catch (IOException e) {
             e.printStackTrace();

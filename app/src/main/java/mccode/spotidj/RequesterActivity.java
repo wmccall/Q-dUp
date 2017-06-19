@@ -60,7 +60,6 @@ public class RequesterActivity extends Activity implements
             public void onCreateSucceeded(View v, final TrackResponse t) {
                 int j = 0;
                 for(final Item i: t.getTracks().getItems()){
-                    System.out.println(i.getId());
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -93,19 +92,7 @@ public class RequesterActivity extends Activity implements
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
                 new ResponseWrapper(result, createrListener, searchResultView);
-//                String resultstring = new String();
-//                String rsnoline = new String();
-//                for(Iterator<String> i = searchResult.iterator(); i.hasNext();){
-//                    String line = i.next();
-//                    resultstring += line;
-//                    resultstring += '\n';
-//                }
-//                loadingCircle.setVisibility(View.GONE);
-//                searchResultView.setText(resultstring);
-//                System.out.println(rsnoline);
                 loadingCircle.setVisibility(View.GONE);
-                //TrackSearchResult track = new TrackSearchResult(searchResult, createrListener, searchResultView);
-
             }
         };
         find.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +104,6 @@ public class RequesterActivity extends Activity implements
                     mPlayer.pause(null);
                     searchResultView.removeAllViews();
                     loadingCircle.setVisibility(View.VISIBLE);
-                    System.out.println(p);
                     p = p.replaceAll("\\s{2,}", " ").trim();
                     p = p.replaceAll(" ", "%20");
                     SearchReader search = new SearchReader();

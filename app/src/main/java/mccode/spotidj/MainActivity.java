@@ -44,7 +44,8 @@ public class MainActivity extends Activity implements
     public static String key = "";
     public static ModelProxy mp;
     public static ObjectMapper mapper = new ObjectMapper();
-    public static Socket routerSocket = new Socket();
+    public static Socket routerSocket;
+    public static String responseToken = "";
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -73,6 +74,7 @@ public class MainActivity extends Activity implements
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                responseToken = response.getAccessToken();
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
@@ -87,6 +89,7 @@ public class MainActivity extends Activity implements
                         Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
+                routerSocket = new Socket();
             }
         }
     }

@@ -49,6 +49,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
         int port = 0;
         boolean exists = false;
         String routerResponse = "";
+        routerSocket = new Socket();
         while(!connected)
         {
             try
@@ -67,33 +68,26 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                     System.out.println("Waiting for router");
                     attempted = true;
                 }
-                try
-                {
-                    this.wait(1000);
-                }
-                catch(InterruptedException f)
-                {
-
-                }
+//                try
+//                {
+//                    this.wait(1000);
+//                }
+//                catch(InterruptedException f)
+//                {
+//
+//                }
             }
 
             if(connected)
             {
-                System.out.println("1");
                 try
                 {
-                    System.out.println("2");
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
-                    System.out.println("3");
                     out.write((this.key).getBytes());
-                    System.out.println("4");
                     Scanner in = new Scanner(routerSocket.getInputStream());
-                    System.out.println("5");
                     routerResponse = in.nextLine();
-                    System.out.println("6");
                     if (routerResponse.equals("NA"))
                     {
-                        System.out.println("7");
                         response.add(routerResponse);
                         in.close();
                         out.close();
@@ -103,7 +97,6 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                     }
                     else
                     {
-                        System.out.println("8");
                         response.add(routerResponse);
                     }
                     in.close();
@@ -111,7 +104,6 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 }
                 catch (IOException e)
                 {
-                    System.out.println("9");
                     System.out.println(e.toString());
                     if(!attempted)
                     {

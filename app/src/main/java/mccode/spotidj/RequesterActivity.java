@@ -19,6 +19,7 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientWriter;
@@ -28,6 +29,7 @@ import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
 
 import static mccode.spotidj.MainActivity.mPlayer;
+import static mccode.spotidj.MainActivity.mapper;
 import static mccode.spotidj.MainActivity.routerSocket;
 
 public class RequesterActivity extends Activity implements
@@ -73,8 +75,9 @@ public class RequesterActivity extends Activity implements
                             artists += ", " + i.getArtists().get(k).getName();
                         }
                     }
-                    btn.setText(j + ". " + artists + ": " +i.getName());
-                    btn.setBackgroundColor(Color.rgb(60, 242, 118));
+                    int f = j+1;
+                    btn.setText(f + ". " + artists + ": " +i.getName());
+                    btn.setBackgroundColor(Color.rgb(30, 215, 96));
                     btn.setTextColor(Color.rgb(35, 35, 35));
                     searchResultView.addView(btn, params);
                     Button tmpbtn = ((Button) findViewById(j));
@@ -82,7 +85,12 @@ public class RequesterActivity extends Activity implements
                         public void onClick(View view){
                             //mPlayer.playUri(null, i.getUri(), 0, 0);
                             ClientWriter w = new ClientWriter();
-                            w.execute(i.getUri());
+                            //w.execute(i.getUri());
+                            try {
+                                w.execute(mapper.writeValueAsString(i));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                     j++;

@@ -17,6 +17,8 @@ import static mccode.spotidj.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/14/2017.
+ *
+ * Writes from the client to the router when sending a song over to the server
  */
 
 public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
@@ -38,7 +40,7 @@ public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
         try {
             out = new PrintStream(routerSocket.getOutputStream());
             System.out.println(strings[0]);
-            out.write(strings[0].getBytes());
+            out.write((strings[0] + "\n").getBytes());
         } catch (IOException e) {
             System.out.println("whoops");
         }

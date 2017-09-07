@@ -42,6 +42,7 @@ public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
             System.out.println(strings[0]);
             out.write((strings[0] + "\n").getBytes());
         } catch (IOException e) {
+            // TODO catch write error
             System.out.println("whoops");
         }
 

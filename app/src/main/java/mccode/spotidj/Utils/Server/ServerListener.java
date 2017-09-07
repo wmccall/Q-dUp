@@ -31,7 +31,6 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
     }
     @Override
     protected ArrayList<String> doInBackground(String... strings) {
-        System.out.println("hey");
         Scanner in;
         try {
              in = new Scanner(routerSocket.getInputStream());

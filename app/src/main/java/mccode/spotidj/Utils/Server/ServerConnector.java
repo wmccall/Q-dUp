@@ -32,6 +32,7 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
     protected ArrayList<String> doInBackground(String... strings)
     {
         //Socket socket = new Socket();
+        routerSocket = new Socket();
         boolean connected = false;
         boolean attempted = false;
         String connectKey = "";
@@ -50,7 +51,6 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             }
             catch (IOException e)
             {
-                System.out.println("0");
                 if(!attempted)
                 {
                     System.out.println("Waiting for router");
@@ -65,24 +65,16 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
 //
 //                }
             }
-            System.out.println("1");
             if(connected)
             {
-                System.out.println("2");
                 try
                 {
-                    System.out.println("3");
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
-                    System.out.println("4");
                     out.write(("server").getBytes());
-                    System.out.println("5");
                     Scanner in = new Scanner(routerSocket.getInputStream());
-                    System.out.println("6");
                     String routerResponse = in.nextLine();
-                    System.out.println("7");
                     if (routerResponse.equals("NA"))
                     {
-                        System.out.println("8");
                         response.add(routerResponse);
                         in.close();
                         routerSocket.close();
@@ -91,7 +83,6 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                     }
                     else
                     {
-                        System.out.println("9");
                         connectKey = routerResponse;
                         System.out.println(connectKey);
                     }
@@ -116,7 +107,6 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                 }
             }
         }
-        System.out.println("!!");
         response.add("" + connectKey);
         return response;
     }

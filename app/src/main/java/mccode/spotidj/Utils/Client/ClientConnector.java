@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import mccode.spotidj.ConnectListener;
-import mccode.spotidj.Utils.ModelProxy;
 
 import static mccode.spotidj.MainActivity.getCPort;
 import static mccode.spotidj.MainActivity.getHost;
-import static mccode.spotidj.MainActivity.mp;
+//import static mccode.spotidj.MainActivity.mp;
 import static mccode.spotidj.MainActivity.routerSocket;
 
 /**
@@ -83,7 +82,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 try
                 {
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
-                    out.write((this.key).getBytes());
+                    out.write((this.key).toUpperCase().getBytes());
                     Scanner in = new Scanner(routerSocket.getInputStream());
                     routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))

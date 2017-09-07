@@ -2,7 +2,9 @@ package mccode.spotidj;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -28,7 +30,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientConnector;
-import mccode.spotidj.Utils.ModelProxy;
 import mccode.spotidj.Utils.Server.ServerConnector;
 
 public class MainActivity extends Activity implements
@@ -42,11 +43,12 @@ public class MainActivity extends Activity implements
     private static int CPORT = 16455;
     private static int SPORT = 16456;
     public static String key = "";
-    public static ModelProxy mp;
     public static ObjectMapper mapper = new ObjectMapper();
     public static Socket routerSocket;
     public static String responseToken = "";
     public static boolean stopped = false;
+    private ServerConnector s;
+    private ClientConnector c;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -56,7 +58,6 @@ public class MainActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
@@ -154,14 +155,16 @@ public class MainActivity extends Activity implements
             @Override
             public void onClick(View v) {
                 if(serverOrClient.isChecked()){
-                    ServerConnector s = new ServerConnector();
+                    s = new ServerConnector();
                     s.setOnConnectListener(listener);
-                    s.execute();
+                    //s.execute();
+                    s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }else{
                     key = keySearch.getText().toString();
-                    ClientConnector c = new ClientConnector(key);
+                    c = new ClientConnector(key);
                     c.setOnConnectListener(listener);
-                    c.execute();
+                    //c.execute();
+                    c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         });

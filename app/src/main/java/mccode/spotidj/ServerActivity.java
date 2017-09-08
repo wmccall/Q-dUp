@@ -3,9 +3,11 @@ package mccode.spotidj;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -124,8 +126,7 @@ public class ServerActivity extends Activity implements
 
         ServerListener listener = new ServerListener();
         listener.setOnServerListnerListener(ml);
-
-        listener.execute();
+        listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -183,6 +184,17 @@ public class ServerActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            mPlayer.pause(null);
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void addButton(final LinearLayout queueBox, final Button btn, final LinearLayout.LayoutParams params){

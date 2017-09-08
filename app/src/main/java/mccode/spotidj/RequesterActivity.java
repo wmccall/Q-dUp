@@ -3,6 +3,7 @@ package mccode.spotidj;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -83,11 +84,9 @@ public class RequesterActivity extends Activity implements
                     Button tmpbtn = ((Button) findViewById(j));
                     tmpbtn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                            //mPlayer.playUri(null, i.getUri(), 0, 0);
                             ClientWriter w = new ClientWriter();
-                            //w.execute(i.getUri());
                             try {
-                                w.execute(mapper.writeValueAsString(i));
+                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -117,7 +116,7 @@ public class RequesterActivity extends Activity implements
                     p = p.replaceAll(" ", "%20");
                     SearchReader search = new SearchReader();
                     search.setOnSearchListener(listener);
-                    search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
                 }
             }
         });
@@ -131,6 +130,7 @@ public class RequesterActivity extends Activity implements
     @Override
     protected void onDestroy() {
         // VERY IMPORTANT! This must always be called or else you will leak resources
+        mPlayer.pause(null);
         Spotify.destroyPlayer(this);
         super.onDestroy();
     }

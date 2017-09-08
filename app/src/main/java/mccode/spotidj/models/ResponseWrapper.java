@@ -4,12 +4,11 @@ import android.view.View;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mccode.spotidj.TrackCreaterListener;
+import mccode.spotidj.Utils.Listeners.TrackCreaterListener;
 
 import static mccode.spotidj.MainActivity.mapper;
 

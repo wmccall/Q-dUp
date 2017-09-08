@@ -1,7 +1,6 @@
 package mccode.spotidj.Utils.Server;
 
 import android.os.AsyncTask;
-import android.widget.EditText;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -10,7 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import mccode.spotidj.ConnectListener;
+import mccode.spotidj.Utils.Listeners.ConnectListener;
 
 import static mccode.spotidj.MainActivity.getSPort;
 import static mccode.spotidj.MainActivity.getHost;

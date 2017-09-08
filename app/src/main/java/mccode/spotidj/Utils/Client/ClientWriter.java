@@ -4,15 +4,8 @@ import android.os.AsyncTask;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import mccode.spotidj.ConnectListener;
-
-import static mccode.spotidj.MainActivity.getCPort;
-import static mccode.spotidj.MainActivity.getHost;
 import static mccode.spotidj.MainActivity.routerSocket;
 
 /**

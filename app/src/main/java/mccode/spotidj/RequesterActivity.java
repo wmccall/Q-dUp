@@ -12,8 +12,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.PlayerEvent;
@@ -24,14 +22,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientWriter;
-import mccode.spotidj.models.Artist_;
+import mccode.spotidj.Utils.Listeners.SearchListener;
+import mccode.spotidj.Utils.Listeners.TrackCreaterListener;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
 
 import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
-import static mccode.spotidj.MainActivity.routerSocket;
 
 public class RequesterActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.InputType;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -30,6 +29,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientConnector;
+import mccode.spotidj.Utils.Listeners.ConnectListener;
 import mccode.spotidj.Utils.Server.ServerConnector;
 
 public class MainActivity extends Activity implements

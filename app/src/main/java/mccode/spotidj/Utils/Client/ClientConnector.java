@@ -1,18 +1,15 @@
 package mccode.spotidj.Utils.Client;
 
 import android.os.AsyncTask;
-import android.view.View;
-import android.widget.EditText;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import mccode.spotidj.ConnectListener;
+import mccode.spotidj.Utils.Listeners.ConnectListener;
 
 import static mccode.spotidj.MainActivity.getCPort;
 import static mccode.spotidj.MainActivity.getHost;

@@ -9,7 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
+
+import mccode.spotidj.Utils.Listeners.SearchListener;
 
 /**
  * Created by mammo on 3/24/2017.

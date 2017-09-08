@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,23 +14,19 @@ import android.widget.TextView;
 
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.PlaybackState;
-import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import mccode.spotidj.Utils.MessageListener;
+import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Server.ServerListener;
 import mccode.spotidj.models.Item;
 
 import static mccode.spotidj.MainActivity.key;
 import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
-import static mccode.spotidj.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback

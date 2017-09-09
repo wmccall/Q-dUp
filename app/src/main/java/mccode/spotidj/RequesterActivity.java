@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -65,7 +66,7 @@ public class RequesterActivity extends Activity implements
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT);
-                    Button btn = new Button(getApplicationContext());
+                    Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(j);
                     String artists = "";
                     int size = i.getArtists().size();
@@ -77,8 +78,8 @@ public class RequesterActivity extends Activity implements
                     }
                     int f = j+1;
                     btn.setText(f + ". " + artists + ": " +i.getName());
-                    btn.setBackgroundColor(Color.rgb(30, 215, 96));
-                    btn.setTextColor(Color.rgb(35, 35, 35));
+//                    btn.setBackgroundColor(Color.rgb(80,80,80));
+//                    btn.setTextColor(Color.WHITE);
                     searchResultView.addView(btn, params);
                     Button tmpbtn = ((Button) findViewById(j));
                     tmpbtn.setOnClickListener(new View.OnClickListener(){

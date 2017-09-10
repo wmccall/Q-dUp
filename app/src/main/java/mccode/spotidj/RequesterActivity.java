@@ -5,12 +5,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -66,9 +73,12 @@ public class RequesterActivity extends Activity implements
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.bottomMargin = 2;
                     Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(j);
-                    String artists = "";
+
+
+                    String artists;
                     int size = i.getArtists().size();
                     artists = i.getArtists().get(0).getName();
                     if(size > 1){
@@ -77,9 +87,15 @@ public class RequesterActivity extends Activity implements
                         }
                     }
                     int f = j+1;
-                    btn.setText(f + ". " + artists + ": " +i.getName());
-//                    btn.setBackgroundColor(Color.rgb(80,80,80));
-//                    btn.setTextColor(Color.WHITE);
+                    artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
+                    int firstLength = i.getName().length();
+                    int total = artists.length();
+                    SpannableString text = new SpannableString(artists);
+                    text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
+                            0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
+                            firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    btn.setText(text, TextView.BufferType.SPANNABLE);
                     searchResultView.addView(btn, params);
                     Button tmpbtn = ((Button) findViewById(j));
                     tmpbtn.setOnClickListener(new View.OnClickListener(){
@@ -96,13 +112,14 @@ public class RequesterActivity extends Activity implements
                     });
                     j++;
                 }
+                loadingCircle.setVisibility(View.GONE);
             }
         };
         final SearchListener listener = new SearchListener() {
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
                 new ResponseWrapper(result, createrListener, searchResultView);
-                loadingCircle.setVisibility(View.GONE);
+
             }
         };
         find.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +128,7 @@ public class RequesterActivity extends Activity implements
             public void onClick(View v) {
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
-                    mPlayer.pause(null);
+                    //mPlayer.pause(null);
                     searchResultView.removeAllViews();
                     loadingCircle.setVisibility(View.VISIBLE);
                     p = p.replaceAll("\\s{2,}", " ").trim();

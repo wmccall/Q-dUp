@@ -45,7 +45,7 @@
         android:layout_width="88dp"
         android:layout_height="49dp"
         android:layout_marginTop="8dp"
-        android:text="Find"
+        android:text="@string/find"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Find"
         android:layout_marginEnd="8dp"
@@ -68,6 +68,7 @@
         app:layout_constraintTop_toBottomOf="@+id/search_bar">
 
         <LinearLayout
+            android:background="@color/colorPrimary"
             android:id="@+id/ButtonLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -2,6 +2,7 @@ package mccode.spotidj;
 
 import android.app.Activity;
 import android.content.Intent;
+Visual-Tweaking
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientWriter;
+import mccode.spotidj.Utils.Listeners.SearchListener;
+import mccode.spotidj.Utils.Listeners.TrackCreaterListener;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
@@ -81,7 +84,7 @@ public class RequesterActivity extends Activity implements
                         public void onClick(View view){
                             ClientWriter w = new ClientWriter();
                             try {
-                                w.execute(mapper.writeValueAsString(i));
+                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -120,7 +123,7 @@ public class RequesterActivity extends Activity implements
                     p = p.replaceAll(" ", "%20");
                     SearchReader search = new SearchReader();
                     search.setOnSearchListener(listener);
-                    search.execute("https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
                 }
             }
         });
@@ -144,6 +147,7 @@ public class RequesterActivity extends Activity implements
     @Override
     protected void onDestroy() {
         // VERY IMPORTANT! This must always be called or else you will leak resources
+        mPlayer.pause(null);
         Spotify.destroyPlayer(this);
         super.onDestroy();
     }

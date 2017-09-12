@@ -3,12 +3,10 @@ package mccode.spotidj.Utils.Server;
 import android.os.AsyncTask;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import mccode.spotidj.ConnectListener;
-import mccode.spotidj.Utils.MessageListener;
+import mccode.spotidj.Utils.Listeners.MessageListener;
 
 import static mccode.spotidj.MainActivity.routerSocket;
 import static mccode.spotidj.MainActivity.stopped;

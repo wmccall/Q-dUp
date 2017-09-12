@@ -3,6 +3,7 @@ package mccode.spotidj;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.view.ContextThemeWrapper;
@@ -10,6 +11,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -17,23 +19,19 @@ import android.widget.TextView;
 
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.PlaybackState;
-import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import mccode.spotidj.Utils.MessageListener;
+import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Server.ServerListener;
 import mccode.spotidj.models.Item;
 
 import static mccode.spotidj.MainActivity.key;
 import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
-import static mccode.spotidj.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -119,8 +117,7 @@ public class ServerActivity extends Activity implements
 
         ServerListener listener = new ServerListener();
         listener.setOnServerListnerListener(ml);
-
-        listener.execute();
+        listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -178,6 +175,17 @@ public class ServerActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            mPlayer.pause(null);
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void addButton(final LinearLayout queueBox, final Button btn, final LinearLayout.LayoutParams params){

@@ -9,7 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
+
+import mccode.spotidj.Utils.Listeners.SearchListener;
 
 /**
  * SearchReader queries spotify with a search term and gives a response to the response wrapper

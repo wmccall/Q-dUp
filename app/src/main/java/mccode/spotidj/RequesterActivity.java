@@ -2,7 +2,6 @@ package mccode.spotidj;
 
 import android.app.Activity;
 import android.content.Intent;
-Visual-Tweaking
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
@@ -33,6 +32,7 @@ import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
 
+import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
 
 public class RequesterActivity extends Activity implements
@@ -71,7 +71,6 @@ public class RequesterActivity extends Activity implements
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.bottomMargin = 2;
                 for(final Item i: t.getTracks().getItems()){
-
                     final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);

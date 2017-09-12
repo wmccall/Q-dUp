@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v7.view.ContextThemeWrapper;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -97,19 +102,10 @@ public class ServerActivity extends Activity implements
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT);
-                    Button btn = new Button(getApplicationContext());
+                    params.bottomMargin = 2;
+                    Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(count);
-                    String artists = "";
-                    int size = i.getArtists().size();
-                    artists = i.getArtists().get(0).getName();
-                    if(size > 1){
-                        for(int k = 1; k < size; k++){
-                            artists += ", " + i.getArtists().get(k).getName();
-                        }
-                    }
-                    btn.setText(count + ". " + artists + ": " +i.getName());
-                    btn.setBackgroundColor(Color.rgb(30, 215, 96));
-                    btn.setTextColor(Color.rgb(35, 35, 35));
+                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
                     //queueBox.addView(btn, params);
                     addButton(queueBox,btn,params);
                 } catch (IOException e) {
@@ -208,5 +204,31 @@ public class ServerActivity extends Activity implements
                 b.setText(text);
             }
         });
+    }
+
+    /**
+     * given an Item i, generates the formatted text that would go on a track displayed from
+     * a search result
+     * @param i Item to be turned into a formatted track string
+     * @return Spann
+     */
+    private SpannableString generateButtonText(Item i){
+        String artists;
+        int size = i.getArtists().size();
+        artists = i.getArtists().get(0).getName();
+        if(size > 1){
+            for(int k = 1; k < size; k++){
+                artists += ", " + i.getArtists().get(k).getName();
+            }
+        }
+        artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
+        int firstLength = i.getName().length();
+        int total = artists.length();
+        SpannableString text = new SpannableString(artists);
+        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
+                0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
+                firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return text;
     }
 }

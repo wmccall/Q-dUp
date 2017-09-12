@@ -1,5 +1,6 @@
 package mccode.spotidj.models;
 
+import android.os.AsyncTask;
 import android.view.View;
 
 import org.codehaus.jackson.JsonParseException;
@@ -13,31 +14,51 @@ import mccode.spotidj.Utils.Listeners.TrackCreaterListener;
 import static mccode.spotidj.MainActivity.mapper;
 
 /**
- * Created by mammo on 4/17/2017.
+ * ResponseWrapper takes a response from the searchReader and gives the track creator listener a
+ * list of tracks to display on the requester side
  */
 
-public class ResponseWrapper {
+public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boolean> {
 
-    TrackCreaterListener listener;
-    TrackResponse response;
 
-    public ResponseWrapper(ArrayList<String> in, TrackCreaterListener listener, View v ){
-        this.setOnCreateListener(listener);
+    private TrackCreatorListener listener;
+    private TrackResponse response;
+    private View v;
+
+    public void setOnCreateListener(TrackCreatorListener listener){
+        this.listener = listener;
+    }
+
+    public void setView(View view){
+        this.v = view;
+    }
+
+    @SafeVarargs
+    @Override
+    protected final Boolean doInBackground(ArrayList<String>... strings) {
         String tot = "";
-        for(String s: in){
+        for(String s : strings[0]){
             tot += s;
         }
         System.out.println(tot);
-//        ObjectMapper mapper = new ObjectMapper();
         try{
             response = mapper.readValue(tot, TrackResponse.class);
-        }catch (JsonParseException e) { e.printStackTrace();}
-        catch (JsonMappingException e) { e.printStackTrace(); }
-        catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) { e.printStackTrace(); }
         listener.onCreateSucceeded(v, this.response);
+
+        return true;
     }
 
-    public void setOnCreateListener(TrackCreaterListener listener){
-        this.listener = listener;
+    protected void onProgressUpdate() {
+        //called when the background task makes any progress
     }
+
+    protected void onPreExecute() {
+        //called before doInBackground() is started
+    }
+    protected void onPostExecute(Boolean result) {
+        //called after doInBackground() has finished
+
+    }
+
 }

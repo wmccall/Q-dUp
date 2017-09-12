@@ -5,9 +5,12 @@
     android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="mccode.spotidj.MainActivity">
+    tools:context="mccode.spotidj.MainActivity"
+    android:background="@color/background">
 
     <ToggleButton
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:id="@+id/serverOrClient"
         android:layout_width="196dp"
         android:layout_height="125dp"
@@ -16,8 +19,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:text="ToggleButton"
-        android:textOff="Client"
-        android:textOn="Server"
+        android:textOff="Join"
+        android:textOn="Host"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -25,6 +28,8 @@
         app:layout_constraintVertical_bias="0.091" />
 
     <Button
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:id="@+id/confirmType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,8 +59,9 @@
         android:hint="Server Key"
         android:inputType="textCapCharacters"
         android:textAlignment="center"
-        android:textColor="@android:color/holo_green_light"
+        android:textColor="@color/colorAccent"
         android:textStyle="bold"
+        android:textColorHint="@color/colorAccent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

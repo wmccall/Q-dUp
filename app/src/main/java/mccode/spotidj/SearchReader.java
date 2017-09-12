@@ -12,17 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by mammo on 3/24/2017.
+ * SearchReader queries spotify with a search term and gives a response to the response wrapper
  */
 
 public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> {
 
-    private ArrayList<String> response = new ArrayList<String>();
-    SearchListener listener;
+    private ArrayList<String> response = new ArrayList<>();
+    private SearchListener listener;
 
     public void setOnSearchListener(SearchListener listener){
         this.listener = listener;
     }
+
+
     @Override
     protected ArrayList<String> doInBackground(String... strings) {
         URL url = null;
@@ -33,6 +35,7 @@ public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> 
             e.printStackTrace();
         }
         try{
+            assert url != null;
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Authorization", "Bearer " + MainActivity.responseToken);
             BufferedReader in = new BufferedReader(

@@ -20,6 +20,12 @@
          <item name="android:textSize">15sp</item>
      </style>
 
+    <style name="TrackTitlePlayed" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">@color/faded</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
     <style name="TrackArtist">
         <item name="android:textColor">@color/faded</item>
         <item name="android:textSize">10sp</item>

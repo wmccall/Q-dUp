@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -14,7 +15,10 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.spotify.sdk.android.player.ConnectionStateCallback;
@@ -24,10 +28,15 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import mccode.spotidj.Utils.Client.ClientWriter;
 import mccode.spotidj.Utils.Listeners.MessageListener;
+import mccode.spotidj.Utils.Listeners.SearchListener;
 import mccode.spotidj.Utils.Server.ServerListener;
 import mccode.spotidj.models.Item;
+import mccode.spotidj.models.ResponseWrapper;
+import mccode.spotidj.models.TrackResponse;
 
 import static mccode.spotidj.MainActivity.key;
 import static mccode.spotidj.MainActivity.mPlayer;
@@ -45,8 +54,9 @@ public class ServerActivity extends Activity implements
 
     //public static ArrayList<Item> queue = new ArrayList<>();
     public static final int jumpBackNum = 10;
-    public static int position = 0;
+    public static int position = -1;
     public static int count = 0;
+    boolean adding = false;
     //private Player mPlayer;
 
     @Override
@@ -59,6 +69,18 @@ public class ServerActivity extends Activity implements
         final Button playPause = (Button) findViewById(R.id.PlayPause);
         final Button nextButton = (Button) findViewById(R.id.Skip);
         final Button backButton = (Button) findViewById(R.id.Back);
+        final Button addSong = (Button) findViewById(R.id.AddSong);
+        final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
+        final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
+        final ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
+        final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
+        progress.setVisibility(View.GONE);
+        final EditText search = (EditText) findViewById(R.id.search_bar);
+        search.setVisibility(View.GONE);
+        final Button findButton = (Button) findViewById(R.id.find_button);
+        findButton.setVisibility(View.GONE);
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
+        scrollView.setVisibility(View.GONE);
 
         playPause.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -78,9 +100,109 @@ public class ServerActivity extends Activity implements
             }
         });
 
+        final TrackCreatorListener creatorListener = new TrackCreatorListener() {
+            @Override
+            public void onCreateSucceeded(View v, final TrackResponse t) {
+                int j = 0;
+                final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.bottomMargin = 2;
+                for(final Item i: t.getTracks().getItems()){
+                    final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    btn.setId(j);
+                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
+                    searchResultView.post(new Runnable() {
+                        public void run() {
+                            searchResultView.addView(btn, params);
+                        }
+                    });
+                    btn.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View view){
+                                //mPlayer.playUri(null, i.getUri(), 0, 0);
+                                //queue.add(i);
+                                count++;
+                                if(mPlayer.getMetadata().nextTrack == null && !mPlayer.getPlaybackState().isPlaying){
+                                    mPlayer.playUri(null, i.getUri(), 0, 0);
+                                    setText(playPause, "Pause");
+                                }else{
+                                    mPlayer.queue(null, i.getUri());
+                                }
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                                params.bottomMargin = 2;
+                                Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                                btn.setId(count);
+                                btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
+                                //queueBox.addView(btn, params);
+                                addButton(queueBox,btn,params);
+                        }
+                    });
+                    j++;
+                }
+            }
+        };
+
         nextButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 mPlayer.skipToPrevious(null);
+            }
+        });
+        final SearchListener searchListener = new SearchListener() {
+            @Override
+            public void onSearchSucceeded(ArrayList<String> result) {
+                ResponseWrapper responseWrapper = new ResponseWrapper();
+                responseWrapper.setOnCreateListener(creatorListener);
+                responseWrapper.setView(searchResultView);
+                responseWrapper.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
+
+            }
+        };
+        findButton.setOnClickListener(new View.OnClickListener() {
+            //TODO: update this to query the database for songs
+            @Override
+            public void onClick(View v) {
+                String p = search.getText().toString().trim();
+                if (p.length()>0) {
+                    //mPlayer.pause(null);
+                    searchResultView.removeAllViews();
+                    progress.setVisibility(View.VISIBLE);
+                    p = p.replaceAll("\\s{2,}", " ").trim();
+                    p = p.replaceAll(" ", "%20");
+                    SearchReader search = new SearchReader();
+                    search.setOnSearchListener(searchListener);
+                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                }
+            }
+        });
+
+        addSong.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                if(adding){
+                    progress.setVisibility(View.GONE);
+                    search.setVisibility(View.GONE);
+                    findButton.setVisibility(View.GONE);
+                    scrollView.setVisibility(View.GONE);
+                    scrollView2.setVisibility(View.VISIBLE);
+                    queueOrSearch.setText("Queue");
+                    addSong.setText("Add Song");
+                    playPause.setVisibility(View.VISIBLE);
+                    nextButton.setVisibility(View.VISIBLE);
+                    backButton.setVisibility(View.VISIBLE);
+                    adding = false;
+                }else{
+                    search.setVisibility(View.VISIBLE);
+                    findButton.setVisibility(View.VISIBLE);
+                    scrollView.setVisibility(View.VISIBLE);
+                    scrollView2.setVisibility(View.GONE);
+                    queueOrSearch.setText("Search");
+                    addSong.setText("View Queue");
+                    playPause.setVisibility(View.GONE);
+                    nextButton.setVisibility(View.GONE);
+                    backButton.setVisibility(View.GONE);
+                    adding = true;
+                }
             }
         });
 
@@ -137,6 +259,17 @@ public class ServerActivity extends Activity implements
         Log.d("MainActivity", "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
             // Handle event type as necessary
+//            case kSpPlaybackNotifyTrackChanged:
+//                position++;
+//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
+//                if(position>0){
+//                    ((Button) findViewById(position-1)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.faded));
+//                }
+//                break;
+//            case kSpPlaybackNotifyPlay:
+//                position++;
+//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
+//                break;
             default:
                 break;
         }

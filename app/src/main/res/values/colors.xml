@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#505050</color>
+    <color name="colorPrimaryClicked">#606060</color>
     <color name="colorPrimaryDark">#000</color>
     <color name="colorAccent">#6de873</color>
     <color name="background">#303030</color>
+    <color name="backgroundClicked">#404040</color>
     <color name="white">#ffffff</color>
     <color name="faded">#aaaaaa</color>
 </resources>

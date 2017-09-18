@@ -1,14 +1,18 @@
 package mccode.spotidj;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,7 +31,6 @@ import java.util.ArrayList;
 
 import mccode.spotidj.Utils.Client.ClientWriter;
 import mccode.spotidj.Utils.Listeners.SearchListener;
-import mccode.spotidj.Utils.Listeners.TrackCreaterListener;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
@@ -59,6 +62,11 @@ public class RequesterActivity extends Activity implements
         final EditText search = (EditText) findViewById(R.id.search_bar);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
+        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+        final int colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
+        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+        final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         loadingCircle.setVisibility(View.GONE);
 
         //handles creating buttons for each of the tracks resulting from a search
@@ -70,8 +78,26 @@ public class RequesterActivity extends Activity implements
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.bottomMargin = 2;
+                int localTrackCount = 0;
                 for(final Item i: t.getTracks().getItems()){
+                    localTrackCount++;
+                    final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackground, colorBackgroundClicked);
+                    colorAnimation.setDuration(250);
+                    final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackgroundClicked, colorBackground);
+                    colorAnimationRev.setDuration(250);
                     final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
+                    colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
                     searchResultView.post(new Runnable() {
@@ -81,6 +107,8 @@ public class RequesterActivity extends Activity implements
                         });
                     btn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
+                            colorAnimation.start();
+                            colorAnimationRev.start();
                             ClientWriter w = new ClientWriter();
                             try {
                                 w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
@@ -91,6 +119,23 @@ public class RequesterActivity extends Activity implements
                     });
                     j++;
                 }
+                if(localTrackCount==0){
+                    final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    btn.setId(0);
+                    btn.setText(generateButtonText(null), TextView.BufferType.SPANNABLE);
+                    btn.setGravity(Gravity.CENTER_HORIZONTAL);
+                    searchResultView.post(new Runnable() {
+                        public void run() {
+                            searchResultView.addView(btn, params);
+                        }
+                    });
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingCircle.setVisibility(View.GONE);
+                    }
+                });
             }
         };
 
@@ -113,9 +158,27 @@ public class RequesterActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        find.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        find.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
                     //mPlayer.pause(null);
+                    colorAnimation.start();
+                    colorAnimationRev.start();
                     searchResultView.removeAllViews();
                     loadingCircle.setVisibility(View.VISIBLE);
                     p = p.replaceAll("\\s{2,}", " ").trim();
@@ -228,22 +291,30 @@ public class RequesterActivity extends Activity implements
      * @return Spann
      */
     private SpannableString generateButtonText(Item i){
-        String artists;
-        int size = i.getArtists().size();
-        artists = i.getArtists().get(0).getName();
-        if(size > 1){
-            for(int k = 1; k < size; k++){
-                artists += ", " + i.getArtists().get(k).getName();
+        SpannableString text;
+        if(i!=null){
+            String artists;
+            int size = i.getArtists().size();
+            artists = i.getArtists().get(0).getName();
+            if(size > 1){
+                for(int k = 1; k < size; k++){
+                    artists += ", " + i.getArtists().get(k).getName();
+                }
             }
+            artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
+            int firstLength = i.getName().length();
+            int total = artists.length();
+            text = new SpannableString(artists);
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
+                    0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
+                    firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }else{
+            text = new SpannableString("No Results");
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.NoTrack),
+                    0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
-        int firstLength = i.getName().length();
-        int total = artists.length();
-        SpannableString text = new SpannableString(artists);
-        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
-                0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
-                firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         return text;
     }
 }

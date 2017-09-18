@@ -1,9 +1,12 @@
 package mccode.spotidj;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -71,7 +75,6 @@ public class MainActivity extends Activity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
@@ -128,12 +131,14 @@ public class MainActivity extends Activity implements
         Log.d("MainActivity", "User logged in");
         setContentView(R.layout.activity_main);
         //mPlayer.playUri(null, "spotify:track:7oK9VyNzrYvRFo7nQEYkWN", 0, 0);
-
+        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+        final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
         final Button confirmType = (Button) findViewById(R.id.confirmType);
         final EditText keySearch = (EditText) findViewById(R.id.key_search);
         final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
-
         final ConnectListener listener = new ConnectListener() {
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
@@ -154,6 +159,24 @@ public class MainActivity extends Activity implements
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 if(serverOrClient.isChecked()){
                     s = new ServerConnector();
                     s.setOnConnectListener(listener);
@@ -171,6 +194,24 @@ public class MainActivity extends Activity implements
 
         serverOrClient.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 TransitionManager.beginDelayedTransition(mainView);
                 keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
             }

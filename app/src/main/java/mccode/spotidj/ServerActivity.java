@@ -1,17 +1,18 @@
 package mccode.spotidj;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +31,6 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mccode.spotidj.Utils.Client.ClientWriter;
 import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Listeners.SearchListener;
 import mccode.spotidj.Utils.Server.ServerListener;
@@ -72,9 +72,14 @@ public class ServerActivity extends Activity implements
         final Button addSong = (Button) findViewById(R.id.AddSong);
         final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
         final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
-        final ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
+        final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
-        progress.setVisibility(View.GONE);
+        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+        final int colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
+        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+        final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+        loadingCircle.setVisibility(View.GONE);
         final EditText search = (EditText) findViewById(R.id.search_bar);
         search.setVisibility(View.GONE);
         final Button findButton = (Button) findViewById(R.id.find_button);
@@ -84,6 +89,24 @@ public class ServerActivity extends Activity implements
 
         playPause.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        playPause.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        playPause.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 if(mPlayer.getPlaybackState().isPlaying){
                     playPause.setText("Play");
                     mPlayer.pause(null);
@@ -96,6 +119,24 @@ public class ServerActivity extends Activity implements
 
         nextButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        nextButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        nextButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 mPlayer.skipToNext(null);
             }
         });
@@ -108,10 +149,28 @@ public class ServerActivity extends Activity implements
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.bottomMargin = 2;
+                int localTrackCount = 0;
                 for(final Item i: t.getTracks().getItems()){
+                    localTrackCount++;
                     final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
+                    final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackground, colorBackgroundClicked);
+                    colorAnimation.setDuration(250);
+                    final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackgroundClicked, colorBackground);
+                    colorAnimationRev.setDuration(250);
+                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
+                    colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
                     searchResultView.post(new Runnable() {
                         public void run() {
                             searchResultView.addView(btn, params);
@@ -119,33 +178,70 @@ public class ServerActivity extends Activity implements
                     });
                     btn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                                //mPlayer.playUri(null, i.getUri(), 0, 0);
-                                //queue.add(i);
-                                count++;
-                                if(mPlayer.getMetadata().nextTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                                    mPlayer.playUri(null, i.getUri(), 0, 0);
-                                    setText(playPause, "Pause");
-                                }else{
-                                    mPlayer.queue(null, i.getUri());
-                                }
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                                params.bottomMargin = 2;
-                                Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                                btn.setId(count);
-                                btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                                //queueBox.addView(btn, params);
-                                addButton(queueBox,btn,params);
+                        colorAnimation.start();
+                        colorAnimationRev.start();
+                        //mPlayer.playUri(null, i.getUri(), 0, 0);
+                        //queue.add(i);
+                        count++;
+                        if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
+                            mPlayer.playUri(null, i.getUri(), 0, 0);
+                            setText(playPause, "Pause");
+                        }else{
+                            mPlayer.queue(null, i.getUri());
+                        }
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.bottomMargin = 2;
+                        Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                        btn.setId(count);
+                        btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
+                        //queueBox.addView(btn, params);
+                        addButton(queueBox,btn,params);
                         }
                     });
                     j++;
                 }
+                if(localTrackCount==0){
+                    final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    btn.setId(0);
+                    btn.setText(generateButtonText(null), TextView.BufferType.SPANNABLE);
+                    btn.setGravity(Gravity.CENTER_HORIZONTAL);
+                    searchResultView.post(new Runnable() {
+                        public void run() {
+                            searchResultView.addView(btn, params);
+                        }
+                    });
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingCircle.setVisibility(View.GONE);
+                    }
+                });
             }
         };
 
-        nextButton.setOnClickListener(new View.OnClickListener(){
+        backButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        backButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        backButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 mPlayer.skipToPrevious(null);
             }
         });
@@ -163,24 +259,60 @@ public class ServerActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                String p = search.getText().toString().trim();
-                if (p.length()>0) {
-                    //mPlayer.pause(null);
-                    searchResultView.removeAllViews();
-                    progress.setVisibility(View.VISIBLE);
-                    p = p.replaceAll("\\s{2,}", " ").trim();
-                    p = p.replaceAll(" ", "%20");
-                    SearchReader search = new SearchReader();
-                    search.setOnSearchListener(searchListener);
-                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
+            final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+            colorAnimation.setDuration(250);
+            final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+            colorAnimationRev.setDuration(250);
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    findButton.setBackgroundColor((int) animator.getAnimatedValue());
                 }
+            });
+            colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                }
+            });
+            String p = search.getText().toString().trim();
+            if (p.length()>0) {
+                //mPlayer.pause(null);
+                colorAnimation.start();
+                colorAnimationRev.start();
+                searchResultView.removeAllViews();
+                loadingCircle.setVisibility(View.VISIBLE);
+                p = p.replaceAll("\\s{2,}", " ").trim();
+                p = p.replaceAll(" ", "%20");
+                SearchReader search = new SearchReader();
+                search.setOnSearchListener(searchListener);
+                search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
+            }
             }
         });
 
         addSong.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
                 if(adding){
-                    progress.setVisibility(View.GONE);
+                    loadingCircle.setVisibility(View.GONE);
                     search.setVisibility(View.GONE);
                     findButton.setVisibility(View.GONE);
                     scrollView.setVisibility(View.GONE);
@@ -215,7 +347,7 @@ public class ServerActivity extends Activity implements
                     //mPlayer.playUri(null, i.getUri(), 0, 0);
                     //queue.add(i);
                     count++;
-                    if(mPlayer.getMetadata().nextTrack == null && !mPlayer.getPlaybackState().isPlaying){
+                    if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
                         mPlayer.playUri(null, i.getUri(), 0, 0);
                         setText(playPause, "Pause");
                     }else{
@@ -346,22 +478,30 @@ public class ServerActivity extends Activity implements
      * @return Spann
      */
     private SpannableString generateButtonText(Item i){
-        String artists;
-        int size = i.getArtists().size();
-        artists = i.getArtists().get(0).getName();
-        if(size > 1){
-            for(int k = 1; k < size; k++){
-                artists += ", " + i.getArtists().get(k).getName();
+        SpannableString text;
+        if(i!=null){
+            String artists;
+            int size = i.getArtists().size();
+            artists = i.getArtists().get(0).getName();
+            if(size > 1){
+                for(int k = 1; k < size; k++){
+                    artists += ", " + i.getArtists().get(k).getName();
+                }
             }
+            artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
+            int firstLength = i.getName().length();
+            int total = artists.length();
+            text = new SpannableString(artists);
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
+                    0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
+                    firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }else{
+            text = new SpannableString("No Results");
+            text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.NoTrack),
+                    0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        artists =i.getName() + "\n" + artists + " - " + i.getAlbum().getName();
-        int firstLength = i.getName().length();
-        int total = artists.length();
-        SpannableString text = new SpannableString(artists);
-        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackTitle),
-                0, firstLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        text.setSpan(new TextAppearanceSpan(getApplicationContext(), R.style.TrackArtist),
-                firstLength, total,  Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         return text;
     }
 }

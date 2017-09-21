@@ -15,6 +15,7 @@ import android.widget.CompoundButton;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -54,6 +55,8 @@ public class MainActivity extends Activity implements
     private ServerConnector s;
     private ClientConnector c;
 
+    private static boolean failedConnect = false;
+
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
@@ -61,6 +64,20 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(!failedConnect){
+            setContentView(R.layout.activity_main);
+            final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
+            final Button confirmType = (Button) findViewById(R.id.confirmType);
+            final EditText keySearch = (EditText) findViewById(R.id.key_search);
+            final Button retry = (Button) findViewById(R.id.retry);
+            final TextView error = (TextView) findViewById(R.id.errorConnect);
+            error.setVisibility(View.GONE);
+            retry.setVisibility(View.GONE);
+            serverOrClient.setVisibility(View.GONE);
+            confirmType.setVisibility(View.GONE);
+            keySearch.setVisibility(View.GONE);
+        }
+
         super.onCreate(savedInstanceState);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
@@ -76,9 +93,19 @@ public class MainActivity extends Activity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         // Check if result comes from the correct activity
+        setContentView(R.layout.activity_main);
+        final Button retry = (Button) findViewById(R.id.retry);
+        final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
+        final Button confirmType = (Button) findViewById(R.id.confirmType);
+        final EditText keySearch = (EditText) findViewById(R.id.key_search);
+        final TextView error = (TextView) findViewById(R.id.errorConnect);
+        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                retry.setVisibility(View.GONE);
+                error.setVisibility(View.GONE);
                 responseToken = response.getAccessToken();
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
@@ -95,6 +122,37 @@ public class MainActivity extends Activity implements
                     }
                 });
                 routerSocket = new Socket();
+            }else{
+                failedConnect = true;
+                retry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
+                        colorAnimation.setDuration(250);
+                        final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
+                        colorAnimationRev.setDuration(250);
+                        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animator) {
+                                retry.setBackgroundColor((int) animator.getAnimatedValue());
+                            }
+                        });
+                        colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animator) {
+                                retry.setBackgroundColor((int) animator.getAnimatedValue());
+                            }
+                        });
+                        colorAnimation.start();
+                        colorAnimationRev.start();
+                        onCreate(null);
+                    }
+                });
+                retry.setVisibility(View.VISIBLE);
+                error.setVisibility(View.VISIBLE);
+                serverOrClient.setVisibility(View.GONE);
+                confirmType.setVisibility(View.GONE);
+                keySearch.setVisibility(View.GONE);
             }
         }
     }
@@ -133,12 +191,15 @@ public class MainActivity extends Activity implements
         //mPlayer.playUri(null, "spotify:track:7oK9VyNzrYvRFo7nQEYkWN", 0, 0);
         final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
         final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
-        final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
         final Button confirmType = (Button) findViewById(R.id.confirmType);
         final EditText keySearch = (EditText) findViewById(R.id.key_search);
         final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
+        final Button retry = (Button) findViewById(R.id.retry);
+        final TextView error = (TextView) findViewById(R.id.errorConnect);
+        retry.setVisibility(View.GONE);
+        error.setVisibility(View.GONE);
         final ConnectListener listener = new ConnectListener() {
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
@@ -159,9 +220,9 @@ public class MainActivity extends Activity implements
         confirmType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
                 colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
                 colorAnimationRev.setDuration(250);
                 colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -194,9 +255,9 @@ public class MainActivity extends Activity implements
 
         serverOrClient.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
                 colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
                 colorAnimationRev.setDuration(250);
                 colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override

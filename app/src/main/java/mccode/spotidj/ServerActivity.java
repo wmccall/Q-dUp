@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Listeners.SearchListener;
 import mccode.spotidj.Utils.Server.ServerListener;
+import mccode.spotidj.Utils.Server.ServerWriter;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
@@ -189,6 +190,12 @@ public class ServerActivity extends Activity implements
                         }else{
                             mPlayer.queue(null, i.getUri());
                         }
+                        ServerWriter s = new ServerWriter();
+                            try {
+                                s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -352,6 +359,12 @@ public class ServerActivity extends Activity implements
                         setText(playPause, "Pause");
                     }else{
                         mPlayer.queue(null, i.getUri());
+                    }
+                    ServerWriter s = new ServerWriter();
+                    try {
+                        s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,

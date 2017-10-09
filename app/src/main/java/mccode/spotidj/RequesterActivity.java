@@ -13,6 +13,7 @@ import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +35,7 @@ import mccode.spotidj.Utils.Client.ClientListener;
 import mccode.spotidj.Utils.Client.ClientWriter;
 import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Listeners.SearchListener;
+import mccode.spotidj.Utils.Server.ServerWriter;
 import mccode.spotidj.models.Item;
 import mccode.spotidj.models.ResponseWrapper;
 import mccode.spotidj.models.TrackResponse;
@@ -41,6 +43,7 @@ import mccode.spotidj.models.TrackResponse;
 import static mccode.spotidj.MainActivity.key;
 import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 public class RequesterActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -190,7 +193,6 @@ public class RequesterActivity extends Activity implements
                 });
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
-                    //mPlayer.pause(null);
                     colorAnimation.start();
                     colorAnimationRev.start();
                     searchResultView.removeAllViews();
@@ -250,8 +252,6 @@ public class RequesterActivity extends Activity implements
                 try {
                     System.out.println("HEY HEY HEY");
                     Item i = mapper.readValue(result, Item.class);
-                    //mPlayer.playUri(null, i.getUri(), 0, 0);
-                    //queue.add(i);
                     count++;
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -260,7 +260,6 @@ public class RequesterActivity extends Activity implements
                     Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
                     btn.setId(count);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                    //queueBox.addView(btn, params);
                     addButton(queueBox,btn,params);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -270,7 +269,7 @@ public class RequesterActivity extends Activity implements
         };
 
         ClientListener clientListener = new ClientListener();
-        clientListener.setOnServerListnerListener(ml);
+        clientListener.setOnClientListnerListener(ml);
         clientListener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -376,6 +375,23 @@ public class RequesterActivity extends Activity implements
         });
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            ClientWriter c = new ClientWriter();
+            c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
+            mPlayer.pause(null);
+            try {
+                routerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
     /**
      * given an Item i, generates the formatted text that would go on a track displayed from
      * a search result

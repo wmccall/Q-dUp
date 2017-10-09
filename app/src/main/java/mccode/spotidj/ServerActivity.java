@@ -42,6 +42,7 @@ import mccode.spotidj.models.TrackResponse;
 import static mccode.spotidj.MainActivity.key;
 import static mccode.spotidj.MainActivity.mPlayer;
 import static mccode.spotidj.MainActivity.mapper;
+import static mccode.spotidj.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -394,6 +395,8 @@ public class ServerActivity extends Activity implements
 
     @Override
     protected void onDestroy() {
+        count = 0;
+        adding = false;
         // VERY IMPORTANT! This must always be called or else you will leak resources
         Spotify.destroyPlayer(this);
         super.onDestroy();
@@ -460,7 +463,14 @@ public class ServerActivity extends Activity implements
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK))
         {
+            ServerWriter s = new ServerWriter();
+            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
             mPlayer.pause(null);
+            try {
+                routerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             finish();
         }
         return super.onKeyDown(keyCode, event);

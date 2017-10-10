@@ -34,15 +34,15 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
              in = new Scanner(routerSocket.getInputStream());
             while(!stopped){
                 response = in.nextLine();
-                System.out.println(response);
+                //System.out.println(response);
                 listener.onMessageSucceeded(response);
                 response = "";
             }
         } catch (IOException e) {
             //e.printStackTrace();
-            System.out.println("closing server listener");
+            System.out.println("Closing server listener");
         } catch (RuntimeException e){
-            System.out.println("closing server listener");
+            System.out.println("Closing server listener");
         }
 
 

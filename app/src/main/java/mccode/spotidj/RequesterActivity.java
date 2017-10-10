@@ -250,7 +250,6 @@ public class RequesterActivity extends Activity implements
             @Override
             public void onMessageSucceeded(String result) {
                 try {
-                    System.out.println("HEY HEY HEY");
                     Item i = mapper.readValue(result, Item.class);
                     count++;
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(

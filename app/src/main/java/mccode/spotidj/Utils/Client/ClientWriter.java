@@ -32,11 +32,11 @@ public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
         PrintStream out;
         try {
             out = new PrintStream(routerSocket.getOutputStream());
-            System.out.println(strings[0]);
+            //System.out.println(strings[0]);
             out.write((strings[0].replace("\n", "").replace("\r", "") + "\n").getBytes());
         } catch (IOException e) {
             // TODO catch write error
-            System.out.println("whoops");
+            System.out.println("Closing client writer");
         }
 
         return response;

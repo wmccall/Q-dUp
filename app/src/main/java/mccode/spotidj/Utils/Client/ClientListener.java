@@ -36,15 +36,15 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
 //                while(in.hasNextLine()){
 //                    response += in.nextLine();
 //                }
-                System.out.println(response);
+                //System.out.println(response);
                 listener.onMessageSucceeded(response);
                 response = "";
             }
         } catch (IOException e) {
             //e.printStackTrace();
-            System.out.println("closing client listener");
+            System.out.println("Closing client listener");
         } catch (RuntimeException e){
-            System.out.println("closing client listener");
+            System.out.println("Closing client listener");
         }
 
 

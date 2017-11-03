@@ -41,7 +41,7 @@ public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boole
         for(String s : strings[0]){
             tot += s;
         }
-        System.out.println(tot);
+        //System.out.println(tot);
         try{
             response = mapper.readValue(tot, TrackResponse.class);
         } catch (IOException e) { e.printStackTrace(); }

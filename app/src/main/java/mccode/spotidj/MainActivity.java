@@ -32,6 +32,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Set;
 
 import mccode.spotidj.Utils.Client.ClientConnector;
 import mccode.spotidj.Utils.Listeners.ConnectListener;
@@ -54,6 +55,7 @@ public class MainActivity extends Activity implements
     public static boolean stopped = false;
     private ServerConnector s;
     private ClientConnector c;
+    private AuthenticationResponse aResponse = null;
 
     private static boolean failedConnect = false;
 
@@ -102,12 +104,12 @@ public class MainActivity extends Activity implements
         final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+            aResponse = AuthenticationClient.getResponse(resultCode, intent);
+            if (aResponse.getType() == AuthenticationResponse.Type.TOKEN) {
                 retry.setVisibility(View.GONE);
                 error.setVisibility(View.GONE);
-                responseToken = response.getAccessToken();
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
+                responseToken = aResponse.getAccessToken();
+                Config playerConfig = new Config(this, aResponse.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
                     public void onInitialized(SpotifyPlayer spotifyPlayer) {
@@ -297,6 +299,24 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if(aResponse!= null && aResponse.getType() == AuthenticationResponse.Type.TOKEN){
+            routerSocket = new Socket();
+        }
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        for (Thread t: threadSet
+             ) {
+            System.out.println(t.getId() + ": " + t.getName() + "-" );
+            for (StackTraceElement s :t.getStackTrace()
+                 ) {
+                System.out.println(s.toString());
+            }
+        }
     }
 
     public static String getHost(){

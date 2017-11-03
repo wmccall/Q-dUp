@@ -23,7 +23,7 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
 
     }
 
-    public void setOnServerListnerListener(MessageListener listener){
+    public void setOnClientListnerListener(MessageListener listener){
         this.listener = listener;
     }
     @Override
@@ -33,12 +33,18 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
             in = new Scanner(routerSocket.getInputStream());
             while(!stopped){
                 response = in.nextLine();
-                System.out.println("WTF" + response);
+//                while(in.hasNextLine()){
+//                    response += in.nextLine();
+//                }
+                //System.out.println(response);
                 listener.onMessageSucceeded(response);
                 response = "";
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Closing client listener");
+        } catch (RuntimeException e){
+            System.out.println("Closing client listener");
         }
 
 

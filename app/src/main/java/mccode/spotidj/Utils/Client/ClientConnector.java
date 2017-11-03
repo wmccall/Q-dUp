@@ -55,7 +55,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 /**TODO:
                  * remove print statement and show on phone
                  */
-                System.out.println("connected to router");
+                System.out.println("Connected to router");
             }
             catch (IOException e)
             {
@@ -100,7 +100,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 }
                 catch (IOException e)
                 {
-                    System.out.println(e.toString());
+                    //System.out.println(e.toString());
                     if(!attempted)
                     {
                         System.out.println("Waiting for router");

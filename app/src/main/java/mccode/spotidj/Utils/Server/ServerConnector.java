@@ -39,14 +39,14 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
         {
             try
             {
-                System.out.println(getHost());
-                System.out.println(getSPort());
+                //System.out.println(getHost());
+                //System.out.println(getSPort());
                 routerSocket.connect(new InetSocketAddress(getHost(), getSPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone
                  */
-                System.out.println("connected to router");
+                System.out.println("Connected to router");
             }
             catch (IOException e)
             {

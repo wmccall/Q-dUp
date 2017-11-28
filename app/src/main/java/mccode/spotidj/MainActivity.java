@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
     private static final String REDIRECT_URI = "mccode-spotidj://callback";
     //private static final String HOST = "mammothtr0n.student.rit.edu";
-    private static final String HOST = "spotidjrouter.ddns.net";
+    private static final String HOST = "spotidjrouter.access.ly";
     //private static int CPORT = 5000;
     private static int CPORT = 16455;
     private static int SPORT = 16456;

@@ -232,7 +232,7 @@ public class RequesterActivity extends Activity implements
                     scrollView.setVisibility(View.GONE);
                     scrollView2.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
-                    addSong.setText("Add Song");
+                    addSong.setText("add Song");
                     adding = false;
                 }else{
                     search.setVisibility(View.VISIBLE);

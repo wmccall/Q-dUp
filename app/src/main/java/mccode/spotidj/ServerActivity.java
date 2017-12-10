@@ -6,8 +6,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
@@ -24,6 +28,7 @@ import android.widget.TextView;
 
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
+import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
@@ -31,8 +36,10 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import mccode.spotidj.Utils.CustomItemTouchHelper;
 import mccode.spotidj.Utils.Listeners.MessageListener;
 import mccode.spotidj.Utils.Listeners.SearchListener;
+import mccode.spotidj.Utils.RecyclerListAdapter;
 import mccode.spotidj.Utils.Server.ServerListener;
 import mccode.spotidj.Utils.Server.ServerWriter;
 import mccode.spotidj.models.Item;
@@ -54,12 +61,16 @@ public class ServerActivity extends Activity implements
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
 
+    private int itemCount = 0;
+
     //public static ArrayList<Item> queue = new ArrayList<>();
     public static final int jumpBackNum = 10;
     public static int position = -1;
     public static int count = 0;
     boolean adding = false;
     //private Player mPlayer;
+    private boolean alreadyChanged = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +78,12 @@ public class ServerActivity extends Activity implements
         setContentView(R.layout.type_server);
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
         serverKey.setText(key);
-        final LinearLayout queueBox = (LinearLayout) findViewById(R.id.QueueBox);
+
         final Button playPause = (Button) findViewById(R.id.PlayPause);
         final Button nextButton = (Button) findViewById(R.id.Skip);
         final Button backButton = (Button) findViewById(R.id.Back);
         final Button addSong = (Button) findViewById(R.id.AddSong);
         final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
-        final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
@@ -88,6 +98,16 @@ public class ServerActivity extends Activity implements
         findButton.setVisibility(View.GONE);
         final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
         scrollView.setVisibility(View.GONE);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        final RecyclerListAdapter adapter = new RecyclerListAdapter(this);
+        ItemTouchHelper.Callback callback = new CustomItemTouchHelper(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        recyclerView.setAdapter(adapter);
+        touchHelper.attachToRecyclerView(recyclerView);
+
+
+
 
         playPause.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -139,7 +159,16 @@ public class ServerActivity extends Activity implements
                 });
                 colorAnimation.start();
                 colorAnimationRev.start();
-                mPlayer.skipToNext(null);
+                String temp = adapter.next();
+                alreadyChanged = true;
+                if (!temp.equals("")){
+                    mPlayer.playUri(null, temp, 0, 0);
+                    setText(playPause, "Pause");
+                }
+                else{
+                    setText(playPause, "Play");
+                }
+
             }
         });
 
@@ -182,14 +211,12 @@ public class ServerActivity extends Activity implements
                         public void onClick(View view){
                         colorAnimation.start();
                         colorAnimationRev.start();
-                        //mPlayer.playUri(null, i.getUri(), 0, 0);
-                        //queue.add(i);
                         count++;
+                        adapter.addItem(i, generateButtonText(i).toString());
                         if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                            mPlayer.playUri(null, i.getUri(), 0, 0);
+                            mPlayer.playUri(null, adapter.next(), 0, 0);
                             setText(playPause, "Pause");
-                        }else{
-                            mPlayer.queue(null, i.getUri());
+                            alreadyChanged = true;
                         }
                         ServerWriter s = new ServerWriter();
                             try {
@@ -197,15 +224,8 @@ public class ServerActivity extends Activity implements
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT);
-                        params.bottomMargin = 2;
-                        Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                        btn.setId(count);
-                        btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                        //queueBox.addView(btn, params);
-                        addButton(queueBox,btn,params);
+                        //recyclerView.addView(btn, params);
+
                         }
                     });
                     j++;
@@ -324,9 +344,9 @@ public class ServerActivity extends Activity implements
                     search.setVisibility(View.GONE);
                     findButton.setVisibility(View.GONE);
                     scrollView.setVisibility(View.GONE);
-                    scrollView2.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
-                    addSong.setText("Add Song");
+                    addSong.setText("add Song");
                     playPause.setVisibility(View.VISIBLE);
                     nextButton.setVisibility(View.VISIBLE);
                     backButton.setVisibility(View.VISIBLE);
@@ -335,7 +355,7 @@ public class ServerActivity extends Activity implements
                     search.setVisibility(View.VISIBLE);
                     findButton.setVisibility(View.VISIBLE);
                     scrollView.setVisibility(View.VISIBLE);
-                    scrollView2.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.GONE);
                     queueOrSearch.setText("Search");
                     addSong.setText("View Queue");
                     playPause.setVisibility(View.GONE);
@@ -352,14 +372,12 @@ public class ServerActivity extends Activity implements
             public void onMessageSucceeded(String result) {
                 try {
                     Item i = mapper.readValue(result, Item.class);
-                    //mPlayer.playUri(null, i.getUri(), 0, 0);
-                    //queue.add(i);
                     count++;
+                    adapter.addItem(i, generateButtonText(i).toString());
                     if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                        mPlayer.playUri(null, i.getUri(), 0, 0);
+                        mPlayer.playUri(null, adapter.next(), 0, 0);
                         setText(playPause, "Pause");
-                    }else{
-                        mPlayer.queue(null, i.getUri());
+                        alreadyChanged = true;
                     }
                     ServerWriter s = new ServerWriter();
                     try {
@@ -367,15 +385,8 @@ public class ServerActivity extends Activity implements
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.bottomMargin = 2;
-                    Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    btn.setId(count);
-                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                    //queueBox.addView(btn, params);
-                    addButton(queueBox,btn,params);
+                    //recyclerView.addView(btn, params);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -383,9 +394,37 @@ public class ServerActivity extends Activity implements
             }
         };
 
+        mPlayer.addNotificationCallback(new Player.NotificationCallback() {
+            @Override
+            public void onPlaybackEvent(PlayerEvent playerEvent) {
+                System.out.println(playerEvent);
+                if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
+                    if(!alreadyChanged) {
+                        String temp = adapter.next();
+                        if (!temp.equals("")) {
+                            mPlayer.playUri(null, temp, 0, 0);
+                            setText(playPause, "Pause");
+                        } else {
+                            setText(playPause, "Play");
+                        }
+                        alreadyChanged = true;
+                    }
+                    else{
+                        alreadyChanged = false;
+                    }
+                }
+            }
+
+            @Override
+            public void onPlaybackError(Error error) {
+
+            }
+        });
+
         ServerListener listener = new ServerListener();
         listener.setOnServerListnerListener(ml);
         listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
     @Override
@@ -526,5 +565,10 @@ public class ServerActivity extends Activity implements
         }
 
         return text;
+    }
+
+    public void playSong(String uri){
+        mPlayer.playUri(null, uri, 0,0);
+        alreadyChanged = true;
     }
 }

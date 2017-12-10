@@ -1,6 +1,5 @@
 package mccode.spotidj.Utils;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,13 +29,22 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     private final List<String> mDisplays = new ArrayList<>();
     private final List<Item> mItems = new ArrayList<>();
 
-    private ServerActivity parent;
+    private RecyclerView mRecyclerView;
+    private ServerActivity activity;
     private int currentPlaying = -1;
     private boolean repeating = false;
 
-    public RecyclerListAdapter(ServerActivity parent) {
-        this.parent = parent;
+    public RecyclerListAdapter(ServerActivity activity) {
+        this.activity = activity;
     }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        mRecyclerView = recyclerView;
+    }
+
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -47,6 +55,13 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, int position) {
         holder.textView.setText(mDisplays.get(position));
+        if(position == currentPlaying){
+            holder.textView.setTextColor(Color.parseColor("#6de873"));
+        }
+        else {
+            holder.textView.setTextColor(Color.parseColor("#ffffff"));
+
+        }
     }
 
     @Override
@@ -56,7 +71,6 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
     @Override
     public void onItemDismiss(int position){
-        Log.d("RecyclerAdapter", "update: " + currentPlaying);
 
         mDisplays.remove(position);
         mItems.remove(position);
@@ -65,10 +79,9 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         }
         if(position == currentPlaying){
             currentPlaying--;
-            parent.playSong(next());
+            activity.playSong(next());
         }
         notifyItemRemoved(position);
-        Log.d("RecyclerAdapter", "post update: " + currentPlaying);
 
     }
 
@@ -101,7 +114,6 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
      * @param to the upper index of the swapper values
      */
     private void updateCurrentPlaying(int from, int to){
-        Log.d("RecyclerAdapter", "update: " + currentPlaying);
 
         if(currentPlaying == from){
             currentPlaying = to;
@@ -112,7 +124,6 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         else if (to < from && currentPlaying < from && currentPlaying > to){
             currentPlaying++;
         }
-        Log.d("RecyclerAdapter", "post update: " + currentPlaying);
 
 
     }
@@ -125,19 +136,67 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     }
 
     public String next(){
-        Log.d("RecyclerAdapter", "next: " + currentPlaying);
+        if(currentPlaying>=mItems.size()){
+            return "";
+        }
+        ItemViewHolder holder;
+        if(currentPlaying >=0) {
+            holder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if(holder != null)
+                holder.textView.setTextColor(Color.parseColor("#ffffff"));
+        }
         String result = "";
+        int last = currentPlaying;
         currentPlaying++;
         if(repeating){
             currentPlaying = currentPlaying % mItems.size();
         }
         if(currentPlaying < mItems.size()) {
             result =  mItems.get(currentPlaying).getUri();
+            holder = (ItemViewHolder)mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if(holder != null)
+                holder.textView.setTextColor(Color.parseColor("#6de873"));
+            notifyItemChanged(currentPlaying);
+            notifyItemChanged(last);
         }
-
         return result;
     }
 
+    public String prev(){
+        Log.d("Adapter", "curr" + currentPlaying);
+        if(currentPlaying== -1){
+            return "";
+        }
+        ItemViewHolder holder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+        if(holder != null)
+            holder.textView.setTextColor(Color.parseColor("#ffffff"));
+
+        String result = "";
+        int last = currentPlaying;
+        currentPlaying--;
+        if(repeating){
+            currentPlaying = currentPlaying % mItems.size();
+        }
+        if(currentPlaying >= 0) {
+            result =  mItems.get(currentPlaying).getUri();
+            holder = (ItemViewHolder)mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if(holder != null)
+                holder.textView.setTextColor(Color.parseColor("#6de873"));
+            notifyItemChanged(currentPlaying);
+            notifyItemChanged(last);
+        }
+        return result;
+
+    }
+
+    public String playFromBeginning(){
+        currentPlaying = -1;
+        return next();
+    }
+
+    public boolean isCurrValid(){
+        return currentPlaying >= 0 && currentPlaying < mItems.size();
+    }
 
     /**
      * Simple example of a view holder that implements {@link ItemTouchHelperViewHolder} and has a
@@ -157,7 +216,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
         @Override
         public void onItemSelected() {
-            itemView.setBackgroundColor(Color.LTGRAY);
+            itemView.setBackgroundColor(Color.parseColor("#606060"));
         }
 
         @Override

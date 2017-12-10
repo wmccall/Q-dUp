@@ -134,7 +134,11 @@ public class ServerActivity extends Activity implements
                     mPlayer.pause(null);
                 }else{
                     playPause.setText("Pause");
-                    mPlayer.resume(null);
+                    if(adapter.isCurrValid())
+                        mPlayer.resume(null);
+                    else
+                        mPlayer.playUri(null, adapter.playFromBeginning(), 0, 0);
+                        alreadyChanged = true;
                 }
             }
         });
@@ -166,7 +170,11 @@ public class ServerActivity extends Activity implements
                     setText(playPause, "Pause");
                 }
                 else{
-                    setText(playPause, "Play");
+                    if(mPlayer.getPlaybackState().isPlaying) {
+                        mPlayer.pause(null);
+                        setText(playPause, "Play");
+                        mPlayer.skipToNext(null);
+                    }
                 }
 
             }
@@ -270,7 +278,19 @@ public class ServerActivity extends Activity implements
                 });
                 colorAnimation.start();
                 colorAnimationRev.start();
-                mPlayer.skipToPrevious(null);
+                String temp = adapter.prev();
+                alreadyChanged = true;
+                if (!temp.equals("")){
+                    mPlayer.playUri(null, temp, 0, 0);
+                    setText(playPause, "Pause");
+                }
+                else{
+                    if(mPlayer.getPlaybackState().isPlaying) {
+                        mPlayer.pause(null);
+                        setText(playPause, "Play");
+                        mPlayer.skipToNext(null);
+                    }
+                }
             }
         });
         final SearchListener searchListener = new SearchListener() {

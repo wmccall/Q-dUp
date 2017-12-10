@@ -5,7 +5,8 @@
     android:layout_height="?listPreferredItemHeight"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?selectableItemBackground">
+    android:foreground="?selectableItemBackground"
+    android:background ="@color/background">
 
     <TextView
         android:id="@+id/holder_text"
@@ -14,7 +15,7 @@
         android:layout_gravity="center_vertical"
         android:padding="5dp"
         android:textColor="@color/white"
-        android:background ="@color/background"/>
+        />
 
     <ImageView
         android:id="@+id/holder_handle"

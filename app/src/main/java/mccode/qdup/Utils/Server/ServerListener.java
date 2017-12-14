@@ -39,9 +39,9 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
                 response = "";
             }
         } catch (IOException e) {
-            //e.printStackTrace();
             System.out.println("Closing server listener");
         } catch (RuntimeException e){
+            e.printStackTrace();
             System.out.println("Closing server listener");
         }
 

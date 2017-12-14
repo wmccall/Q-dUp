@@ -127,6 +127,7 @@ public class RequesterActivity extends Activity implements
                             colorAnimationRev.start();
                             ClientWriter w = new ClientWriter();
                             try {
+                                Log.d("requester activity", "sending song");
                                 w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
                             } catch (IOException e) {
                                 e.printStackTrace();

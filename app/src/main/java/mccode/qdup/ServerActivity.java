@@ -365,7 +365,7 @@ public class ServerActivity extends Activity implements
                     scrollView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
-                    addSong.setText("add Song");
+                    addSong.setText("Add Song");
                     playPause.setVisibility(View.VISIBLE);
                     nextButton.setVisibility(View.VISIBLE);
                     backButton.setVisibility(View.VISIBLE);
@@ -390,9 +390,15 @@ public class ServerActivity extends Activity implements
             @Override
             public void onMessageSucceeded(String result) {
                 try {
-                    Item i = mapper.readValue(result, Item.class);
+                    final Item i = mapper.readValue(result, Item.class);
                     count++;
-                    adapter.addItem(i, generateButtonText(i).toString());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.addItem(i, generateButtonText(i).toString());
+                        }
+                    });
+
                     if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
                         mPlayer.playUri(null, adapter.next(), 0, 0);
                         setText(playPause, "Pause");

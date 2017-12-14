@@ -142,11 +142,19 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         ItemViewHolder holder;
         if(currentPlaying >=0) {
             holder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
-            if(holder != null)
-                holder.textView.setTextColor(Color.parseColor("#ffffff"));
+            if(holder != null) {
+                final ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#ffffff"));
+                    }
+                });
+            }
+
         }
         String result = "";
-        int last = currentPlaying;
+        final int last = currentPlaying;
         currentPlaying++;
         if(repeating){
             currentPlaying = currentPlaying % mItems.size();
@@ -154,10 +162,18 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         if(currentPlaying < mItems.size()) {
             result =  mItems.get(currentPlaying).getUri();
             holder = (ItemViewHolder)mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
-            if(holder != null)
-                holder.textView.setTextColor(Color.parseColor("#6de873"));
-            notifyItemChanged(currentPlaying);
-            notifyItemChanged(last);
+            if(holder != null) {
+                final ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#6de873"));
+                        notifyItemChanged(currentPlaying);
+                        notifyItemChanged(last);
+                    }
+                });
+            }
+
         }
         return result;
     }

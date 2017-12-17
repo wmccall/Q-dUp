@@ -396,14 +396,14 @@ public class ServerActivity extends Activity implements
                         @Override
                         public void run() {
                             adapter.addItem(i, generateButtonText(i).toString());
+                            if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
+                                mPlayer.playUri(null, adapter.next(), 0, 0);
+                                setText(playPause, "Pause");
+                                alreadyChanged = true;
+                            }
                         }
                     });
 
-                    if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                        mPlayer.playUri(null, adapter.next(), 0, 0);
-                        setText(playPause, "Pause");
-                        alreadyChanged = true;
-                    }
                     ServerWriter s = new ServerWriter();
                     try {
                         s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));

@@ -53,15 +53,50 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     }
 
     @Override
-    public void onBindViewHolder(final ItemViewHolder holder, int position) {
+    public void onBindViewHolder(final ItemViewHolder holder, final int position) {
         holder.textView.setText(mDisplays.get(position));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                final int last = currentPlaying;
+                if(currentPlaying >=0 && currentPlaying <mItems.size()) {
+                    ItemViewHolder currPlayHolder;
+
+                    currPlayHolder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                    if(currPlayHolder != null) {
+                        final ItemViewHolder finalHolder = currPlayHolder;
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                finalHolder.textView.setTextColor(Color.parseColor("#ffffff"));
+                            }
+                        });
+                    }
+
+                }
+                currentPlaying = holder.getAdapterPosition();
+                activity.playSong(mItems.get(currentPlaying).getUri());
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.textView.setTextColor(Color.parseColor("#6de873"));
+                        notifyItemChanged(currentPlaying);
+                        notifyItemChanged(last);
+                    }
+                });
+            }
+
+        });
         if(position == currentPlaying){
             holder.textView.setTextColor(Color.parseColor("#6de873"));
         }
         else {
             holder.textView.setTextColor(Color.parseColor("#ffffff"));
-
         }
+
+
+
     }
 
     @Override

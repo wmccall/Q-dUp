@@ -46,6 +46,7 @@ public class MainActivity extends Activity implements
     private static int CPORT = 16455;
     private static int SPORT = 16456;
     public static String key = "";
+    public static boolean requestNewKey = true;
     public static ObjectMapper mapper = new ObjectMapper();
     public static Socket routerSocket;
     public static String responseToken = "";
@@ -262,96 +263,6 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-//        setContentView(R.layout.activity_main);
-        //mPlayer.playUri(null, "spotify:track:7oK9VyNzrYvRFo7nQEYkWN", 0, 0);
-//        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
-//        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-//        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
-//        final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
-//        final Button confirmType = (Button) findViewById(R.id.confirmType);
-//        final EditText keySearch = (EditText) findViewById(R.id.key_search);
-//        final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
-//        final Button retry = (Button) findViewById(R.id.retry);
-//        final TextView error = (TextView) findViewById(R.id.errorConnect);
-//        retry.setVisibility(View.GONE);
-//        error.setVisibility(View.GONE);
-//        final ConnectListener listener = new ConnectListener() {
-//            @Override
-//            public void onConnectSucceeded(ArrayList<String> result) {
-//                //is checked means it is server, not is client
-//                if(!result.get(0).equals("NA")) {
-//                    key = result.get(0);
-//                    if(serverOrClient.isChecked()){
-//                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
-//                        startActivity(intent);
-//                    }else{
-//                        Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
-//                        startActivity(intent);
-//                    }
-//                }
-//            }
-//        };
-//
-//        confirmType.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-//                colorAnimation.setDuration(250);
-//                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-//                colorAnimationRev.setDuration(250);
-//                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimation.start();
-//                colorAnimationRev.start();
-//                if(serverOrClient.isChecked()){
-//                    s = new ServerConnector();
-//                    s.setOnConnectListener(listener);
-//                    //s.execute();
-//                    s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                }else{
-//                    key = keySearch.getText().toString();
-//                    c = new ClientConnector(key);
-//                    c.setOnConnectListener(listener);
-//                    //c.execute();
-//                    c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                }
-//            }
-//        });
-//
-//        serverOrClient.setOnClickListener(new View.OnClickListener(){
-//            public void onClick(View v){
-//                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-//                colorAnimation.setDuration(250);
-//                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-//                colorAnimationRev.setDuration(250);
-//                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimation.start();
-//                colorAnimationRev.start();
-//                TransitionManager.beginDelayedTransition(mainView);
-//                keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
-//            }
-//        });
     }
 
     public void logIn(){
@@ -401,10 +312,10 @@ public class MainActivity extends Activity implements
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         for (Thread t: threadSet
              ) {
-            System.out.println(t.getId() + ": " + t.getName() + "-" );
+            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
             for (StackTraceElement s :t.getStackTrace()
                  ) {
-                System.out.println(s.toString());
+                Log.d("Main Activity", s.toString());
             }
         }
     }

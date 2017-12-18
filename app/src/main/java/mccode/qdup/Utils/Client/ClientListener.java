@@ -1,5 +1,6 @@
 package mccode.qdup.Utils.Client;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,15 +37,15 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
 //                while(in.hasNextLine()){
 //                    response += in.nextLine();
 //                }
-                //System.out.println(response);
+                //Log.i("Client Listener", response);
                 listener.onMessageSucceeded(response);
                 response = "";
             }
         } catch (IOException e) {
             //e.printStackTrace();
-            System.out.println("Closing client listener");
+            Log.e("Client Listener", "Closing client listener");
         } catch (RuntimeException e){
-            System.out.println("Closing client listener");
+            Log.e("Client Listener", "Closing client listener");
         }
 
 

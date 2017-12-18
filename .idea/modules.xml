@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SpotiDJ.iml" filepath="$PROJECT_DIR$/SpotiDJ.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Q-dUp.iml" filepath="$PROJECT_DIR$/Q-dUp.iml" />
+      <module fileurl="file://C:\Users\mammo\Documents\GitHub\Q-dUp\SpotiDJ.iml" filepath="C:\Users\mammo\Documents\GitHub\Q-dUp\SpotiDJ.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -1,6 +1,7 @@
 package mccode.qdup.Utils.Client;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -55,13 +56,13 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 /**TODO:
                  * remove print statement and show on phone
                  */
-                System.out.println("Connected to router");
+                Log.i("Client Connector", "Connected to router");
             }
             catch (IOException e)
             {
                 if(!attempted)
                 {
-                    System.out.println("Waiting for router");
+                    Log.e("Client Connector", "Waiting for router");
                     attempted = true;
                 }
 //                try
@@ -100,10 +101,10 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 }
                 catch (IOException e)
                 {
-                    //System.out.println(e.toString());
+                    //Log.e("Client Connector", e.toString());
                     if(!attempted)
                     {
-                        System.out.println("Waiting for router");
+                        Log.e("Client Connector", "Waiting for router");
                         attempted = true;
                         connected = false;
                     }

@@ -40,31 +40,34 @@ import mccode.qdup.Utils.Server.ServerConnector;
 public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
-    private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
-    private static final String REDIRECT_URI = "mccode-qdup://callback";
-    private static final String HOST = "spotidjrouter.access.ly";
-    private static int CPORT = 16455;
-    private static int SPORT = 16456;
-    public static String key = "";
-    public static ObjectMapper mapper = new ObjectMapper();
-    public static Socket routerSocket;
+    private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
+    private static final String REDIRECT_URI = "mccode-qdup://callback";    //callback for Spotify
+    private static final String HOST = "spotidjrouter.access.ly";       //hostname of the router
+    private static int CPORT = 16455;           //client port number on the router
+    private static int SPORT = 16456;           //server port number on the router
+    public static String key = "";              //string that holds the server key
+    public static boolean requestNewKey = true; //tells us if the server is going to need a new key
+    public static ObjectMapper mapper = new ObjectMapper(); //mapper to do json parsing
+    public static Socket routerSocket;          //socket connection to the router
     public static String responseToken = "";
     public static boolean stopped = false;
-    private ServerConnector s;
-    private ClientConnector c;
-    private AuthenticationResponse aResponse = null;
-    private boolean premium = true;
-
-    private static boolean failedConnect = false;
-
+    private ServerConnector s;                  //tool to connect the server to the router
+    private ClientConnector c;                  //tool to connect the client to the router
+    private AuthenticationResponse aResponse = null;    //Spotify authentication response
+    private boolean premium = true;             //variable that holds if user has Spotify premium
+    private static boolean failedConnect = false;       //remembers if the user couldnt connect
     // Request code that will be used to verify if the result comes from correct activity
-    // Can be any integer
     private static final int REQUEST_CODE = 1337;
-    public static Player mPlayer;
+    public static Player mPlayer;               //Spotify music player
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(!failedConnect){
+        /**
+         * Method:      OnCreate
+         * Purpose:     gets called when the activity is created. Sets up the buttons and then logs
+         *              the user in.
+         */
+        if(!failedConnect){     //if the person has not failed to connect, it will update the screen
             setContentView(R.layout.activity_main);
             final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
             final Button confirmType = (Button) findViewById(R.id.confirmType);
@@ -77,10 +80,8 @@ public class MainActivity extends Activity implements
             confirmType.setVisibility(View.GONE);
             keySearch.setVisibility(View.GONE);
         }
-
         super.onCreate(savedInstanceState);
-
-        logIn();
+        logIn();    //logs the user in with Spotify
     }
 
     @Override
@@ -262,96 +263,6 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-//        setContentView(R.layout.activity_main);
-        //mPlayer.playUri(null, "spotify:track:7oK9VyNzrYvRFo7nQEYkWN", 0, 0);
-//        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
-//        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-//        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
-//        final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
-//        final Button confirmType = (Button) findViewById(R.id.confirmType);
-//        final EditText keySearch = (EditText) findViewById(R.id.key_search);
-//        final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
-//        final Button retry = (Button) findViewById(R.id.retry);
-//        final TextView error = (TextView) findViewById(R.id.errorConnect);
-//        retry.setVisibility(View.GONE);
-//        error.setVisibility(View.GONE);
-//        final ConnectListener listener = new ConnectListener() {
-//            @Override
-//            public void onConnectSucceeded(ArrayList<String> result) {
-//                //is checked means it is server, not is client
-//                if(!result.get(0).equals("NA")) {
-//                    key = result.get(0);
-//                    if(serverOrClient.isChecked()){
-//                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
-//                        startActivity(intent);
-//                    }else{
-//                        Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
-//                        startActivity(intent);
-//                    }
-//                }
-//            }
-//        };
-//
-//        confirmType.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-//                colorAnimation.setDuration(250);
-//                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-//                colorAnimationRev.setDuration(250);
-//                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimation.start();
-//                colorAnimationRev.start();
-//                if(serverOrClient.isChecked()){
-//                    s = new ServerConnector();
-//                    s.setOnConnectListener(listener);
-//                    //s.execute();
-//                    s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                }else{
-//                    key = keySearch.getText().toString();
-//                    c = new ClientConnector(key);
-//                    c.setOnConnectListener(listener);
-//                    //c.execute();
-//                    c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                }
-//            }
-//        });
-//
-//        serverOrClient.setOnClickListener(new View.OnClickListener(){
-//            public void onClick(View v){
-//                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-//                colorAnimation.setDuration(250);
-//                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-//                colorAnimationRev.setDuration(250);
-//                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    @Override
-//                    public void onAnimationUpdate(ValueAnimator animator) {
-//                        serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-//                    }
-//                });
-//                colorAnimation.start();
-//                colorAnimationRev.start();
-//                TransitionManager.beginDelayedTransition(mainView);
-//                keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
-//            }
-//        });
     }
 
     public void logIn(){
@@ -400,11 +311,11 @@ public class MainActivity extends Activity implements
         }
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         for (Thread t: threadSet
-             ) {
-            System.out.println(t.getId() + ": " + t.getName() + "-" );
+                ) {
+            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
             for (StackTraceElement s :t.getStackTrace()
-                 ) {
-                System.out.println(s.toString());
+                    ) {
+                Log.d("Main Activity", s.toString());
             }
         }
     }

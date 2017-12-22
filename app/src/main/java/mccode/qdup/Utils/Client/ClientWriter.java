@@ -1,6 +1,7 @@
 package mccode.qdup.Utils.Client;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -32,11 +33,11 @@ public class ClientWriter extends AsyncTask<String, Integer, ArrayList<String>>
         PrintStream out;
         try {
             out = new PrintStream(routerSocket.getOutputStream());
-            //System.out.println(strings[0]);
+            //Log.i("Client Listener", strings[0]);
             out.write((strings[0].replace("\n", "").replace("\r", "") + "\n").getBytes());
         } catch (IOException e) {
             // TODO catch write error
-            System.out.println("Closing client writer");
+            Log.e("Client Listener", "Closing client writer");
         }
 
         return response;

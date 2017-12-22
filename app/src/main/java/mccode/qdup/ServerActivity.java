@@ -33,12 +33,15 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import mccode.qdup.Utils.CustomItemTouchHelper;
+import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Listeners.MessageListener;
 import mccode.qdup.Utils.Listeners.SearchListener;
 import mccode.qdup.Utils.RecyclerListAdapter;
+import mccode.qdup.Utils.Server.ServerConnector;
 import mccode.qdup.Utils.Server.ServerListener;
 import mccode.qdup.Utils.Server.ServerWriter;
 import mccode.qdup.models.Item;
@@ -48,6 +51,7 @@ import mccode.qdup.models.TrackResponse;
 import static mccode.qdup.MainActivity.key;
 import static mccode.qdup.MainActivity.mPlayer;
 import static mccode.qdup.MainActivity.mapper;
+import static mccode.qdup.MainActivity.requestNewKey;
 import static mccode.qdup.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
@@ -389,6 +393,15 @@ public class ServerActivity extends Activity implements
 
             @Override
             public void onMessageSucceeded(String result) {
+                final ConnectListener listener = new ConnectListener() {
+                    @Override
+                    public void onConnectSucceeded(ArrayList<String> result) {
+                        //is checked means it is server, not is client
+                        if(!result.get(0).equals("NA")) {
+                            key = result.get(0);
+                        }
+                    }
+                };
                 try {
                     final Item i = mapper.readValue(result, Item.class);
                     count++;
@@ -413,7 +426,15 @@ public class ServerActivity extends Activity implements
                     //recyclerView.addView(btn, params);
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    if (result.equals("err")){
+                        requestNewKey = false;
+                        routerSocket = new Socket();
+                        ServerConnector s = new ServerConnector();
+                        s.setOnConnectListener(listener);
+                        //s.execute();
+                        s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
                 }
 
             }
@@ -422,7 +443,7 @@ public class ServerActivity extends Activity implements
         mPlayer.addNotificationCallback(new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
-                System.out.println(playerEvent);
+                Log.i("Server Activity", playerEvent.toString());
                 if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
                     if(!alreadyChanged) {
                         String temp = adapter.next();
@@ -448,7 +469,10 @@ public class ServerActivity extends Activity implements
 
         ServerListener listener = new ServerListener();
         listener.setOnServerListnerListener(ml);
-        listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        while(listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR) == null){
+            listener = new ServerListener();
+            listener.setOnServerListnerListener(ml);
+        }
 
     }
 

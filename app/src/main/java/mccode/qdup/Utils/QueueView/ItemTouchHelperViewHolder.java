@@ -1,4 +1,4 @@
-package mccode.qdup.Utils;
+package mccode.qdup.Utils.QueueView;
 
 /**
  * Author: Connor McAuliffe

@@ -34,6 +34,7 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
             in = new Scanner(routerSocket.getInputStream());
             while(!stopped){
                 response = in.nextLine();
+                Log.d("readin", response);
 //                while(in.hasNextLine()){
 //                    response += in.nextLine();
 //                }

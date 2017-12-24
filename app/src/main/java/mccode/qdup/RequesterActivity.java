@@ -8,6 +8,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
@@ -35,6 +38,11 @@ import mccode.qdup.Utils.Client.ClientListener;
 import mccode.qdup.Utils.Client.ClientWriter;
 import mccode.qdup.Utils.Listeners.MessageListener;
 import mccode.qdup.Utils.Listeners.SearchListener;
+import mccode.qdup.Utils.Messaging.Message;
+import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
+import mccode.qdup.Utils.QueueView.HostRecyclerListAdapter;
+import mccode.qdup.Utils.QueueView.RequesterItemTouchHelper;
+import mccode.qdup.Utils.QueueView.RequesterRecyclerListAdapter;
 import mccode.qdup.models.Item;
 import mccode.qdup.models.ResponseWrapper;
 import mccode.qdup.models.TrackResponse;
@@ -68,10 +76,10 @@ public class RequesterActivity extends Activity implements
         setContentView(R.layout.type_requester);
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
         serverKey.setText(key);
-        final LinearLayout queueBox = (LinearLayout) findViewById(R.id.QueueBox);
+        //final LinearLayout queueBox = (LinearLayout) findViewById(R.id.QueueBox);
         final Button addSong = (Button) findViewById(R.id.AddSong);
         final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
-        final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
+        //final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
         final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
         final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
         final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
@@ -83,7 +91,15 @@ public class RequesterActivity extends Activity implements
         final EditText search = (EditText) findViewById(R.id.search_bar);
         final Button findButton = (Button) findViewById(R.id.find_button);
         final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
-        scrollView2.setVisibility(View.GONE);
+
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        final RequesterRecyclerListAdapter adapter = new RequesterRecyclerListAdapter(this);
+        ItemTouchHelper.Callback callback = new RequesterItemTouchHelper(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        recyclerView.setAdapter(adapter);
+        touchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setVisibility(View.GONE);
 
         //handles creating buttons for each of the tracks resulting from a search
         final TrackCreatorListener creatorListener = new TrackCreatorListener() {
@@ -118,9 +134,9 @@ public class RequesterActivity extends Activity implements
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
                     searchResultView.post(new Runnable() {
                         public void run() {
-                        searchResultView.addView(btn, params);
-                    }
-                        });
+                            searchResultView.addView(btn, params);
+                        }
+                    });
                     btn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
                             colorAnimation.start();
@@ -128,7 +144,8 @@ public class RequesterActivity extends Activity implements
                             ClientWriter w = new ClientWriter();
                             try {
                                 Log.d("requester activity", "sending song");
-                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
+                                Message m = new Message(i);
+                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(m));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -230,7 +247,7 @@ public class RequesterActivity extends Activity implements
                     search.setVisibility(View.GONE);
                     findButton.setVisibility(View.GONE);
                     scrollView.setVisibility(View.GONE);
-                    scrollView2.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
                     addSong.setText("add Song");
                     adding = false;
@@ -238,7 +255,7 @@ public class RequesterActivity extends Activity implements
                     search.setVisibility(View.VISIBLE);
                     findButton.setVisibility(View.VISIBLE);
                     scrollView.setVisibility(View.VISIBLE);
-                    scrollView2.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.GONE);
                     queueOrSearch.setText("Search");
                     addSong.setText("View Queue");
                     adding = true;
@@ -250,16 +267,47 @@ public class RequesterActivity extends Activity implements
             @Override
             public void onMessageSucceeded(String result) {
                 try {
-                    Item i = mapper.readValue(result, Item.class);
-                    count++;
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.bottomMargin = 2;
-                    Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    btn.setId(count);
-                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                    addButton(queueBox,btn,params);
+                    final Message m = mapper.readValue(result, Message.class);
+                    switch(m.getCode()) {
+                        case ADD: {
+
+                            final Item i = m.getItem();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.addItem(i, generateButtonText(i).toString());
+                                }
+                            });
+                            break;
+                        }
+                        case SWAP:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.swap(m.getVal1(), m.getVal2());
+                                }
+                            });
+                            break;
+                        }
+                        case REMOVE:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.remove(m.getVal1());
+                                }
+                            });
+                            break;
+                        }
+                        case CHANGE_PLAYING:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.changePlaying(m.getVal1());
+                                }
+                            });
+                            break;
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -365,14 +413,6 @@ public class RequesterActivity extends Activity implements
         Log.d("MainActivity", "Received connection message: " + message);
     }
 
-    private void addButton(final LinearLayout queueBox, final Button btn, final LinearLayout.LayoutParams params){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                queueBox.addView(btn, params);
-            }
-        });
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -425,3 +465,4 @@ public class RequesterActivity extends Activity implements
         return text;
     }
 }
+

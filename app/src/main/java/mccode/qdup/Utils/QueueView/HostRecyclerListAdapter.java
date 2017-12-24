@@ -1,4 +1,4 @@
-package mccode.qdup.Utils;
+package mccode.qdup.Utils.QueueView;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +15,8 @@ import java.util.List;
 
 import mccode.qdup.R;
 import mccode.qdup.ServerActivity;
+import mccode.qdup.Utils.Messaging.Message;
+import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.models.Item;
 
 /**
@@ -23,7 +25,7 @@ import mccode.qdup.models.Item;
  * Last Revised: 12/6/2017
  */
 
-public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapter.ItemViewHolder>
+public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerListAdapter.ItemViewHolder>
         implements ItemTouchHelperAdapter {
 
     private final List<String> mDisplays = new ArrayList<>();
@@ -34,7 +36,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     private int currentPlaying = -1;
     private boolean repeating = false;
 
-    public RecyclerListAdapter(ServerActivity activity) {
+    public HostRecyclerListAdapter(ServerActivity activity) {
         this.activity = activity;
     }
 
@@ -85,6 +87,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
                         notifyItemChanged(last);
                     }
                 });
+                activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
             }
 
         });
@@ -118,6 +121,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         }
         notifyItemRemoved(position);
 
+        activity.sendMessage(new Message(MessageCode.REMOVE, position));
     }
 
     @Override
@@ -136,6 +140,8 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
             }
         }
         updateCurrentPlaying(fromPosition, toPosition);
+        activity.sendMessage(new Message(fromPosition, toPosition));
+
 
         notifyItemMoved(fromPosition, toPosition);
         return true;
@@ -159,7 +165,6 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         else if (to < from && currentPlaying < from && currentPlaying > to){
             currentPlaying++;
         }
-
 
     }
 
@@ -210,6 +215,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
             }
 
         }
+        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
     }
 
@@ -236,6 +242,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
             notifyItemChanged(currentPlaying);
             notifyItemChanged(last);
         }
+        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
 
     }
@@ -276,3 +283,4 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
         }
     }
 }
+

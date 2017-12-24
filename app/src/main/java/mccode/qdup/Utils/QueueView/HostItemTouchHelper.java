@@ -1,4 +1,6 @@
-package mccode.qdup.Utils;
+
+
+package mccode.qdup.Utils.QueueView;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -9,11 +11,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Last Revised: 12/6/2017
  */
 
-public class CustomItemTouchHelper extends ItemTouchHelper.Callback {
+public class HostItemTouchHelper extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
 
-    public CustomItemTouchHelper(ItemTouchHelperAdapter adapter){
+    public HostItemTouchHelper(ItemTouchHelperAdapter adapter){
         mAdapter = adapter;
     }
 
@@ -41,6 +43,7 @@ public class CustomItemTouchHelper extends ItemTouchHelper.Callback {
         return true;
     }
 
+
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
@@ -65,3 +68,4 @@ public class CustomItemTouchHelper extends ItemTouchHelper.Callback {
     }
 
 }
+

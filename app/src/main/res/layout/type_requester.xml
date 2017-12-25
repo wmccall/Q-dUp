@@ -144,6 +144,7 @@
         app:layout_constraintRight_toRightOf="@+id/Server"
         app:layout_constraintTop_toBottomOf="@+id/Server" />
 
+    <!--
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="0dp"
@@ -169,5 +170,23 @@
 
         </LinearLayout>
     </ScrollView>
+    !-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/QueueBox"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="64dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AddSong"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

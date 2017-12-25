@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,15 +34,13 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 
-import mccode.qdup.Utils.CustomItemTouchHelper;
-import mccode.qdup.Utils.Listeners.ConnectListener;
+import mccode.qdup.Utils.Messaging.Message;
+import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
 import mccode.qdup.Utils.Listeners.MessageListener;
 import mccode.qdup.Utils.Listeners.SearchListener;
-import mccode.qdup.Utils.RecyclerListAdapter;
-import mccode.qdup.Utils.Server.ServerConnector;
+import mccode.qdup.Utils.QueueView.HostRecyclerListAdapter;
 import mccode.qdup.Utils.Server.ServerListener;
 import mccode.qdup.Utils.Server.ServerWriter;
 import mccode.qdup.models.Item;
@@ -51,7 +50,6 @@ import mccode.qdup.models.TrackResponse;
 import static mccode.qdup.MainActivity.key;
 import static mccode.qdup.MainActivity.mPlayer;
 import static mccode.qdup.MainActivity.mapper;
-import static mccode.qdup.MainActivity.requestNewKey;
 import static mccode.qdup.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
@@ -81,7 +79,7 @@ public class ServerActivity extends Activity implements
         setContentView(R.layout.type_server);
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
         serverKey.setText(key);
-
+        Log.d("serverActivity",key);
         final Button playPause = (Button) findViewById(R.id.PlayPause);
         final Button nextButton = (Button) findViewById(R.id.Skip);
         final Button backButton = (Button) findViewById(R.id.Back);
@@ -103,8 +101,8 @@ public class ServerActivity extends Activity implements
         scrollView.setVisibility(View.GONE);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        final RecyclerListAdapter adapter = new RecyclerListAdapter(this);
-        ItemTouchHelper.Callback callback = new CustomItemTouchHelper(adapter);
+        final HostRecyclerListAdapter adapter = new HostRecyclerListAdapter(this);
+        ItemTouchHelper.Callback callback = new HostItemTouchHelper(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         recyclerView.setAdapter(adapter);
         touchHelper.attachToRecyclerView(recyclerView);
@@ -141,7 +139,7 @@ public class ServerActivity extends Activity implements
                         mPlayer.resume(null);
                     else
                         mPlayer.playUri(null, adapter.playFromBeginning(), 0, 0);
-                        alreadyChanged = true;
+                    alreadyChanged = true;
                 }
             }
         });
@@ -220,22 +218,20 @@ public class ServerActivity extends Activity implements
                     });
                     btn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                        colorAnimation.start();
-                        colorAnimationRev.start();
-                        count++;
-                        adapter.addItem(i, generateButtonText(i).toString());
-                        if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                            mPlayer.playUri(null, adapter.next(), 0, 0);
-                            setText(playPause, "Pause");
-                            alreadyChanged = true;
-                        }
-                        ServerWriter s = new ServerWriter();
-                            try {
-                                s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            colorAnimation.start();
+                            colorAnimationRev.start();
+                            count++;
+                            adapter.addItem(i, generateButtonText(i).toString());
+                            if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
+                                mPlayer.playUri(null, adapter.next(), 0, 0);
+                                setText(playPause, "Pause");
+                                alreadyChanged = true;
                             }
-                        //recyclerView.addView(btn, params);
+
+                            Message m = new Message(i);
+                            Log.d("server", "sending message: " + m.getCode().toString());
+                            sendMessage(m);
+                            //recyclerView.addView(btn, params);
 
                         }
                     });
@@ -310,35 +306,35 @@ public class ServerActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-            final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
-            colorAnimation.setDuration(250);
-            final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
-            colorAnimationRev.setDuration(250);
-            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                String p = search.getText().toString().trim();
+                if (p.length()>0) {
+                    //mPlayer.pause(null);
+                    colorAnimation.start();
+                    colorAnimationRev.start();
+                    searchResultView.removeAllViews();
+                    loadingCircle.setVisibility(View.VISIBLE);
+                    p = p.replaceAll("\\s{2,}", " ").trim();
+                    p = p.replaceAll(" ", "%20");
+                    SearchReader search = new SearchReader();
+                    search.setOnSearchListener(searchListener);
+                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
                 }
-            });
-            colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    findButton.setBackgroundColor((int) animator.getAnimatedValue());
-                }
-            });
-            String p = search.getText().toString().trim();
-            if (p.length()>0) {
-                //mPlayer.pause(null);
-                colorAnimation.start();
-                colorAnimationRev.start();
-                searchResultView.removeAllViews();
-                loadingCircle.setVisibility(View.VISIBLE);
-                p = p.replaceAll("\\s{2,}", " ").trim();
-                p = p.replaceAll(" ", "%20");
-                SearchReader search = new SearchReader();
-                search.setOnSearchListener(searchListener);
-                search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
-            }
             }
         });
 
@@ -393,48 +389,33 @@ public class ServerActivity extends Activity implements
 
             @Override
             public void onMessageSucceeded(String result) {
-                final ConnectListener listener = new ConnectListener() {
-                    @Override
-                    public void onConnectSucceeded(ArrayList<String> result) {
-                        //is checked means it is server, not is client
-                        if(!result.get(0).equals("NA")) {
-                            key = result.get(0);
-                        }
-                    }
-                };
                 try {
-                    final Item i = mapper.readValue(result, Item.class);
-                    count++;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.addItem(i, generateButtonText(i).toString());
-                            if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                                mPlayer.playUri(null, adapter.next(), 0, 0);
-                                setText(playPause, "Pause");
-                                alreadyChanged = true;
-                            }
+                    final Message m = mapper.readValue(result, Message.class);
+                    switch (m.getCode()) {
+                        case ADD: {
+                            final Item i = m.getItem();
+                            count++;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.addItem(i, generateButtonText(i).toString());
+                                    if (mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying) {
+                                        mPlayer.playUri(null, adapter.next(), 0, 0);
+                                        setText(playPause, "Pause");
+                                        alreadyChanged = true;
+                                    }
+                                }
+                            });
+
+
+
+                            Log.d("server", "sending message: " + m.getCode().toString());
+                            sendMessage(m);
+                            //recyclerView.addView(btn, params);
                         }
-                    });
-
-                    ServerWriter s = new ServerWriter();
-                    try {
-                        s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(i));
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-                    //recyclerView.addView(btn, params);
-
                 } catch (IOException e) {
-//                    e.printStackTrace();
-                    if (result.equals("err")){
-                        requestNewKey = false;
-                        routerSocket = new Socket();
-                        ServerConnector s = new ServerConnector();
-                        s.setOnConnectListener(listener);
-                        //s.execute();
-                        s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }
+                    e.printStackTrace();
                 }
 
             }
@@ -443,7 +424,7 @@ public class ServerActivity extends Activity implements
         mPlayer.addNotificationCallback(new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
-                Log.i("Server Activity", playerEvent.toString());
+                System.out.println(playerEvent);
                 if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
                     if(!alreadyChanged) {
                         String temp = adapter.next();
@@ -469,10 +450,7 @@ public class ServerActivity extends Activity implements
 
         ServerListener listener = new ServerListener();
         listener.setOnServerListnerListener(ml);
-        while(listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR) == null){
-            listener = new ServerListener();
-            listener.setOnServerListnerListener(ml);
-        }
+        listener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
     }
 
@@ -620,4 +598,14 @@ public class ServerActivity extends Activity implements
         mPlayer.playUri(null, uri, 0,0);
         alreadyChanged = true;
     }
+
+    public void sendMessage(Message m){
+        ServerWriter s = new ServerWriter();
+        try {
+            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(m));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

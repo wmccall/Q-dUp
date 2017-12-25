@@ -42,7 +42,7 @@ public class MainActivity extends Activity implements
 {
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
     private static final String REDIRECT_URI = "mccode-qdup://callback";    //callback for Spotify
-    private static final String HOST = "qduprouter.ddns.net";       //hostname of the router
+    private static final String HOST = "ec2-52-14-28-204.us-east-2.compute.amazonaws.com";       //hostname of the router
     private static int CPORT = 16455;           //client port number on the router
     private static int SPORT = 16456;           //server port number on the router
     public static String key = "";              //string that holds the server key

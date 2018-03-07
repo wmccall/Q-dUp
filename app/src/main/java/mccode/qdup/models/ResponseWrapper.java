@@ -1,6 +1,7 @@
 package mccode.qdup.models;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boole
         for(String s : strings[0]){
             tot += s;
         }
-        //System.out.println(tot);
+        Log.d("Response:",tot);
         try{
             response = mapper.readValue(tot, TrackResponse.class);
         } catch (IOException e) { e.printStackTrace(); }

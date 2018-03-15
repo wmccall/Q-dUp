@@ -15,7 +15,6 @@ import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Listeners.MessageListener;
 
 import static mccode.qdup.MainActivity.routerSocket;
-import static mccode.qdup.MainActivity.stopped;
 
 /**
  * Created by Will on 6/14/2017.
@@ -37,21 +36,18 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
     protected ArrayList<String> doInBackground(String... strings) {
         Scanner in;
         try {
-             in = new Scanner(routerSocket.getInputStream());
-            while(!stopped){
-                try{
-                    response = in.nextLine();
-                    //Log.i("Server Listener", response);
-                    listener.onMessageSucceeded(response);
-                    response = "";
-                }catch(NoSuchElementException e){
-                    Log.e("Server Listener", "no line found, but its okay");
-                    in.close();
-                    response = "err";
-                    listener.onMessageSucceeded(response);
-                    return null;
-                }
-
+            in = new Scanner(routerSocket.getInputStream());
+            try{
+                response = in.nextLine();
+                //Log.i("Server Listener", response);
+                listener.onMessageSucceeded(response);
+                response = "";
+            }catch(NoSuchElementException e){
+                Log.e("Server Listener", "no line found, but its okay");
+                in.close();
+                response = "err";
+                listener.onMessageSucceeded(response);
+                return null;
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -12,8 +12,8 @@ import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.MainActivity.getCPort;
-import static mccode.qdup.MainActivity.getHost;
+import static mccode.qdup.MainActivity.getClientPort;
+import static mccode.qdup.MainActivity.getRouterUrl;
 //import static mccode.qdup.MainActivity.mp;
 import static mccode.qdup.MainActivity.routerSocket;
 
@@ -51,7 +51,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
         {
             try
             {
-                routerSocket.connect(new InetSocketAddress(getHost(), getCPort()));
+                routerSocket.connect(new InetSocketAddress(getRouterUrl(), getClientPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone

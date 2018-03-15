@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mccode.qdup.TrackCreatorListener;
 
-import static mccode.qdup.MainActivity.mapper;
+import static mccode.qdup.MainActivity.jsonConverter;
 
 /**
  * ResponseWrapper takes a response from the searchReader and gives the track creator listener a
@@ -40,7 +40,7 @@ public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boole
         }
         Log.d("Response:",tot);
         try{
-            response = mapper.readValue(tot, TrackResponse.class);
+            response = jsonConverter.readValue(tot, TrackResponse.class);
         } catch (IOException e) { e.printStackTrace(); }
         listener.onCreateSucceeded(v, this.response);
 

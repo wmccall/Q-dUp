@@ -41,24 +41,23 @@ public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
-    private static final String REDIRECT_URI = "mccode-qdup://callback";    //callback for Spotify
-    private static final String HOST = "mccoderouter.ddns.net";       //hostname of the router
-    private static int CPORT = 16455;           //client port number on the router
-    private static int SPORT = 16456;           //server port number on the router
-    public static String key = "";              //string that holds the server key
-    public static boolean requestNewKey = true; //tells us if the server is going to need a new key
-    public static ObjectMapper mapper = new ObjectMapper(); //mapper to do json parsing
-    public static Socket routerSocket;          //socket connection to the router
+    private static final String REDIRECT_URI = "mccode-qdup://callback";        //callback for Spotify
+    private static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
+    private static int CLIENT_PORT = 16455;                                     //client port number on the router
+    private static int SERVER_PORT = 16456;                                     //server port number on the router
+    public static String serverCode = "";                                       //string that holds the server serverCode
+    public static boolean requestNewServerCode = true;                          //flag if going to need a new serverCode
+    public static ObjectMapper jsonConverter = new ObjectMapper();              //jsonConverter to do json parsing
+    public static Socket routerSocket;                                          //socket connection to the router
     public static String responseToken = "";
-    public static boolean stopped = false;
-    private ServerConnector s;                  //tool to connect the server to the router
-    private ClientConnector c;                  //tool to connect the client to the router
-    private AuthenticationResponse aResponse = null;    //Spotify authentication response
-    private boolean premium = true;             //variable that holds if user has Spotify premium
-    private static boolean failedConnect = false;       //remembers if the user couldnt connect
+    private ServerConnector serverConnector;                                    //tool to connect the server to the router
+    private ClientConnector clientConnector;                                    //tool to connect the client to the router
+    private AuthenticationResponse authenticationResponse = null;               //Spotify authentication response
+    private boolean premium = true;                                             //variable that holds if user has Spotify premium
+    private static boolean failedConnect = false;                               //remembers if the user couldnt connect
     // Request code that will be used to verify if the result comes from correct activity
     private static final int REQUEST_CODE = 1337;
-    public static Player mPlayer;               //Spotify music player
+    public static Player musicPlayer;                                           //Spotify music player
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,18 +97,18 @@ public class MainActivity extends Activity implements
         final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
 
         if (requestCode == REQUEST_CODE) {
-            aResponse = AuthenticationClient.getResponse(resultCode, intent);
-            if (aResponse.getType() == AuthenticationResponse.Type.TOKEN) {
+            authenticationResponse = AuthenticationClient.getResponse(resultCode, intent);
+            if (authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN) {
                 retry.setVisibility(View.GONE);
                 error.setVisibility(View.GONE);
-                responseToken = aResponse.getAccessToken();
-                Config playerConfig = new Config(this, aResponse.getAccessToken(), CLIENT_ID);
+                responseToken = authenticationResponse.getAccessToken();
+                Config playerConfig = new Config(this, authenticationResponse.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
                     public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(MainActivity.this);
-                        mPlayer.addNotificationCallback(MainActivity.this);
+                        musicPlayer = spotifyPlayer;
+                        musicPlayer.addConnectionStateCallback(MainActivity.this);
+                        musicPlayer.addNotificationCallback(MainActivity.this);
                     }
 
                     @Override
@@ -122,7 +121,7 @@ public class MainActivity extends Activity implements
                     public void onConnectSucceeded(ArrayList<String> result) {
                         //is checked means it is server, not is client
                         if(!result.get(0).equals("NA")) {
-                            key = result.get(0);
+                            serverCode = result.get(0);
                             if(serverOrClient.isChecked()){
                                 Intent intent = new Intent(MainActivity.this, ServerActivity.class);
                                 startActivity(intent);
@@ -156,16 +155,16 @@ public class MainActivity extends Activity implements
                         colorAnimation.start();
                         colorAnimationRev.start();
                         if(serverOrClient.isChecked()){
-                            s = new ServerConnector();
-                            s.setOnConnectListener(listener);
+                            serverConnector = new ServerConnector();
+                            serverConnector.setOnConnectListener(listener);
                             //s.execute();
-                            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            serverConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }else{
-                            key = keySearch.getText().toString();
-                            c = new ClientConnector(key);
-                            c.setOnConnectListener(listener);
+                            serverCode = keySearch.getText().toString();
+                            clientConnector = new ClientConnector(serverCode);
+                            clientConnector.setOnConnectListener(listener);
                             //c.execute();
-                            c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            clientConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }
                     }
                 });
@@ -306,7 +305,7 @@ public class MainActivity extends Activity implements
     public void onResume()
     {
         super.onResume();
-        if(aResponse!= null && aResponse.getType() == AuthenticationResponse.Type.TOKEN){
+        if(authenticationResponse != null && authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN){
             routerSocket = new Socket();
         }
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
@@ -320,13 +319,15 @@ public class MainActivity extends Activity implements
         }
     }
 
-    public static String getHost(){
-        return HOST;
+    public static String getRouterUrl(){
+        return ROUTER_URL;
     }
 
-    public static int getCPort(){
-        return CPORT;
+    public static int getClientPort(){
+        return CLIENT_PORT;
     }
 
-    public static int getSPort() { return SPORT;}
+    public static int getServerPort() {
+        return SERVER_PORT;
+    }
 }

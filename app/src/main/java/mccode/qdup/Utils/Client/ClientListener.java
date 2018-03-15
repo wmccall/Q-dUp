@@ -9,7 +9,6 @@ import java.util.Scanner;
 import mccode.qdup.Utils.Listeners.MessageListener;
 
 import static mccode.qdup.MainActivity.routerSocket;
-import static mccode.qdup.MainActivity.stopped;
 
 /**
  * Created by Will on 6/14/2017.
@@ -32,16 +31,14 @@ public class ClientListener extends AsyncTask<String, Integer, ArrayList<String>
         Scanner in;
         try {
             in = new Scanner(routerSocket.getInputStream());
-            while(!stopped){
-                response = in.nextLine();
-                Log.d("readin", response);
+            response = in.nextLine();
+            Log.d("readin", response);
 //                while(in.hasNextLine()){
 //                    response += in.nextLine();
 //                }
-                //Log.i("Client Listener", response);
-                listener.onMessageSucceeded(response);
-                response = "";
-            }
+            //Log.i("Client Listener", response);
+            listener.onMessageSucceeded(response);
+            response = "";
         } catch (IOException e) {
             //e.printStackTrace();
             Log.e("Client Listener", "Closing client listener");

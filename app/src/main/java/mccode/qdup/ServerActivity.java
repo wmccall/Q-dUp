@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,9 +46,9 @@ import mccode.qdup.models.Item;
 import mccode.qdup.models.ResponseWrapper;
 import mccode.qdup.models.TrackResponse;
 
-import static mccode.qdup.MainActivity.key;
-import static mccode.qdup.MainActivity.mPlayer;
-import static mccode.qdup.MainActivity.mapper;
+import static mccode.qdup.MainActivity.serverCode;
+import static mccode.qdup.MainActivity.musicPlayer;
+import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
 
 public class ServerActivity extends Activity implements
@@ -69,7 +68,7 @@ public class ServerActivity extends Activity implements
     public static int position = -1;
     public static int count = 0;
     boolean adding = false;
-    //private Player mPlayer;
+    //private Player musicPlayer;
     private boolean alreadyChanged = false;
 
 
@@ -78,8 +77,8 @@ public class ServerActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_server);
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
-        serverKey.setText(key);
-        Log.d("serverActivity",key);
+        serverKey.setText(serverCode);
+        Log.d("serverActivity", serverCode);
         final Button playPause = (Button) findViewById(R.id.PlayPause);
         final Button nextButton = (Button) findViewById(R.id.Skip);
         final Button backButton = (Button) findViewById(R.id.Back);
@@ -130,15 +129,15 @@ public class ServerActivity extends Activity implements
                 });
                 colorAnimation.start();
                 colorAnimationRev.start();
-                if(mPlayer.getPlaybackState().isPlaying){
+                if(musicPlayer.getPlaybackState().isPlaying){
                     playPause.setText("Play");
-                    mPlayer.pause(null);
+                    musicPlayer.pause(null);
                 }else{
                     playPause.setText("Pause");
                     if(adapter.isCurrValid())
-                        mPlayer.resume(null);
+                        musicPlayer.resume(null);
                     else
-                        mPlayer.playUri(null, adapter.playFromBeginning(), 0, 0);
+                        musicPlayer.playUri(null, adapter.playFromBeginning(), 0, 0);
                     alreadyChanged = true;
                 }
             }
@@ -167,14 +166,14 @@ public class ServerActivity extends Activity implements
                 String temp = adapter.next();
                 alreadyChanged = true;
                 if (!temp.equals("")){
-                    mPlayer.playUri(null, temp, 0, 0);
+                    musicPlayer.playUri(null, temp, 0, 0);
                     setText(playPause, "Pause");
                 }
                 else{
-                    if(mPlayer.getPlaybackState().isPlaying) {
-                        mPlayer.pause(null);
+                    if(musicPlayer.getPlaybackState().isPlaying) {
+                        musicPlayer.pause(null);
                         setText(playPause, "Play");
-                        mPlayer.skipToNext(null);
+                        musicPlayer.skipToNext(null);
                     }
                 }
 
@@ -222,8 +221,8 @@ public class ServerActivity extends Activity implements
                             colorAnimationRev.start();
                             count++;
                             adapter.addItem(i, generateButtonText(i).toString());
-                            if(mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying){
-                                mPlayer.playUri(null, adapter.next(), 0, 0);
+                            if(musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying){
+                                musicPlayer.playUri(null, adapter.next(), 0, 0);
                                 setText(playPause, "Pause");
                                 alreadyChanged = true;
                             }
@@ -280,14 +279,14 @@ public class ServerActivity extends Activity implements
                 String temp = adapter.prev();
                 alreadyChanged = true;
                 if (!temp.equals("")){
-                    mPlayer.playUri(null, temp, 0, 0);
+                    musicPlayer.playUri(null, temp, 0, 0);
                     setText(playPause, "Pause");
                 }
                 else{
-                    if(mPlayer.getPlaybackState().isPlaying) {
-                        mPlayer.pause(null);
+                    if(musicPlayer.getPlaybackState().isPlaying) {
+                        musicPlayer.pause(null);
                         setText(playPause, "Play");
-                        mPlayer.skipToNext(null);
+                        musicPlayer.skipToNext(null);
                     }
                 }
             }
@@ -324,7 +323,7 @@ public class ServerActivity extends Activity implements
                 });
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
-                    //mPlayer.pause(null);
+                    //musicPlayer.pause(null);
                     colorAnimation.start();
                     colorAnimationRev.start();
                     searchResultView.removeAllViews();
@@ -390,7 +389,7 @@ public class ServerActivity extends Activity implements
             @Override
             public void onMessageSucceeded(String result) {
                 try {
-                    final Message m = mapper.readValue(result, Message.class);
+                    final Message m = jsonConverter.readValue(result, Message.class);
                     switch (m.getCode()) {
                         case ADD: {
                             final Item i = m.getItem();
@@ -399,8 +398,8 @@ public class ServerActivity extends Activity implements
                                 @Override
                                 public void run() {
                                     adapter.addItem(i, generateButtonText(i).toString());
-                                    if (mPlayer.getMetadata().currentTrack == null && !mPlayer.getPlaybackState().isPlaying) {
-                                        mPlayer.playUri(null, adapter.next(), 0, 0);
+                                    if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
+                                        musicPlayer.playUri(null, adapter.next(), 0, 0);
                                         setText(playPause, "Pause");
                                         alreadyChanged = true;
                                     }
@@ -421,7 +420,7 @@ public class ServerActivity extends Activity implements
             }
         };
 
-        mPlayer.addNotificationCallback(new Player.NotificationCallback() {
+        musicPlayer.addNotificationCallback(new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
                 System.out.println(playerEvent);
@@ -429,7 +428,7 @@ public class ServerActivity extends Activity implements
                     if(!alreadyChanged) {
                         String temp = adapter.next();
                         if (!temp.equals("")) {
-                            mPlayer.playUri(null, temp, 0, 0);
+                            musicPlayer.playUri(null, temp, 0, 0);
                             setText(playPause, "Pause");
                         } else {
                             setText(playPause, "Play");
@@ -531,7 +530,7 @@ public class ServerActivity extends Activity implements
         {
             ServerWriter s = new ServerWriter();
             s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
-            mPlayer.pause(null);
+            musicPlayer.pause(null);
             try {
                 routerSocket.close();
             } catch (IOException e) {
@@ -595,14 +594,14 @@ public class ServerActivity extends Activity implements
     }
 
     public void playSong(String uri){
-        mPlayer.playUri(null, uri, 0,0);
+        musicPlayer.playUri(null, uri, 0,0);
         alreadyChanged = true;
     }
 
     public void sendMessage(Message m){
         ServerWriter s = new ServerWriter();
         try {
-            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(m));
+            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
         } catch (IOException e) {
             e.printStackTrace();
         }

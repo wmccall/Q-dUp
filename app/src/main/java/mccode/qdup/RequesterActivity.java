@@ -39,17 +39,15 @@ import mccode.qdup.Utils.Client.ClientWriter;
 import mccode.qdup.Utils.Listeners.MessageListener;
 import mccode.qdup.Utils.Listeners.SearchListener;
 import mccode.qdup.Utils.Messaging.Message;
-import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
-import mccode.qdup.Utils.QueueView.HostRecyclerListAdapter;
 import mccode.qdup.Utils.QueueView.RequesterItemTouchHelper;
 import mccode.qdup.Utils.QueueView.RequesterRecyclerListAdapter;
 import mccode.qdup.models.Item;
 import mccode.qdup.models.ResponseWrapper;
 import mccode.qdup.models.TrackResponse;
 
-import static mccode.qdup.MainActivity.key;
-import static mccode.qdup.MainActivity.mPlayer;
-import static mccode.qdup.MainActivity.mapper;
+import static mccode.qdup.MainActivity.serverCode;
+import static mccode.qdup.MainActivity.musicPlayer;
+import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
 
 public class RequesterActivity extends Activity implements
@@ -75,7 +73,7 @@ public class RequesterActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_requester);
         TextView serverKey = (TextView) findViewById(R.id.ServerKey);
-        serverKey.setText(key);
+        serverKey.setText(serverCode);
         //final LinearLayout queueBox = (LinearLayout) findViewById(R.id.QueueBox);
         final Button addSong = (Button) findViewById(R.id.AddSong);
         final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
@@ -145,7 +143,7 @@ public class RequesterActivity extends Activity implements
                             try {
                                 Log.d("requester activity", "sending song");
                                 Message m = new Message(i);
-                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mapper.writeValueAsString(m));
+                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -267,7 +265,7 @@ public class RequesterActivity extends Activity implements
             @Override
             public void onMessageSucceeded(String result) {
                 try {
-                    final Message m = mapper.readValue(result, Message.class);
+                    final Message m = jsonConverter.readValue(result, Message.class);
                     switch(m.getCode()) {
                         case ADD: {
 
@@ -338,7 +336,7 @@ public class RequesterActivity extends Activity implements
     @Override
     protected void onDestroy() {
         // VERY IMPORTANT! This must always be called or else you will leak resources
-        mPlayer.pause(null);
+        musicPlayer.pause(null);
         Spotify.destroyPlayer(this);
         super.onDestroy();
     }
@@ -421,7 +419,7 @@ public class RequesterActivity extends Activity implements
         {
             ClientWriter c = new ClientWriter();
             c.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
-            mPlayer.pause(null);
+            musicPlayer.pause(null);
             try {
                 routerSocket.close();
             } catch (IOException e) {

@@ -12,11 +12,11 @@ import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.MainActivity.getSPort;
-import static mccode.qdup.MainActivity.getHost;
+import static mccode.qdup.MainActivity.getServerPort;
+import static mccode.qdup.MainActivity.getRouterUrl;
 import static mccode.qdup.MainActivity.routerSocket;
-import static mccode.qdup.MainActivity.key;
-import static mccode.qdup.MainActivity.requestNewKey;
+import static mccode.qdup.MainActivity.serverCode;
+import static mccode.qdup.MainActivity.requestNewServerCode;
 
 /**
  * Created by Will on 6/13/2017.
@@ -42,7 +42,7 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             try
             {
                 routerSocket = new Socket();
-                routerSocket.connect(new InetSocketAddress(getHost(), getSPort()));
+                routerSocket.connect(new InetSocketAddress(getRouterUrl(), getServerPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone
@@ -74,12 +74,12 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                 {
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
                     Scanner in = new Scanner(routerSocket.getInputStream());
-                    if(requestNewKey){
+                    if(requestNewServerCode){
                         out.write(("server:").getBytes());
                     } else {
-                        Log.i("Server Connector", "reconnecting with key: " + key);
-                        requestNewKey = true;
-                        out.write(key.getBytes());
+                        Log.i("Server Connector", "reconnecting with serverCode: " + serverCode);
+                        requestNewServerCode = true;
+                        out.write(serverCode.getBytes());
                     }
                     String routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))
@@ -92,8 +92,8 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                     }
                     else
                     {
-                        key = routerResponse;
-                        Log.i("Server Connector", key);
+                        serverCode = routerResponse;
+                        Log.i("Server Connector", serverCode);
                     }
                     //in.close();
                 }
@@ -120,8 +120,8 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             }
         }
         Log.i("Server Connector", "connected! Yo");
-        Log.i("Server Connector", ("key:" + key));
-        response.add("" + key);
+        Log.i("Server Connector", ("serverCode:" + serverCode));
+        response.add("" + serverCode);
         return response;
     }
     protected void onProgressUpdate()

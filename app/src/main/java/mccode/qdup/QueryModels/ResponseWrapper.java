@@ -1,4 +1,4 @@
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import android.os.AsyncTask;
 import android.util.Log;

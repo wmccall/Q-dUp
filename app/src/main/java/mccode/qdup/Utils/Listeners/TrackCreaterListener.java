@@ -2,7 +2,7 @@ package mccode.qdup.Utils.Listeners;
 
 import android.view.View;
 
-import mccode.qdup.models.TrackResponse;
+import mccode.qdup.QueryModels.TrackResponse;
 
 /**
  * Created by mammo on 3/24/2017.

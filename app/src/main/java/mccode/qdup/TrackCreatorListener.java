@@ -2,7 +2,7 @@ package mccode.qdup;
 
 import android.view.View;
 
-import mccode.qdup.models.TrackResponse;
+import mccode.qdup.QueryModels.TrackResponse;
 
 /**
  * TrackCreatorListener is a interface that is used to create the tracks coming back from

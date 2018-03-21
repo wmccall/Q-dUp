@@ -4,7 +4,7 @@ package mccode.qdup.Utils.Listeners;
 
 import java.io.IOException;
 
-import mccode.qdup.models.Item;
+import mccode.qdup.QueryModels.Item;
 
 /**
  * The controller interface that tells the model when the

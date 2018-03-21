@@ -1,6 +1,6 @@
 package mccode.qdup.Utils.Messaging;
 
-import mccode.qdup.models.Item;
+import mccode.qdup.QueryModels.Item;
 
 import java.security.InvalidParameterException;
 

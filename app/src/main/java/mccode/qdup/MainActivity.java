@@ -1,6 +1,5 @@
 package mccode.qdup;
 
-import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,9 +37,11 @@ import mccode.qdup.Utils.Client.ClientConnector;
 import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Server.ServerConnector;
 
+import static mccode.qdup.Utils.GeneralUIUtils.*;
+
 public class MainActivity extends Activity implements
-        SpotifyPlayer.NotificationCallback, ConnectionStateCallback
-{
+        SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
+    //Program Fields
     private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
     private static final String REDIRECT_URI = "mccode-qdup://callback";        //callback for Spotify
     private static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
@@ -59,6 +61,16 @@ public class MainActivity extends Activity implements
     private static final int REQUEST_CODE = 1337;
     public static Player musicPlayer;                                           //Spotify music player
 
+    //Buttons
+    private CompoundButton serverOrClient;
+    private Button confirmType;
+    private EditText keySearch;
+    private Button retry;
+    private TextView error;
+    private int colorPrimary;
+    private int colorFaded;
+    private ViewGroup mainView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /**
@@ -68,11 +80,7 @@ public class MainActivity extends Activity implements
          */
         if(!failedConnect){     //if the person has not failed to connect, it will update the screen
             setContentView(R.layout.activity_main);
-            final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
-            final Button confirmType = (Button) findViewById(R.id.confirmType);
-            final EditText keySearch = (EditText) findViewById(R.id.key_search);
-            final Button retry = (Button) findViewById(R.id.retry);
-            final TextView error = (TextView) findViewById(R.id.errorConnect);
+            initializeScreenElements();
             error.setVisibility(View.GONE);
             retry.setVisibility(View.GONE);
             serverOrClient.setVisibility(View.GONE);
@@ -87,15 +95,7 @@ public class MainActivity extends Activity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         setContentView(R.layout.activity_main);
-        final Button retry = (Button) findViewById(R.id.retry);
-        final CompoundButton serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
-        final Button confirmType = (Button) findViewById(R.id.confirmType);
-        final EditText keySearch = (EditText) findViewById(R.id.key_search);
-        final TextView error = (TextView) findViewById(R.id.errorConnect);
-        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
-        final ViewGroup mainView = (ViewGroup) findViewById(R.id.mainView);
-
+        initializeScreenElements();
         if (requestCode == REQUEST_CODE) {
             authenticationResponse = AuthenticationClient.getResponse(resultCode, intent);
             if (authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN) {
@@ -116,113 +116,14 @@ public class MainActivity extends Activity implements
                         Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
-                final ConnectListener listener = new ConnectListener() {
-                    @Override
-                    public void onConnectSucceeded(ArrayList<String> result) {
-                        //is checked means it is server, not is client
-                        if(!result.get(0).equals("NA")) {
-                            serverCode = result.get(0);
-                            if(serverOrClient.isChecked()){
-                                Intent intent = new Intent(MainActivity.this, ServerActivity.class);
-                                startActivity(intent);
-                            }else{
-                                Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
-                                startActivity(intent);
-                            }
-                        }
-                    }
-                };
-
-                confirmType.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-                        colorAnimation.setDuration(250);
-                        final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-                        colorAnimationRev.setDuration(250);
-                        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animator) {
-                                confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-                            }
-                        });
-                        colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animator) {
-                                confirmType.setBackgroundColor((int) animator.getAnimatedValue());
-                            }
-                        });
-                        colorAnimation.start();
-                        colorAnimationRev.start();
-                        if(serverOrClient.isChecked()){
-                            serverConnector = new ServerConnector();
-                            serverConnector.setOnConnectListener(listener);
-                            //s.execute();
-                            serverConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }else{
-                            serverCode = keySearch.getText().toString();
-                            clientConnector = new ClientConnector(serverCode);
-                            clientConnector.setOnConnectListener(listener);
-                            //c.execute();
-                            clientConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }
-                    }
-                });
-                if(premium) {
-                    serverOrClient.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-                            colorAnimation.setDuration(250);
-                            final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-                            colorAnimationRev.setDuration(250);
-                            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animator) {
-                                    serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-                                }
-                            });
-                            colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animator) {
-                                    serverOrClient.setBackgroundColor((int) animator.getAnimatedValue());
-                                }
-                            });
-                            colorAnimation.start();
-                            colorAnimationRev.start();
-                            TransitionManager.beginDelayedTransition(mainView);
-                            keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
-                        }
-                    });
-                }else{
-                    serverOrClient.setEnabled(false);
-                }
+                ConnectListener connectListener = createConnectListener();
+                OnClickListener confirmTypeOnClickListener = createConfirmTypeOnClickListener(connectListener);
+                confirmType.setOnClickListener(confirmTypeOnClickListener);
+                setServerOrClientButtonFunctionality(premium);
                 routerSocket = new Socket();
             }else{
                 failedConnect = true;
-                retry.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorFaded);
-                        colorAnimation.setDuration(250);
-                        final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorFaded, colorPrimary);
-                        colorAnimationRev.setDuration(250);
-                        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animator) {
-                                retry.setBackgroundColor((int) animator.getAnimatedValue());
-                            }
-                        });
-                        colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animator) {
-                                retry.setBackgroundColor((int) animator.getAnimatedValue());
-                            }
-                        });
-                        colorAnimation.start();
-                        colorAnimationRev.start();
-                        onCreate(null);
-                    }
-                });
+                retry.setOnClickListener(createRetryButtonOnClickListener());
                 retry.setVisibility(View.VISIBLE);
                 error.setVisibility(View.VISIBLE);
                 serverOrClient.setVisibility(View.GONE);
@@ -264,6 +165,85 @@ public class MainActivity extends Activity implements
         Log.d("MainActivity", "User logged in");
     }
 
+    public void initializeScreenElements(){
+        setContentView(R.layout.activity_main);
+        serverOrClient = (CompoundButton) findViewById(R.id.serverOrClient);
+        confirmType = (Button) findViewById(R.id.confirmType);
+        keySearch = (EditText) findViewById(R.id.key_search);
+        retry = (Button) findViewById(R.id.retry);
+        error = (TextView) findViewById(R.id.errorConnect);
+        colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+        mainView = (ViewGroup) findViewById(R.id.mainView);
+    }
+
+    public ConnectListener createConnectListener(){
+        return new ConnectListener() {
+            @Override
+            public void onConnectSucceeded(ArrayList<String> result) {
+                //is checked means it is server, not is client
+                if (!result.get(0).equals("NA")) {
+                    serverCode = result.get(0);
+                    if (serverOrClient.isChecked()) {
+                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
+                        startActivity(intent);
+                    }
+                }
+            }
+        };
+    }
+
+    public OnClickListener createConfirmTypeOnClickListener(final ConnectListener connectListener){
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, confirmType);
+                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, confirmType);
+                colorAnimation.start();
+                colorAnimationRev.start();
+                if(serverOrClient.isChecked()){
+                    serverConnector = new ServerConnector();
+                    serverConnector.setOnConnectListener(connectListener);
+                    serverConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else{
+                    serverCode = keySearch.getText().toString();
+                    clientConnector = new ClientConnector(serverCode);
+                    clientConnector.setOnConnectListener(connectListener);
+                    clientConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            }
+        };
+    }
+
+    public OnClickListener createServerOrClientOnClickListener(){
+        return new View.OnClickListener() {
+            public void onClick(View v) {
+                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, serverOrClient);
+                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, serverOrClient);
+                colorAnimation.start();
+                colorAnimationRev.start();
+                TransitionManager.beginDelayedTransition(mainView);
+                keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
+            }
+        };
+    }
+
+    public OnClickListener createRetryButtonOnClickListener(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, retry);
+                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, retry);
+                colorAnimation.start();
+                colorAnimationRev.start();
+                onCreate(null);
+            }
+        };
+    }
+
     public void logIn(){
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
@@ -274,9 +254,17 @@ public class MainActivity extends Activity implements
 
         }
         AuthenticationRequest request = builder.build();
-
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
+
+    public void setServerOrClientButtonFunctionality(boolean premium){
+        if(premium) {
+            serverOrClient.setOnClickListener(createServerOrClientOnClickListener());
+        }else{
+            serverOrClient.setEnabled(false);
+        }
+    }
+
     @Override
     public void onLoggedOut() {
         Log.d("MainActivity", "User logged out");

@@ -41,9 +41,9 @@ import mccode.qdup.Utils.Listeners.SearchListener;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.QueueView.RequesterItemTouchHelper;
 import mccode.qdup.Utils.QueueView.RequesterRecyclerListAdapter;
-import mccode.qdup.models.Item;
-import mccode.qdup.models.ResponseWrapper;
-import mccode.qdup.models.TrackResponse;
+import mccode.qdup.QueryModels.Item;
+import mccode.qdup.QueryModels.ResponseWrapper;
+import mccode.qdup.QueryModels.TrackResponse;
 
 import static mccode.qdup.MainActivity.serverCode;
 import static mccode.qdup.MainActivity.musicPlayer;

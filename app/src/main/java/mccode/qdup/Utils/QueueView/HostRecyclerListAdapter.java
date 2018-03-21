@@ -17,7 +17,7 @@ import mccode.qdup.R;
 import mccode.qdup.ServerActivity;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
-import mccode.qdup.models.Item;
+import mccode.qdup.QueryModels.Item;
 
 /**
  * Author: Connor McAuliffe

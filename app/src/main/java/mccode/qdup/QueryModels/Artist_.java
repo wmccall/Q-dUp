@@ -1,27 +1,27 @@
 
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Artist implements Serializable
+public class Artist_ implements Serializable
 {
 
-    private External_urls external_urls;
+    private External_urls__ external_urls;
     private String href;
     private String id;
     private String name;
     private String type;
     private String uri;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 4408550435184883578L;
+    private final static long serialVersionUID = -3085991458441260863L;
 
     /**
      * No args constructor for use in serialization
      * 
      */
-    public Artist() {
+    public Artist_() {
     }
 
     /**
@@ -33,7 +33,7 @@ public class Artist implements Serializable
      * @param uri
      * @param href
      */
-    public Artist(External_urls external_urls, String href, String id, String name, String type, String uri) {
+    public Artist_(External_urls__ external_urls, String href, String id, String name, String type, String uri) {
         super();
         this.external_urls = external_urls;
         this.href = href;
@@ -43,15 +43,15 @@ public class Artist implements Serializable
         this.uri = uri;
     }
 
-    public External_urls getExternal_urls() {
+    public External_urls__ getExternal_urls() {
         return external_urls;
     }
 
-    public void setExternal_urls(External_urls external_urls) {
+    public void setExternal_urls(External_urls__ external_urls) {
         this.external_urls = external_urls;
     }
 
-    public Artist withExternal_urls(External_urls external_urls) {
+    public Artist_ withExternal_urls(External_urls__ external_urls) {
         this.external_urls = external_urls;
         return this;
     }
@@ -64,7 +64,7 @@ public class Artist implements Serializable
         this.href = href;
     }
 
-    public Artist withHref(String href) {
+    public Artist_ withHref(String href) {
         this.href = href;
         return this;
     }
@@ -77,7 +77,7 @@ public class Artist implements Serializable
         this.id = id;
     }
 
-    public Artist withId(String id) {
+    public Artist_ withId(String id) {
         this.id = id;
         return this;
     }
@@ -90,7 +90,7 @@ public class Artist implements Serializable
         this.name = name;
     }
 
-    public Artist withName(String name) {
+    public Artist_ withName(String name) {
         this.name = name;
         return this;
     }
@@ -103,7 +103,7 @@ public class Artist implements Serializable
         this.type = type;
     }
 
-    public Artist withType(String type) {
+    public Artist_ withType(String type) {
         this.type = type;
         return this;
     }
@@ -116,7 +116,7 @@ public class Artist implements Serializable
         this.uri = uri;
     }
 
-    public Artist withUri(String uri) {
+    public Artist_ withUri(String uri) {
         this.uri = uri;
         return this;
     }
@@ -129,7 +129,7 @@ public class Artist implements Serializable
         this.additionalProperties.put(name, value);
     }
 
-    public Artist withAdditionalProperty(String name, Object value) {
+    public Artist_ withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }

@@ -1,29 +1,29 @@
 
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class External_urls___ implements Serializable
+public class External_urls__ implements Serializable
 {
 
     private String spotify;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 3750519466588088449L;
+    private final static long serialVersionUID = -6136351249974607498L;
 
     /**
      * No args constructor for use in serialization
      * 
      */
-    public External_urls___() {
+    public External_urls__() {
     }
 
     /**
      * 
      * @param spotify
      */
-    public External_urls___(String spotify) {
+    public External_urls__(String spotify) {
         super();
         this.spotify = spotify;
     }
@@ -36,7 +36,7 @@ public class External_urls___ implements Serializable
         this.spotify = spotify;
     }
 
-    public External_urls___ withSpotify(String spotify) {
+    public External_urls__ withSpotify(String spotify) {
         this.spotify = spotify;
         return this;
     }
@@ -49,7 +49,7 @@ public class External_urls___ implements Serializable
         this.additionalProperties.put(name, value);
     }
 
-    public External_urls___ withAdditionalProperty(String name, Object value) {
+    public External_urls__ withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }

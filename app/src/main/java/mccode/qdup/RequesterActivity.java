@@ -76,11 +76,11 @@ public class RequesterActivity extends Activity implements
     RequesterRecyclerListAdapter adapter;
     ItemTouchHelper.Callback callback;
     ItemTouchHelper touchHelper;
-    final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
-    final int colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
-    final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-    final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
-    final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+    int colorBackground;
+    int colorBackgroundClicked;
+    int colorPrimary;
+    int colorFaded;
+    int colorPrimaryClicked;
 
     ClientListener clientListener;
     /**
@@ -92,6 +92,11 @@ public class RequesterActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_requester);
+        colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+        colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
+        colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+        colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         initializeScreenElements(savedInstanceState);
         serverKey.setText(serverCode);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));

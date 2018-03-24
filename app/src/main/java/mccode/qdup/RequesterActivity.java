@@ -2,6 +2,7 @@ package mccode.qdup;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -63,6 +64,25 @@ public class RequesterActivity extends Activity implements
     boolean adding = true;
     public static int count = 0;
 
+    private TextView serverKey;
+    private Button addSong;
+    private TextView queueOrSearch;
+    ProgressBar loadingCircle;
+    LinearLayout searchResultView;
+    EditText search;
+    Button findButton;
+    ScrollView scrollView;
+    RecyclerView recyclerView;
+    RequesterRecyclerListAdapter adapter;
+    ItemTouchHelper.Callback callback;
+    ItemTouchHelper touchHelper;
+    final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+    final int colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
+    final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+    final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+    final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+
+    ClientListener clientListener;
     /**
      * occurs when the page is created
      * creates classes and listeners to handle button presses and searches
@@ -72,250 +92,29 @@ public class RequesterActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_requester);
-        TextView serverKey = (TextView) findViewById(R.id.ServerKey);
+        initializeScreenElements(savedInstanceState);
         serverKey.setText(serverCode);
-        //final LinearLayout queueBox = (LinearLayout) findViewById(R.id.QueueBox);
-        final Button addSong = (Button) findViewById(R.id.AddSong);
-        final TextView queueOrSearch = (TextView) findViewById(R.id.QueueText);
-        //final ScrollView scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
-        final ProgressBar loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
-        final LinearLayout searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
-        final int colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
-        final int colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
-        final int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        final int colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
-        final int colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
-        loadingCircle.setVisibility(View.GONE);
-        final EditText search = (EditText) findViewById(R.id.search_bar);
-        final Button findButton = (Button) findViewById(R.id.find_button);
-        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
-
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        final RequesterRecyclerListAdapter adapter = new RequesterRecyclerListAdapter(this);
-        ItemTouchHelper.Callback callback = new RequesterItemTouchHelper(adapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         recyclerView.setAdapter(adapter);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setVisibility(View.GONE);
 
         //handles creating buttons for each of the tracks resulting from a search
-        final TrackCreatorListener creatorListener = new TrackCreatorListener() {
-            @Override
-            public void onCreateSucceeded(View v, final TrackResponse t) {
-                int j = 0;
-                final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.bottomMargin = 2;
-                int localTrackCount = 0;
-                for(final Item i: t.getTracks().getItems()){
-                    localTrackCount++;
-                    final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackground, colorBackgroundClicked);
-                    colorAnimation.setDuration(250);
-                    final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackgroundClicked, colorBackground);
-                    colorAnimationRev.setDuration(250);
-                    final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animator) {
-                            btn.setBackgroundColor((int) animator.getAnimatedValue());
-                        }
-                    });
-                    colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animator) {
-                            btn.setBackgroundColor((int) animator.getAnimatedValue());
-                        }
-                    });
-                    btn.setId(j);
-                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                    searchResultView.post(new Runnable() {
-                        public void run() {
-                            searchResultView.addView(btn, params);
-                        }
-                    });
-                    btn.setOnClickListener(new View.OnClickListener(){
-                        public void onClick(View view){
-                            colorAnimation.start();
-                            colorAnimationRev.start();
-                            ClientWriter w = new ClientWriter();
-                            try {
-                                Log.d("requester activity", "sending song");
-                                Message m = new Message(i);
-                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    j++;
-                }
-                if(localTrackCount==0){
-                    final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    btn.setId(0);
-                    btn.setText(generateButtonText(null), TextView.BufferType.SPANNABLE);
-                    btn.setGravity(Gravity.CENTER_HORIZONTAL);
-                    searchResultView.post(new Runnable() {
-                        public void run() {
-                            searchResultView.addView(btn, params);
-                        }
-                    });
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadingCircle.setVisibility(View.GONE);
-                    }
-                });
-            }
-        };
+        final TrackCreatorListener creatorListener = createTrackCreatorListener();
 
         //object that listens to the spotify query
         //when it gets something it responds by using the above TrackCreatorListener
-        final SearchListener listener = new SearchListener() {
-            @Override
-            public void onSearchSucceeded(ArrayList<String> result) {
-                ResponseWrapper responseWrapper = new ResponseWrapper();
-                responseWrapper.setOnCreateListener(creatorListener);
-                responseWrapper.setView(searchResultView);
-                responseWrapper.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
-
-            }
-        };
+        final SearchListener listener = createSearchListener(creatorListener);
 
         //deals with clicking on the search button
         //takes the text and queries spotify with it
-        findButton.setOnClickListener(new View.OnClickListener() {
-            //TODO: update this to query the database for songs
-            @Override
-            public void onClick(View v) {
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
-                colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
-                colorAnimationRev.setDuration(250);
-                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                String p = search.getText().toString().trim();
-                if (p.length()>0) {
-                    colorAnimation.start();
-                    colorAnimationRev.start();
-                    searchResultView.removeAllViews();
-                    loadingCircle.setVisibility(View.VISIBLE);
-                    p = p.replaceAll("\\s{2,}", " ").trim();
-                    p = p.replaceAll(" ", "%20");
-                    SearchReader search = new SearchReader();
-                    search.setOnSearchListener(listener);
-                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
-                }
-            }
-        });
-        addSong.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
-                colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
-                colorAnimationRev.setDuration(250);
-                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                colorAnimation.start();
-                colorAnimationRev.start();
-                if(adding){
-                    loadingCircle.setVisibility(View.GONE);
-                    search.setVisibility(View.GONE);
-                    findButton.setVisibility(View.GONE);
-                    scrollView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    queueOrSearch.setText("Queue");
-                    addSong.setText("add Song");
-                    adding = false;
-                }else{
-                    search.setVisibility(View.VISIBLE);
-                    findButton.setVisibility(View.VISIBLE);
-                    scrollView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                    queueOrSearch.setText("Search");
-                    addSong.setText("View Queue");
-                    adding = true;
-                }
-            }
-        });
-        final MessageListener ml = new MessageListener(){
+        findButton.setOnClickListener(createFindButtonOnClickListener(listener));
 
-            @Override
-            public void onMessageSucceeded(String result) {
-                try {
-                    final Message m = jsonConverter.readValue(result, Message.class);
-                    switch(m.getCode()) {
-                        case ADD: {
+        addSong.setOnClickListener(addSongOnClickListener());
 
-                            final Item i = m.getItem();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.addItem(i, generateButtonText(i).toString());
-                                }
-                            });
-                            break;
-                        }
-                        case SWAP:{
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.swap(m.getVal1(), m.getVal2());
-                                }
-                            });
-                            break;
-                        }
-                        case REMOVE:{
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.remove(m.getVal1());
-                                }
-                            });
-                            break;
-                        }
-                        case CHANGE_PLAYING:{
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.changePlaying(m.getVal1());
-                                }
-                            });
-                            break;
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        final MessageListener messageListener = createMessageListener();
 
-            }
-        };
-
-        ClientListener clientListener = new ClientListener();
-        clientListener.setOnClientListnerListener(ml);
-        clientListener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        createAndStartClientListener(messageListener);
     }
 
     /**
@@ -367,6 +166,249 @@ public class RequesterActivity extends Activity implements
             default:
                 break;
         }
+    }
+
+    public void initializeScreenElements(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.type_requester);
+        serverKey = (TextView) findViewById(R.id.ServerKey);
+        addSong = (Button) findViewById(R.id.AddSong);
+        queueOrSearch = (TextView) findViewById(R.id.QueueText);
+        loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
+        searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
+        loadingCircle.setVisibility(View.GONE);
+        search = (EditText) findViewById(R.id.search_bar);
+        findButton = (Button) findViewById(R.id.find_button);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
+        adapter = new RequesterRecyclerListAdapter(this);
+        callback = new RequesterItemTouchHelper(adapter);
+        touchHelper = new ItemTouchHelper(callback);
+    }
+
+    public TrackCreatorListener createTrackCreatorListener(){
+        return new TrackCreatorListener() {
+            @Override
+            public void onCreateSucceeded(View v, final TrackResponse t) {
+                int j = 0;
+                final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.bottomMargin = 2;
+                int localTrackCount = 0;
+                for(final Item i: t.getTracks().getItems()){
+                    localTrackCount++;
+                    final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackground, colorBackgroundClicked);
+                    colorAnimation.setDuration(250);
+                    final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackgroundClicked, colorBackground);
+                    colorAnimationRev.setDuration(250);
+                    @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
+                    colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animator) {
+                            btn.setBackgroundColor((int) animator.getAnimatedValue());
+                        }
+                    });
+                    btn.setId(j);
+                    btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
+                    searchResultView.post(new Runnable() {
+                        public void run() {
+                            searchResultView.addView(btn, params);
+                        }
+                    });
+                    btn.setOnClickListener(new View.OnClickListener(){
+                        public void onClick(View view){
+                            colorAnimation.start();
+                            colorAnimationRev.start();
+                            ClientWriter w = new ClientWriter();
+                            try {
+                                Log.d("requester activity", "sending song");
+                                Message m = new Message(i);
+                                w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    j++;
+                }
+                if(localTrackCount==0){
+                    @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
+                    btn.setId(0);
+                    btn.setText(generateButtonText(null), TextView.BufferType.SPANNABLE);
+                    btn.setGravity(Gravity.CENTER_HORIZONTAL);
+                    searchResultView.post(new Runnable() {
+                        public void run() {
+                            searchResultView.addView(btn, params);
+                        }
+                    });
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingCircle.setVisibility(View.GONE);
+                    }
+                });
+            }
+        };
+    }
+
+    public SearchListener createSearchListener(final TrackCreatorListener creatorListener){
+        return new SearchListener() {
+            @Override
+            public void onSearchSucceeded(ArrayList<String> result) {
+                ResponseWrapper responseWrapper = new ResponseWrapper();
+                responseWrapper.setOnCreateListener(creatorListener);
+                responseWrapper.setView(searchResultView);
+                responseWrapper.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
+
+            }
+        };
+    }
+
+    public View.OnClickListener createFindButtonOnClickListener(final SearchListener listener){
+        return new View.OnClickListener() {
+            //TODO: update this to query the database for songs
+            @Override
+            public void onClick(View v) {
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                String p = search.getText().toString().trim();
+                if (p.length()>0) {
+                    colorAnimation.start();
+                    colorAnimationRev.start();
+                    searchResultView.removeAllViews();
+                    loadingCircle.setVisibility(View.VISIBLE);
+                    p = p.replaceAll("\\s{2,}", " ").trim();
+                    p = p.replaceAll(" ", "%20");
+                    SearchReader search = new SearchReader();
+                    search.setOnSearchListener(listener);
+                    search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
+                }
+            }
+        };
+    }
+
+    public View.OnClickListener addSongOnClickListener(){
+        return new View.OnClickListener(){
+            public void onClick(View v){
+                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
+                colorAnimation.setDuration(250);
+                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
+                colorAnimationRev.setDuration(250);
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
+                    }
+                });
+                colorAnimation.start();
+                colorAnimationRev.start();
+                if(adding){
+                    loadingCircle.setVisibility(View.GONE);
+                    search.setVisibility(View.GONE);
+                    findButton.setVisibility(View.GONE);
+                    scrollView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    queueOrSearch.setText("Queue");
+                    addSong.setText("add Song");
+                    adding = false;
+                }else{
+                    search.setVisibility(View.VISIBLE);
+                    findButton.setVisibility(View.VISIBLE);
+                    scrollView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    queueOrSearch.setText("Search");
+                    addSong.setText("View Queue");
+                    adding = true;
+                }
+            }
+        };
+    }
+
+    public MessageListener createMessageListener(){
+        return new MessageListener(){
+            @Override
+            public void onMessageSucceeded(String result) {
+                try {
+                    final Message m = jsonConverter.readValue(result, Message.class);
+                    switch(m.getCode()) {
+                        case ADD: {
+                            final Item i = m.getItem();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.addItem(i, generateButtonText(i).toString());
+                                }
+                            });
+                            break;
+                        }
+                        case SWAP:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.swap(m.getVal1(), m.getVal2());
+                                }
+                            });
+                            break;
+                        }
+                        case REMOVE:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.remove(m.getVal1());
+                                }
+                            });
+                            break;
+                        }
+                        case CHANGE_PLAYING:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.changePlaying(m.getVal1());
+                                }
+                            });
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+    }
+
+    public void createAndStartClientListener(MessageListener messageListener){
+        clientListener = new ClientListener();
+        clientListener.setOnClientListnerListener(messageListener);
+        clientListener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**

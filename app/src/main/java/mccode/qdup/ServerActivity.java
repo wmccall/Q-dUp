@@ -1,6 +1,5 @@
 package mccode.qdup;
 
-import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -36,6 +35,7 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
 import mccode.qdup.Utils.Listeners.MessageListener;
@@ -94,6 +94,10 @@ public class ServerActivity extends Activity implements
     ItemTouchHelper.Callback callback;
     ItemTouchHelper touchHelper;
 
+    TrackCreatorListener trackCreatorListener;
+    SearchListener searchListener;
+    MessageListener messageListener;
+
     ServerListener serverListener;
 
     @Override
@@ -112,23 +116,16 @@ public class ServerActivity extends Activity implements
         touchHelper.attachToRecyclerView(recyclerView);
 
         playPause.setOnClickListener(createPlayPauseOnClickListener());
-
         nextButton.setOnClickListener(createNextButtonOnClickListener());
-
-        final TrackCreatorListener trackCreatorListener = createTrackcreatorListener();
-
         backButton.setOnClickListener(createBackButtonOnClickListener());
-
-        final SearchListener searchListener = createSearchListener(trackCreatorListener);
-
-        findButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
-
+        musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
         addSong.setOnClickListener(createAddSongOnClickListener());
 
-        final MessageListener messageListener = createMessageListener();
+        trackCreatorListener = createTrackcreatorListener();
+        searchListener = createSearchListener(trackCreatorListener);
+        findButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
 
-        musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
-
+        messageListener = createMessageListener();
         createAndRunServerListener(messageListener);
 
     }

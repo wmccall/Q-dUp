@@ -7,7 +7,7 @@ import android.view.View;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mccode.qdup.TrackCreatorListener;
+import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 
 import static mccode.qdup.MainActivity.jsonConverter;
 

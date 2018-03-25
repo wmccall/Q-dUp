@@ -50,6 +50,7 @@ import static mccode.qdup.MainActivity.serverCode;
 import static mccode.qdup.MainActivity.musicPlayer;
 import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 import static mccode.qdup.Utils.GeneralUIUtils.initializeValueAnimator;
 
 public class RequesterActivity extends Activity implements
@@ -204,8 +205,6 @@ public class RequesterActivity extends Activity implements
                 for(final Item i: t.getTracks().getItems()){
                     localTrackCount++;
                     @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    final ValueAnimator colorAnimation = initializeValueAnimator(colorBackground, colorBackgroundClicked, 250, btn);
-                    final ValueAnimator colorAnimationRev = initializeValueAnimator(colorBackgroundClicked, colorBackground, 250, btn);
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
                     searchResultView.post(new Runnable() {
@@ -215,8 +214,7 @@ public class RequesterActivity extends Activity implements
                     });
                     btn.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                            colorAnimation.start();
-                            colorAnimationRev.start();
+                            animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                             ClientWriter w = new ClientWriter();
                             try {
                                 Log.d("requester activity", "sending song");
@@ -268,12 +266,9 @@ public class RequesterActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, findButton);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, findButton);
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
-                    colorAnimation.start();
-                    colorAnimationRev.start();
+                    animateButtonClick(colorPrimary, colorPrimaryClicked, 250, findButton);
                     searchResultView.removeAllViews();
                     loadingCircle.setVisibility(View.VISIBLE);
                     p = p.replaceAll("\\s{2,}", " ").trim();
@@ -289,10 +284,7 @@ public class RequesterActivity extends Activity implements
     public View.OnClickListener addSongOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, addSong);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, addSong);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, addSong);
                 if(adding){
                     loadingCircle.setVisibility(View.GONE);
                     search.setVisibility(View.GONE);

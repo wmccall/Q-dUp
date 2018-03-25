@@ -200,10 +200,7 @@ public class MainActivity extends Activity implements
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, confirmType);
-                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, confirmType);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorFaded, 250, confirmType);
                 if(serverOrClient.isChecked()){
                     serverConnector = new ServerConnector();
                     serverConnector.setOnConnectListener(connectListener);
@@ -221,10 +218,7 @@ public class MainActivity extends Activity implements
     public OnClickListener createServerOrClientOnClickListener(){
         return new View.OnClickListener() {
             public void onClick(View v) {
-                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, serverOrClient);
-                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, serverOrClient);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorFaded, 250, serverOrClient);
                 TransitionManager.beginDelayedTransition(mainView);
                 keySearch.setVisibility(serverOrClient.isChecked() ? View.GONE : View.VISIBLE);
             }
@@ -235,10 +229,7 @@ public class MainActivity extends Activity implements
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorFaded, 250, retry);
-                ValueAnimator colorAnimationRev = initializeValueAnimator(colorFaded, colorPrimary, 250, retry);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorFaded, 250, retry);
                 onCreate(null);
             }
         };

@@ -51,6 +51,7 @@ import static mccode.qdup.MainActivity.serverCode;
 import static mccode.qdup.MainActivity.musicPlayer;
 import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 import static mccode.qdup.Utils.GeneralUIUtils.initializeValueAnimator;
 
 public class ServerActivity extends Activity implements
@@ -245,10 +246,7 @@ public class ServerActivity extends Activity implements
     public View.OnClickListener createPlayPauseOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, playPause);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, playPause);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, playPause);
                 if(musicPlayer.getPlaybackState().isPlaying){
                     playPause.setText("Play");
                     musicPlayer.pause(null);
@@ -267,10 +265,7 @@ public class ServerActivity extends Activity implements
     public View.OnClickListener createNextButtonOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, nextButton);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, nextButton);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, nextButton);
                 String temp = adapter.next();
                 alreadyChanged = true;
                 if (!temp.equals("")){
@@ -304,8 +299,6 @@ public class ServerActivity extends Activity implements
                     @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track), null, R.style.Track);
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
-                    final ValueAnimator colorAnimation = initializeValueAnimator(colorBackground, colorBackgroundClicked, 250, btn);
-                    final ValueAnimator colorAnimationRev = initializeValueAnimator(colorBackgroundClicked, colorBackground, 250, btn);
                     searchResultView.post(new Runnable() {
                         public void run() {
                             searchResultView.addView(btn, params);
@@ -313,8 +306,7 @@ public class ServerActivity extends Activity implements
                     });
                     btn.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View view) {
-                            colorAnimation.start();
-                            colorAnimationRev.start();
+                            animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                             count++;
                             adapter.addItem(i, generateButtonText(i).toString());
                             if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
@@ -356,10 +348,7 @@ public class ServerActivity extends Activity implements
     public View.OnClickListener createBackButtonOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, backButton);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, backButton);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, backButton);
                 String temp = adapter.prev();
                 alreadyChanged = true;
                 if (!temp.equals("")){
@@ -395,13 +384,10 @@ public class ServerActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, findButton);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, findButton);
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
                     //musicPlayer.pause(null);
-                    colorAnimation.start();
-                    colorAnimationRev.start();
+                    animateButtonClick(colorPrimary, colorPrimaryClicked, 250, findButton);
                     searchResultView.removeAllViews();
                     loadingCircle.setVisibility(View.VISIBLE);
                     p = p.replaceAll("\\s{2,}", " ").trim();
@@ -417,10 +403,7 @@ public class ServerActivity extends Activity implements
     public View.OnClickListener createAddSongOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, addSong);
-                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, addSong);
-                colorAnimation.start();
-                colorAnimationRev.start();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, addSong);
                 if(adding){
                     loadingCircle.setVisibility(View.GONE);
                     search.setVisibility(View.GONE);

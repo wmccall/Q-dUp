@@ -21,4 +21,11 @@ public class GeneralUIUtils {
         });
         return animation;
     }
+
+    public static void animateButtonClick(int startColor, int endColor, int timeDuration, final Button button){
+        ValueAnimator colorAnimation = initializeValueAnimator(startColor, endColor, timeDuration, button);
+        ValueAnimator colorAnimationRev = initializeValueAnimator(endColor, startColor, timeDuration, button);
+        colorAnimation.start();
+        colorAnimationRev.start();
+    }
 }

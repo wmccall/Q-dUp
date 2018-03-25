@@ -50,6 +50,7 @@ import static mccode.qdup.MainActivity.serverCode;
 import static mccode.qdup.MainActivity.musicPlayer;
 import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Utils.GeneralUIUtils.initializeValueAnimator;
 
 public class RequesterActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -92,12 +93,7 @@ public class RequesterActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_requester);
-        colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
-        colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
-        colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
-        colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
-        initializeScreenElements(savedInstanceState);
+        initializeScreenElements();
         serverKey.setText(serverCode);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(adapter);
@@ -173,9 +169,13 @@ public class RequesterActivity extends Activity implements
         }
     }
 
-    public void initializeScreenElements(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
+    public void initializeScreenElements(){
         setContentView(R.layout.type_requester);
+        colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
+        colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
+        colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
+        colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         serverKey = (TextView) findViewById(R.id.ServerKey);
         addSong = (Button) findViewById(R.id.AddSong);
         queueOrSearch = (TextView) findViewById(R.id.QueueText);
@@ -203,23 +203,9 @@ public class RequesterActivity extends Activity implements
                 int localTrackCount = 0;
                 for(final Item i: t.getTracks().getItems()){
                     localTrackCount++;
-                    final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackground, colorBackgroundClicked);
-                    colorAnimation.setDuration(250);
-                    final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorBackgroundClicked, colorBackground);
-                    colorAnimationRev.setDuration(250);
                     @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track) ,null, R.style.Track);
-                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animator) {
-                            btn.setBackgroundColor((int) animator.getAnimatedValue());
-                        }
-                    });
-                    colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animator) {
-                            btn.setBackgroundColor((int) animator.getAnimatedValue());
-                        }
-                    });
+                    final ValueAnimator colorAnimation = initializeValueAnimator(colorBackground, colorBackgroundClicked, 250, btn);
+                    final ValueAnimator colorAnimationRev = initializeValueAnimator(colorBackgroundClicked, colorBackground, 250, btn);
                     btn.setId(j);
                     btn.setText(generateButtonText(i), TextView.BufferType.SPANNABLE);
                     searchResultView.post(new Runnable() {
@@ -282,22 +268,8 @@ public class RequesterActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
-                colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
-                colorAnimationRev.setDuration(250);
-                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        findButton.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
+                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, findButton);
+                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, findButton);
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
                     colorAnimation.start();
@@ -317,22 +289,8 @@ public class RequesterActivity extends Activity implements
     public View.OnClickListener addSongOnClickListener(){
         return new View.OnClickListener(){
             public void onClick(View v){
-                final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimary, colorPrimaryClicked);
-                colorAnimation.setDuration(250);
-                final ValueAnimator colorAnimationRev = ValueAnimator.ofObject(new ArgbEvaluator(), colorPrimaryClicked, colorPrimary);
-                colorAnimationRev.setDuration(250);
-                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-                colorAnimationRev.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        addSong.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
+                final ValueAnimator colorAnimation = initializeValueAnimator(colorPrimary, colorPrimaryClicked, 250, addSong);
+                final ValueAnimator colorAnimationRev = initializeValueAnimator(colorPrimaryClicked, colorPrimary, 250, addSong);
                 colorAnimation.start();
                 colorAnimationRev.start();
                 if(adding){

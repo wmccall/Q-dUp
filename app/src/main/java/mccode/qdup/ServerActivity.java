@@ -454,9 +454,6 @@ public class ServerActivity extends Activity implements
                                     }
                                 }
                             });
-
-
-
                             Log.d("server", "sending message: " + m.getCode().toString());
                             sendMessage(m);
                             //recyclerView.addView(btn, params);

@@ -51,6 +51,7 @@ import static mccode.qdup.MainActivity.serverCode;
 import static mccode.qdup.MainActivity.musicPlayer;
 import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.MainActivity.isServer;
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 import static mccode.qdup.Utils.GeneralUIUtils.initializeValueAnimator;
 
@@ -73,6 +74,7 @@ public class ServerActivity extends Activity implements
     boolean adding = false;
     //private Player musicPlayer;
     private boolean alreadyChanged = false;
+    private String appType;
 
     TextView serverKey;
     Button playPause;
@@ -105,26 +107,10 @@ public class ServerActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_server);
-        initializeScreenElements();
-        serverKey.setText(serverCode);
-        Log.d("serverActivity", serverCode);
-        loadingCircle.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
-        findButton.setVisibility(View.GONE);
-        scrollView.setVisibility(View.GONE);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(adapter);
-        touchHelper.attachToRecyclerView(recyclerView);
-
-        playPause.setOnClickListener(createPlayPauseOnClickListener());
-        nextButton.setOnClickListener(createNextButtonOnClickListener());
-        backButton.setOnClickListener(createBackButtonOnClickListener());
-        musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
-        addSong.setOnClickListener(createAddSongOnClickListener());
-
-        trackCreatorListener = createTrackcreatorListener();
-        searchListener = createSearchListener(trackCreatorListener);
-        findButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
+        appType = isServer ? "serverActivity" : "clientActivity";
+        setupTrackCreatorListenerAndSearchListener();
+        initializeScreenElements(isServer);
+        Log.d(appType, serverCode);
 
         messageListener = createMessageListener();
         createAndRunServerListener(messageListener);
@@ -147,7 +133,7 @@ public class ServerActivity extends Activity implements
 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d("MainActivity", "Playback event received: " + playerEvent.name());
+        Log.d(appType, "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
             // Handle event type as necessary
 //            case kSpPlaybackNotifyTrackChanged:
@@ -168,7 +154,7 @@ public class ServerActivity extends Activity implements
 
     @Override
     public void onPlaybackError(Error error) {
-        Log.d("MainActivity", "Playback error received: " + error.name());
+        Log.d(appType, "Playback error received: " + error.name());
         switch (error) {
             // Handle error type as necessary
             default:
@@ -178,27 +164,27 @@ public class ServerActivity extends Activity implements
 
     @Override
     public void onLoggedIn() {
-        Log.d("MainActivity", "User logged in");
+        Log.d(appType, "User logged in");
     }
 
     @Override
     public void onLoggedOut() {
-        Log.d("MainActivity", "User logged out");
+        Log.d(appType, "User logged out");
     }
 
     @Override
     public void onLoginFailed(Error error) {
-        Log.d("MainActivity", "Login failed");
+        Log.d(appType, "Login failed");
     }
 
     @Override
     public void onTemporaryError() {
-        Log.d("MainActivity", "Temporary error occurred");
+        Log.d(appType, "Temporary error occurred");
     }
 
     @Override
     public void onConnectionMessage(String message) {
-        Log.d("MainActivity", "Received connection message: " + message);
+        Log.d(appType, "Received connection message: " + message);
     }
 
     @Override
@@ -219,17 +205,23 @@ public class ServerActivity extends Activity implements
         return super.onKeyDown(keyCode, event);
     }
 
-    public void initializeScreenElements(){
-        setContentView(R.layout.type_server);
+    public void initializeScreenElements(boolean isServer){
+        hookUpElementsWithFrontEnd();
+        setupRecyclerView();
+        showAndHideElementsBasedOffOfServerOrClient(isServer);
+        createButtonListeners(isServer);
+    }
+
+    public void hookUpElementsWithFrontEnd(){
+        // colors
         colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
         colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
         colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
         colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+
+        // server and client
         serverKey = (TextView) findViewById(R.id.ServerKey);
-        playPause = (Button) findViewById(R.id.PlayPause);
-        nextButton = (Button) findViewById(R.id.Skip);
-        backButton = (Button) findViewById(R.id.Back);
         addSong = (Button) findViewById(R.id.AddSong);
         queueOrSearch = (TextView) findViewById(R.id.QueueText);
         loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
@@ -238,9 +230,38 @@ public class ServerActivity extends Activity implements
         findButton = (Button) findViewById(R.id.find_button);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
-        adapter = new HostRecyclerListAdapter(this);
-        callback = new HostItemTouchHelper(adapter);
-        touchHelper = new ItemTouchHelper(callback);
+
+        // server only
+        playPause = (Button) findViewById(R.id.PlayPause);
+        nextButton = (Button) findViewById(R.id.Skip);
+        backButton = (Button) findViewById(R.id.Back);
+    }
+
+    public void showAndHideElementsBasedOffOfServerOrClient(boolean isServer){
+        serverKey.setText(serverCode);
+        loadingCircle.setVisibility(View.GONE);
+        if(isServer){
+            search.setVisibility(View.GONE);
+            findButton.setVisibility(View.GONE);
+            scrollView.setVisibility(View.GONE);
+        }else{
+            recyclerView.setVisibility(View.GONE);
+            loadingCircle.setVisibility(View.GONE);
+            playPause.setVisibility(View.GONE);
+            nextButton.setVisibility(View.GONE);
+            backButton.setVisibility(View.GONE);
+        }
+    }
+
+    public void createButtonListeners(boolean isServer){
+        if(isServer){
+            playPause.setOnClickListener(createPlayPauseOnClickListener());
+            nextButton.setOnClickListener(createNextButtonOnClickListener());
+            backButton.setOnClickListener(createBackButtonOnClickListener());
+            musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
+        }
+        addSong.setOnClickListener(createAddSongOnClickListener());
+        findButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
     }
 
     public View.OnClickListener createPlayPauseOnClickListener(){
@@ -316,7 +337,7 @@ public class ServerActivity extends Activity implements
                             }
 
                             Message m = new Message(i);
-                            Log.d("server", "sending message: " + m.getCode().toString());
+                            Log.d(appType, "sending message: " + m.getCode().toString());
                             sendMessage(m);
                             //recyclerView.addView(btn, params);
 
@@ -454,7 +475,7 @@ public class ServerActivity extends Activity implements
                                     }
                                 }
                             });
-                            Log.d("server", "sending message: " + m.getCode().toString());
+                            Log.d(appType, "sending message: " + m.getCode().toString());
                             sendMessage(m);
                             //recyclerView.addView(btn, params);
                         }
@@ -518,6 +539,20 @@ public class ServerActivity extends Activity implements
                 b.setText(text);
             }
         });
+    }
+
+    private void setupRecyclerView(){
+        adapter = new HostRecyclerListAdapter(this);
+        callback = new HostItemTouchHelper(adapter);
+        touchHelper = new ItemTouchHelper(callback);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        recyclerView.setAdapter(adapter);
+        touchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void setupTrackCreatorListenerAndSearchListener(){
+        trackCreatorListener = createTrackcreatorListener();
+        searchListener = createSearchListener(trackCreatorListener);
     }
 
     /**

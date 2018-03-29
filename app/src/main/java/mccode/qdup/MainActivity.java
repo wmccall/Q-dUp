@@ -231,7 +231,7 @@ public class MainActivity extends Activity implements
                         startActivity(intent);
                     } else {
                         isServer = false;
-                        Intent intent = new Intent(MainActivity.this, RequesterActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
                         startActivity(intent);
                     }
                 }

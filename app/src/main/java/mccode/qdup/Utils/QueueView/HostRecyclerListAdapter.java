@@ -58,8 +58,8 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
 
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
+        holder.textView.setText(mDisplays.get(position));
         if(isServer) {
-            holder.textView.setText(mDisplays.get(position));
             holder.itemView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -101,9 +101,6 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
         else {
             holder.textView.setTextColor(Color.parseColor("#ffffff"));
         }
-
-
-
     }
 
     @Override

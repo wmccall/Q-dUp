@@ -111,7 +111,6 @@ public class ServerActivity extends Activity implements
         setupTrackCreatorListenerAndSearchListener();
         createButtonListeners(isServer);
         createAndRunRouterListener();
-
         Log.d(appType, serverCode);
     }
 
@@ -190,8 +189,7 @@ public class ServerActivity extends Activity implements
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK))
         {
-            ServerWriter s = new ServerWriter();
-            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
+            informRouterOfQuit();
             musicPlayer.pause(null);
             try {
                 routerSocket.close();
@@ -251,13 +249,10 @@ public class ServerActivity extends Activity implements
     public void showAndHideElementsBasedOffOfServerOrClient(boolean isServer){
         serverKey.setText(serverCode);
         loadingCircle.setVisibility(View.GONE);
-        if(isServer){
-            search.setVisibility(View.GONE);
-            findButton.setVisibility(View.GONE);
-            scrollView.setVisibility(View.GONE);
-        }else{
-            recyclerView.setVisibility(View.GONE);
-            loadingCircle.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
+        findButton.setVisibility(View.GONE);
+        scrollView.setVisibility(View.GONE);
+        if(!isServer){
             playPause.setVisibility(View.GONE);
             nextButton.setVisibility(View.GONE);
             backButton.setVisibility(View.GONE);
@@ -427,9 +422,11 @@ public class ServerActivity extends Activity implements
                     recyclerView.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
                     addSong.setText("Add Song");
-                    playPause.setVisibility(View.VISIBLE);
-                    nextButton.setVisibility(View.VISIBLE);
-                    backButton.setVisibility(View.VISIBLE);
+                    if(isServer) {
+                        playPause.setVisibility(View.VISIBLE);
+                        nextButton.setVisibility(View.VISIBLE);
+                        backButton.setVisibility(View.VISIBLE);
+                    }
                     adding = false;
                 }else{
                     search.setVisibility(View.VISIBLE);
@@ -455,22 +452,60 @@ public class ServerActivity extends Activity implements
                     final Message m = jsonConverter.readValue(result, Message.class);
                     switch (m.getCode()) {
                         case ADD: {
-                            final Item i = m.getItem();
-                            count++;
+                            if(isServer){
+                                final Item i = m.getItem();
+                                count++;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.addItem(i, generateButtonText(i).toString());
+                                        if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
+                                            musicPlayer.playUri(null, adapter.next(), 0, 0);
+                                            setText(playPause, "Pause");
+                                            alreadyChanged = true;
+                                        }
+                                    }
+                                });
+                                Log.d(appType, "sending message: " + m.getCode().toString());
+                                sendMessage(m);
+                                //recyclerView.addView(btn, params);
+                            } else {
+                                final Item i = m.getItem();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.addItem(i, generateButtonText(i).toString());
+                                    }
+                                });
+                                break;
+                            }
+                        }
+                        case SWAP:{
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.addItem(i, generateButtonText(i).toString());
-                                    if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
-                                        musicPlayer.playUri(null, adapter.next(), 0, 0);
-                                        setText(playPause, "Pause");
-                                        alreadyChanged = true;
-                                    }
+                                    adapter.swap(m.getVal1(), m.getVal2());
                                 }
                             });
-                            Log.d(appType, "sending message: " + m.getCode().toString());
-                            sendMessage(m);
-                            //recyclerView.addView(btn, params);
+                            break;
+                        }
+                        case REMOVE:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.remove(m.getVal1());
+                                }
+                            });
+                            break;
+                        }
+                        case CHANGE_PLAYING:{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.changePlaying(m.getVal1());
+                                }
+                            });
+                            break;
                         }
                     }
                 } catch (IOException e) {
@@ -534,14 +569,9 @@ public class ServerActivity extends Activity implements
             return new View.OnClickListener(){
                 public void onClick(View view){
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
-                    ClientWriter w = new ClientWriter();
-                    try {
-                        Log.d("requester activity", "sending song");
-                        Message m = new Message(i);
-                        w.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    Log.d("requester activity", "sending song");
+                    Message m = new Message(i);
+                    sendMessage(m);
                 }
             };
         }
@@ -613,12 +643,15 @@ public class ServerActivity extends Activity implements
     }
 
     public void sendMessage(Message m){
-        ServerWriter s = new ServerWriter();
         try {
-            s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
+            new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void informRouterOfQuit(){
+        new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
     }
 }
 

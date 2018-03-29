@@ -37,17 +37,19 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
         Scanner in;
         try {
             in = new Scanner(routerSocket.getInputStream());
-            try{
-                response = in.nextLine();
-                //Log.i("Server Listener", response);
-                listener.onMessageSucceeded(response);
-                response = "";
-            }catch(NoSuchElementException e){
-                Log.e("Server Listener", "no line found, but its okay");
-                in.close();
-                response = "err";
-                listener.onMessageSucceeded(response);
-                return null;
+            while(true) {
+                try {
+                    response = in.nextLine();
+                    Log.i("Server Listener", response);
+                    listener.onMessageSucceeded(response);
+                    response = "";
+                } catch (NoSuchElementException e) {
+                    Log.e("Server Listener", "no line found, but its okay");
+                    in.close();
+                    response = "err";
+                    listener.onMessageSucceeded(response);
+                    return null;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

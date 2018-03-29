@@ -316,11 +316,11 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             if (currentPlaying >= mItems.size()) {
                 return;
             }
-            RequesterRecyclerListAdapter.ItemViewHolder holder;
+            HostRecyclerListAdapter.ItemViewHolder holder;
             if (currentPlaying >= 0) {
-                holder = (RequesterRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
                 if (holder != null) {
-                    final RequesterRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                    final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -336,9 +336,9 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
                 currentPlaying = currentPlaying % mItems.size();
             }
             if (currentPlaying < mItems.size()) {
-                holder = (RequesterRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
                 if (holder != null) {
-                    final RequesterRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                    final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

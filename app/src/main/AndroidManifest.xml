@@ -16,8 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="mccode.qdup.RequesterActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity android:name="mccode.qdup.ServerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity

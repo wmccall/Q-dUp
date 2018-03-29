@@ -34,7 +34,6 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mccode.qdup.Utils.Client.ClientWriter;
 import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
@@ -471,6 +470,7 @@ public class ServerActivity extends Activity implements
                                 //recyclerView.addView(btn, params);
                             } else {
                                 final Item i = m.getItem();
+                                count++;
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -612,6 +612,7 @@ public class ServerActivity extends Activity implements
     private SpannableString generateButtonText(Item i){
         SpannableString text;
         if(i!=null){
+            Log.i(appType, "Generating button text");
             String artists;
             int size = i.getArtists().size();
             artists = i.getArtists().get(0).getName();

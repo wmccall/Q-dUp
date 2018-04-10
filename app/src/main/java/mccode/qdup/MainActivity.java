@@ -54,12 +54,12 @@ public class MainActivity extends Activity implements
     private ServerConnector serverConnector;                                    //tool to connect the server to the router
     private ClientConnector clientConnector;                                    //tool to connect the client to the router
     private AuthenticationResponse authenticationResponse = null;               //Spotify authentication response
-    private boolean accountType = true;                                         //variable that holds if user has Spotify premium
-    private static boolean failedConnect = false;                               //remembers if the user couldnt connect
+    private boolean isPremium = true;                                         //variable that holds if user has Spotify premium
     // Request code that will be used to verify if the result comes from correct activity
     private static final int REQUEST_CODE = 1337;
     public static Player musicPlayer;                                           //Spotify music player
     public static boolean isServer;
+    public static boolean buttonsSetup = false;
 
     //Buttons
     private CompoundButton serverOrClientButton;
@@ -73,62 +73,24 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /**
-         * Method:      OnCreate
-         * Purpose:     gets called when the activity is created. Sets up the buttons and then logs
-         *              the user in.
-         */
-        if(!failedConnect){     //if the person has not failed to connect, it will update the screen
-            setContentView(R.layout.activity_main);
-            initializeScreenElements();
-            error.setVisibility(View.GONE);
-            retry.setVisibility(View.GONE);
-            serverOrClientButton.setVisibility(View.GONE);
-            confirmType.setVisibility(View.GONE);
-            keySearch.setVisibility(View.GONE);
-        }
         super.onCreate(savedInstanceState);
+        initializeScreenElements();
         logIn();    //logs the user in with Spotify
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        setContentView(R.layout.activity_main);
-        initializeScreenElements();
         if (requestCode == REQUEST_CODE) {
             authenticationResponse = AuthenticationClient.getResponse(resultCode, intent);
             if (authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN) {
-                retry.setVisibility(View.GONE);
-                error.setVisibility(View.GONE);
+                toggleVisibility(true, false);
                 responseToken = authenticationResponse.getAccessToken();
-                Config playerConfig = new Config(this, authenticationResponse.getAccessToken(), CLIENT_ID);
-                Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                    @Override
-                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        musicPlayer = spotifyPlayer;
-                        musicPlayer.addConnectionStateCallback(MainActivity.this);
-                        musicPlayer.addNotificationCallback(MainActivity.this);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-                    }
-                });
-                ConnectListener connectListener = createConnectListener();
-                OnClickListener confirmTypeOnClickListener = createConfirmTypeOnClickListener(connectListener);
-                confirmType.setOnClickListener(confirmTypeOnClickListener);
-                setServerOrClientButtonFunctionality(accountType);
+                setupPlayer();
+                setServerOrClientButtonFunctionality(isPremium);
                 routerSocket = new Socket();
             }else{
-                failedConnect = true;
-                retry.setOnClickListener(createRetryButtonOnClickListener());
-                retry.setVisibility(View.VISIBLE);
-                error.setVisibility(View.VISIBLE);
-                serverOrClientButton.setVisibility(View.GONE);
-                confirmType.setVisibility(View.GONE);
-                keySearch.setVisibility(View.GONE);
+                toggleVisibility(false, false);
             }
         }
     }
@@ -174,7 +136,7 @@ public class MainActivity extends Activity implements
     public void onLoginFailed(Error error) {
         Log.d("MainActivity", "Login failed");
         if(error.toString().equals("kSpErrorNeedsPremium")){
-            accountType = false;
+            isPremium = false;
             logIn();
         }
     }
@@ -196,19 +158,27 @@ public class MainActivity extends Activity implements
         if(authenticationResponse != null && authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN){
             routerSocket = new Socket();
         }
-        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-        for (Thread t: threadSet
-                ) {
-            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
-            for (StackTraceElement s :t.getStackTrace()
-                    ) {
-                Log.d("Main Activity", s.toString());
-            }
-        }
+//        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+//        for (Thread t: threadSet
+//                ) {
+//            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
+//            for (StackTraceElement s :t.getStackTrace()
+//                    ) {
+//                Log.d("Main Activity", s.toString());
+//            }
+//        }
     }
 
     public void initializeScreenElements(){
-        setContentView(R.layout.activity_main);
+        if(!buttonsSetup) {
+            setContentView(R.layout.activity_main);
+            hookUpElementsWithFrontEnd();
+            setupOnClickListeners();
+        }
+        toggleVisibility(false, true);
+    }
+
+    public void hookUpElementsWithFrontEnd(){
         serverOrClientButton = (CompoundButton) findViewById(R.id.serverOrClient);
         confirmType = (Button) findViewById(R.id.confirmType);
         keySearch = (EditText) findViewById(R.id.key_search);
@@ -217,6 +187,42 @@ public class MainActivity extends Activity implements
         colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         mainView = (ViewGroup) findViewById(R.id.mainView);
+    }
+
+    public void toggleVisibility(boolean loggedIn, boolean hide){
+        int optionOne = View.GONE;
+        int optionTwo = hide ? View.GONE : View.VISIBLE;
+        error.setVisibility(loggedIn ? optionOne : optionTwo);
+        retry.setVisibility(loggedIn ? optionOne : optionTwo);
+        serverOrClientButton.setVisibility(loggedIn ? optionTwo : optionOne);
+        confirmType.setVisibility(loggedIn ? optionTwo : optionOne);
+        keySearch.setVisibility(loggedIn ? optionTwo : optionOne);
+    }
+
+    public void setupOnClickListeners(){
+        ConnectListener connectListener = createConnectListener();
+        OnClickListener confirmTypeOnClickListener = createConfirmTypeOnClickListener(connectListener);
+        confirmType.setOnClickListener(confirmTypeOnClickListener);
+
+        retry.setOnClickListener(createRetryButtonOnClickListener());
+        buttonsSetup = true;
+    }
+
+    public void setupPlayer(){
+        Config playerConfig = new Config(this, authenticationResponse.getAccessToken(), CLIENT_ID);
+        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+            @Override
+            public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                musicPlayer = spotifyPlayer;
+                musicPlayer.addConnectionStateCallback(MainActivity.this);
+                musicPlayer.addNotificationCallback(MainActivity.this);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+            }
+        });
     }
 
     public ConnectListener createConnectListener(){
@@ -282,7 +288,7 @@ public class MainActivity extends Activity implements
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
                 REDIRECT_URI);
-        if(accountType) {
+        if(isPremium) {
             builder.setScopes(new String[]{"user-read-private", "streaming"});
         }else{
 

@@ -30,7 +30,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Set;
 
 import mccode.qdup.Utils.Client.ClientConnector;
 import mccode.qdup.Utils.Listeners.ConnectListener;
@@ -46,8 +45,8 @@ public class MainActivity extends Activity implements
     private static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
     private static int CLIENT_PORT = 16455;                                     //client port number on the router
     private static int SERVER_PORT = 16456;                                     //server port number on the router
-    public static String serverCode = "";                                       //string that holds the server serverCode
-    public static boolean requestNewServerCode = true;                          //flag if going to need a new serverCode
+    public static String serverKey = "";                                        //string that holds the server serverKey
+    public static boolean requestNewServerKey = true;                           //flag if going to need a new serverKey
     public static ObjectMapper jsonConverter = new ObjectMapper();              //jsonConverter to do json parsing
     public static Socket routerSocket;                                          //socket connection to the router
     public static String responseToken = "";
@@ -73,24 +72,26 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MainActivity", "OnCreate running");
         super.onCreate(savedInstanceState);
         initializeScreenElements();
-        logIn();    //logs the user in with Spotify
+        logIn();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Log.d("MainActivity", "OnActivityResult running");
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_CODE) {
             authenticationResponse = AuthenticationClient.getResponse(resultCode, intent);
             if (authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN) {
-                toggleVisibility(true, false);
+                changingElementsVisibility(true, false);
                 responseToken = authenticationResponse.getAccessToken();
                 setupPlayer();
                 setServerOrClientButtonFunctionality(isPremium);
                 routerSocket = new Socket();
             }else{
-                toggleVisibility(false, false);
+                changingElementsVisibility(false, false);
             }
         }
     }
@@ -152,8 +153,8 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
+        Log.d("MainActivity", "OnResume running");
         super.onResume();
         if(authenticationResponse != null && authenticationResponse.getType() == AuthenticationResponse.Type.TOKEN){
             routerSocket = new Socket();
@@ -170,15 +171,17 @@ public class MainActivity extends Activity implements
     }
 
     public void initializeScreenElements(){
+        Log.d("MainActivity", "Initializing Screen Elements");
         if(!buttonsSetup) {
             setContentView(R.layout.activity_main);
             hookUpElementsWithFrontEnd();
             setupOnClickListeners();
         }
-        toggleVisibility(false, true);
+        changingElementsVisibility(false, true);
     }
 
     public void hookUpElementsWithFrontEnd(){
+        Log.d("MainActivity", "Hooking up elements with front end");
         serverOrClientButton = (CompoundButton) findViewById(R.id.serverOrClient);
         confirmType = (Button) findViewById(R.id.confirmType);
         keySearch = (EditText) findViewById(R.id.key_search);
@@ -189,7 +192,8 @@ public class MainActivity extends Activity implements
         mainView = (ViewGroup) findViewById(R.id.mainView);
     }
 
-    public void toggleVisibility(boolean loggedIn, boolean hide){
+    public void changingElementsVisibility(boolean loggedIn, boolean hide){
+        Log.d("MainActivity", "Changing element visibility");
         int optionOne = View.GONE;
         int optionTwo = hide ? View.GONE : View.VISIBLE;
         error.setVisibility(loggedIn ? optionOne : optionTwo);
@@ -200,6 +204,7 @@ public class MainActivity extends Activity implements
     }
 
     public void setupOnClickListeners(){
+        Log.d("MainActivity", "Setting up OnClickListeners for buttons");
         ConnectListener connectListener = createConnectListener();
         OnClickListener confirmTypeOnClickListener = createConfirmTypeOnClickListener(connectListener);
         confirmType.setOnClickListener(confirmTypeOnClickListener);
@@ -209,6 +214,7 @@ public class MainActivity extends Activity implements
     }
 
     public void setupPlayer(){
+        Log.d("MainActivity", "Setting up the spotify player");
         Config playerConfig = new Config(this, authenticationResponse.getAccessToken(), CLIENT_ID);
         Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
             @Override
@@ -226,18 +232,21 @@ public class MainActivity extends Activity implements
     }
 
     public ConnectListener createConnectListener(){
+        Log.d("MainActivity", "Creating the connect listener");
         return new ConnectListener() {
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
                 if (!result.get(0).equals("NA")) {
-                    serverCode = result.get(0);
+                    serverKey = result.get(0);
                     if (serverOrClientButton.isChecked()) {
+                        Log.d("MainActivity", "Starting MusicActivity as a Server");
                         isServer = true;
-                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
+                        Intent intent = new Intent(MainActivity.this, MusicActivity.class);
                         startActivity(intent);
                     } else {
+                        Log.d("MainActivity", "Starting MusicActivity as a Client");
                         isServer = false;
-                        Intent intent = new Intent(MainActivity.this, ServerActivity.class);
+                        Intent intent = new Intent(MainActivity.this, MusicActivity.class);
                         startActivity(intent);
                     }
                 }
@@ -246,17 +255,20 @@ public class MainActivity extends Activity implements
     }
 
     public OnClickListener createConfirmTypeOnClickListener(final ConnectListener connectListener){
+        Log.d("MainActivity", "Creating confirmType's OnClickListener");
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
                 animateButtonClick(colorPrimary, colorFaded, 250, confirmType);
                 if(serverOrClientButton.isChecked()){
+                    Log.d("MainActivity", "Connecting to the router as a Server");
                     serverConnector = new ServerConnector();
                     serverConnector.setOnConnectListener(connectListener);
                     serverConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }else{
-                    serverCode = keySearch.getText().toString();
-                    clientConnector = new ClientConnector(serverCode);
+                    Log.d("MainActivity", "Connecting to the router as a Client");
+                    serverKey = keySearch.getText().toString();
+                    clientConnector = new ClientConnector(serverKey);
                     clientConnector.setOnConnectListener(connectListener);
                     clientConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
@@ -265,8 +277,10 @@ public class MainActivity extends Activity implements
     }
 
     public OnClickListener createServerOrClientOnClickListener(){
+        Log.d("MainActivity", "Creating serverOrClient's OnClickListener");
         return new View.OnClickListener() {
             public void onClick(View v) {
+                Log.d("MainActivity", "Changing from " + (serverOrClientButton.isChecked() ? "Client to Server" : "Server to Client"));
                 animateButtonClick(colorPrimary, colorFaded, 250, serverOrClientButton);
                 TransitionManager.beginDelayedTransition(mainView);
                 keySearch.setVisibility(serverOrClientButton.isChecked() ? View.GONE : View.VISIBLE);
@@ -275,9 +289,11 @@ public class MainActivity extends Activity implements
     }
 
     public OnClickListener createRetryButtonOnClickListener(){
+        Log.d("MainActivity", "Creating retry's OnClickListener");
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("MainActivity", "Re-trying to connect with spotify");
                 animateButtonClick(colorPrimary, colorFaded, 250, retry);
                 onCreate(null);
             }
@@ -285,6 +301,7 @@ public class MainActivity extends Activity implements
     }
 
     public void logIn(){
+        Log.d("MainActivity", "Logging in as " + (isPremium ? "premium" : "free"));
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
                 REDIRECT_URI);
@@ -298,6 +315,7 @@ public class MainActivity extends Activity implements
     }
 
     public void setServerOrClientButtonFunctionality(boolean premium){
+        Log.d("MainActivity", "Setting serverOrClient's functionality to " + (premium ? "functional" : "nonfunctional"));
         if(premium) {
             serverOrClientButton.setOnClickListener(createServerOrClientOnClickListener());
         }else{

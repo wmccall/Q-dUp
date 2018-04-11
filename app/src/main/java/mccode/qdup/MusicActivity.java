@@ -46,35 +46,23 @@ import mccode.qdup.QueryModels.Item;
 import mccode.qdup.QueryModels.ResponseWrapper;
 import mccode.qdup.QueryModels.TrackResponse;
 
-import static mccode.qdup.MainActivity.serverCode;
+import static mccode.qdup.MainActivity.serverKey;
 import static mccode.qdup.MainActivity.musicPlayer;
 import static mccode.qdup.MainActivity.jsonConverter;
 import static mccode.qdup.MainActivity.routerSocket;
 import static mccode.qdup.MainActivity.isServer;
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 
-public class ServerActivity extends Activity implements
-        SpotifyPlayer.NotificationCallback, ConnectionStateCallback
-{
-    private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630";
-    private static final String REDIRECT_URI = "mccode-qdup://callback";
+public class MusicActivity extends Activity implements
+        SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
 
-    // Request code that will be used to verify if the result comes from correct activity
-    // Can be any integer
-    private static final int REQUEST_CODE = 1337;
-
-    private int itemCount = 0;
-
-    //public static ArrayList<Item> queue = new ArrayList<>();
-    public static final int jumpBackNum = 10;
-    public static int position = -1;
     public static int count = 0;
     boolean adding = false;
-    //private Player musicPlayer;
+
     private boolean alreadyChanged = false;
     private String appType;
 
-    TextView serverKey;
+    TextView serverKeyView;
     Button playPause;
     Button nextButton;
     Button backButton;
@@ -103,18 +91,20 @@ public class ServerActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appType = "MusicActivity-" + (isServer ? "Server" : "Client");
+        Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.type_server);
-        appType = isServer ? "serverActivity" : "clientActivity";
+        setContentView(R.layout.music_activity);
         initializeScreenElements(isServer);
         setupTrackCreatorListenerAndSearchListener();
         createButtonListeners(isServer);
         createAndRunRouterListener();
-        Log.d(appType, serverCode);
+        Log.d(appType, "Assigned Server Key: " + serverKey);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Log.d(appType, "OnActivityResult running");
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
@@ -201,17 +191,20 @@ public class ServerActivity extends Activity implements
     }
 
     private void setupTrackCreatorListenerAndSearchListener(){
+        Log.d(appType, "Setting up TrackCreatorListener and SearchListener");
         trackCreatorListener = createTrackCreatorListener();
         searchListener = createSearchListener(trackCreatorListener);
     }
 
     public void initializeScreenElements(boolean isServer){
+        Log.d(appType, "Initializing screen elements");
         hookUpElementsWithFrontEnd();
         setupRecyclerView();
         showAndHideElementsBasedOffOfServerOrClient(isServer);
     }
 
     public void hookUpElementsWithFrontEnd(){
+        Log.d(appType, "Hooking up elements with frontend");
         // colors
         colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
         colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
@@ -220,7 +213,8 @@ public class ServerActivity extends Activity implements
         colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
 
         // server and client
-        serverKey = (TextView) findViewById(R.id.ServerKey);
+        serverKeyView = (TextView) findViewById(R.id.ServerKey);
+        serverKeyView.setText(serverKey);
         addSong = (Button) findViewById(R.id.AddSong);
         queueOrSearch = (TextView) findViewById(R.id.QueueText);
         loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
@@ -237,6 +231,7 @@ public class ServerActivity extends Activity implements
     }
 
     private void setupRecyclerView(){
+        Log.d(appType, "Setting up the RecyclerView");
         adapter = new HostRecyclerListAdapter(this);
         callback = new HostItemTouchHelper(adapter);
         touchHelper = new ItemTouchHelper(callback);
@@ -246,7 +241,7 @@ public class ServerActivity extends Activity implements
     }
 
     public void showAndHideElementsBasedOffOfServerOrClient(boolean isServer){
-        serverKey.setText(serverCode);
+        Log.d(appType, "Showing and hiding elements for the " + (isServer ? "server" : "client"));
         loadingCircle.setVisibility(View.GONE);
         search.setVisibility(View.GONE);
         findButton.setVisibility(View.GONE);
@@ -259,6 +254,7 @@ public class ServerActivity extends Activity implements
     }
 
     public void createButtonListeners(boolean isServer){
+        Log.d(appType, "Creating button listeners");
         if(isServer){
             playPause.setOnClickListener(createPlayPauseOnClickListener());
             nextButton.setOnClickListener(createNextButtonOnClickListener());
@@ -270,8 +266,10 @@ public class ServerActivity extends Activity implements
     }
 
     public View.OnClickListener createPlayPauseOnClickListener(){
+        Log.d(appType, "Creating playPause button's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
+                Log.d(appType, "Changing playPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "play" : "pause"));
                 animateButtonClick(colorPrimary, colorPrimaryClicked, 250, playPause);
                 if(musicPlayer.getPlaybackState().isPlaying){
                     playPause.setText("Play");
@@ -289,17 +287,20 @@ public class ServerActivity extends Activity implements
     }
 
     public View.OnClickListener createNextButtonOnClickListener(){
+        Log.d(appType, "Creating nextButton's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 animateButtonClick(colorPrimary, colorPrimaryClicked, 250, nextButton);
                 String temp = adapter.next();
                 alreadyChanged = true;
                 if (!temp.equals("")){
+                    Log.d(appType, "Going to next song");
                     musicPlayer.playUri(null, temp, 0, 0);
                     setText(playPause, "Pause");
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
+                        Log.d(appType, "Skipped last song; stopped playing songs");
                         musicPlayer.pause(null);
                         setText(playPause, "Play");
                         musicPlayer.skipToNext(null);
@@ -311,15 +312,18 @@ public class ServerActivity extends Activity implements
     }
 
     public TrackCreatorListener createTrackCreatorListener() {
+        Log.d(appType, "Creating a TrackCreatorListener");
         return new TrackCreatorListener() {
             @Override
             public void onCreateSucceeded(View v, final TrackResponse t) {
+                Log.d(appType, "Finished creating tracks from the search");
                 int j = 0;
                 final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.bottomMargin = 2;
                 int localTrackCount = 0;
+                Log.d(appType, "Creating buttons for the tracks (if there are any)");
                 for (final Item i : t.getTracks().getItems()) {
                     localTrackCount++;
                     @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track), null, R.style.Track);
@@ -334,6 +338,7 @@ public class ServerActivity extends Activity implements
                     j++;
                 }
                 if (localTrackCount == 0) {
+                    Log.d(appType, "No tracks found");
                     @SuppressLint("RestrictedApi") final Button btn = new Button(new ContextThemeWrapper(getApplicationContext(), R.style.Track), null, R.style.Track);
                     btn.setId(0);
                     btn.setText(generateButtonText(null), TextView.BufferType.SPANNABLE);
@@ -355,17 +360,21 @@ public class ServerActivity extends Activity implements
     }
 
     public View.OnClickListener createBackButtonOnClickListener(){
+        Log.d(appType, "Creating backButton OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
+                Log.d(appType, "Clicked the back button");
                 animateButtonClick(colorPrimary, colorPrimaryClicked, 250, backButton);
                 String temp = adapter.prev();
                 alreadyChanged = true;
                 if (!temp.equals("")){
+                    Log.d(appType, "Skipping to previous track");
                     musicPlayer.playUri(null, temp, 0, 0);
                     setText(playPause, "Pause");
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
+                        Log.d(appType, "Skipped back past first song; stopped playing songs");
                         musicPlayer.pause(null);
                         setText(playPause, "Play");
                         musicPlayer.skipToNext(null);
@@ -376,9 +385,11 @@ public class ServerActivity extends Activity implements
     }
 
     public SearchListener createSearchListener(final TrackCreatorListener trackCreatorListener){
+        Log.d(appType, "Creating a SearchListener");
         return new SearchListener() {
             @Override
             public void onSearchSucceeded(ArrayList<String> result) {
+                Log.d(appType, "Search succeeded, wrapping responses before displaying them");
                 ResponseWrapper responseWrapper = new ResponseWrapper();
                 responseWrapper.setOnCreateListener(trackCreatorListener);
                 responseWrapper.setView(searchResultView);
@@ -389,12 +400,14 @@ public class ServerActivity extends Activity implements
     }
 
     public View.OnClickListener createFindButtonOnClickListener(final SearchListener searchListener){
+        Log.d(appType, "Creating FindButton's OnClickListener");
         return new View.OnClickListener() {
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
                 String p = search.getText().toString().trim();
                 if (p.length()>0) {
+                    Log.d(appType, "Searching for songs");
                     //musicPlayer.pause(null);
                     animateButtonClick(colorPrimary, colorPrimaryClicked, 250, findButton);
                     searchResultView.removeAllViews();
@@ -404,14 +417,16 @@ public class ServerActivity extends Activity implements
                     SearchReader search = new SearchReader();
                     search.setOnSearchListener(searchListener);
                     search.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "https://api.spotify.com/v1/search?q=" + p + "&type=track");
-                }
+                } else { Log.d(appType, "Must enter non-white-text to search"); }
             }
         };
     }
 
     public View.OnClickListener createAddSongOnClickListener(){
+        Log.d(appType, "Creating AddSong's on Click Listener");
         return new View.OnClickListener(){
             public void onClick(View v){
+                Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));
                 animateButtonClick(colorPrimary, colorPrimaryClicked, 250, addSong);
                 if(adding){
                     loadingCircle.setVisibility(View.GONE);
@@ -444,6 +459,7 @@ public class ServerActivity extends Activity implements
     }
 
     public MessageListener createMessageListener(){
+        Log.d(appType, "Creating a MessageListener");
         return new MessageListener(){
             @Override
             public void onMessageSucceeded(String result) {
@@ -451,6 +467,7 @@ public class ServerActivity extends Activity implements
                     final Message m = jsonConverter.readValue(result, Message.class);
                     switch (m.getCode()) {
                         case ADD: {
+                            Log.d(appType, "Received message of ADD type");
                             if(isServer){
                                 final Item i = m.getItem();
                                 count++;
@@ -465,9 +482,7 @@ public class ServerActivity extends Activity implements
                                         }
                                     }
                                 });
-                                Log.d(appType, "sending message: " + m.getCode().toString());
                                 sendMessage(m);
-                                //recyclerView.addView(btn, params);
                             } else {
                                 final Item i = m.getItem();
                                 count++;
@@ -481,6 +496,7 @@ public class ServerActivity extends Activity implements
                             }
                         }
                         case SWAP:{
+                            Log.d(appType, "Received message of SWAP type");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -490,6 +506,7 @@ public class ServerActivity extends Activity implements
                             break;
                         }
                         case REMOVE:{
+                            Log.d(appType, "Received message of REMOVE type");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -499,6 +516,7 @@ public class ServerActivity extends Activity implements
                             break;
                         }
                         case CHANGE_PLAYING:{
+                            Log.d(appType, "Received message of CHANGE_PLAYING type");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -517,10 +535,11 @@ public class ServerActivity extends Activity implements
     }
 
     public Player.NotificationCallback createPlayerNotificationCallback(){
+        Log.d(appType, "Creating a PlayerNotificationCallback");
         return new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
-                System.out.println(playerEvent);
+                Log.d(appType, "Received player event: " + playerEvent.toString());
                 if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
                     if(!alreadyChanged) {
                         String temp = adapter.next();
@@ -546,6 +565,7 @@ public class ServerActivity extends Activity implements
     }
 
     public View.OnClickListener createSongButtonOnClickListener(final Button btn, final Item i){
+        Log.d(appType, "Creating SongButton's OnClickListener");
         if(isServer){
             return new View.OnClickListener() {
                 public void onClick(View view) {
@@ -569,8 +589,8 @@ public class ServerActivity extends Activity implements
             return new View.OnClickListener(){
                 public void onClick(View view){
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
-                    Log.d("requester activity", "sending song");
                     Message m = new Message(i);
+                    Log.d(appType, "sending message: " + m.getCode().toString());
                     sendMessage(m);
                 }
             };
@@ -579,6 +599,7 @@ public class ServerActivity extends Activity implements
     }
 
     public void createAndRunRouterListener(){
+        Log.d(appType, "Creating and running routerListener");
         messageListener = createMessageListener();
         serverListener = new ServerListener();
         serverListener.setOnServerListnerListener(messageListener);
@@ -586,6 +607,7 @@ public class ServerActivity extends Activity implements
     }
 
     private void addButton(final LinearLayout queueBox, final Button btn, final LinearLayout.LayoutParams params){
+        Log.d(appType, "Adding a button");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -595,6 +617,7 @@ public class ServerActivity extends Activity implements
     }
 
     private void setText(final Button b, final String text){
+        Log.d(appType, "Setting button's text");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -639,11 +662,13 @@ public class ServerActivity extends Activity implements
     }
 
     public void playSong(String uri){
+        Log.d(appType, "Playing a song");
         musicPlayer.playUri(null, uri, 0,0);
         alreadyChanged = true;
     }
 
     public void sendMessage(Message m){
+        Log.d(appType, "Sending a message to the router");
         try {
             new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
         } catch (IOException e) {
@@ -652,6 +677,7 @@ public class ServerActivity extends Activity implements
     }
 
     public void informRouterOfQuit(){
+        Log.d(appType, "Informing the router that the server is quitting");
         new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
     }
 }

@@ -15,8 +15,8 @@ import mccode.qdup.Utils.Listeners.ConnectListener;
 import static mccode.qdup.MainActivity.getServerPort;
 import static mccode.qdup.MainActivity.getRouterUrl;
 import static mccode.qdup.MainActivity.routerSocket;
-import static mccode.qdup.MainActivity.serverCode;
-import static mccode.qdup.MainActivity.requestNewServerCode;
+import static mccode.qdup.MainActivity.serverKey;
+import static mccode.qdup.MainActivity.requestNewServerKey;
 
 /**
  * Created by Will on 6/13/2017.
@@ -74,12 +74,12 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                 {
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
                     Scanner in = new Scanner(routerSocket.getInputStream());
-                    if(requestNewServerCode){
+                    if(requestNewServerKey){
                         out.write(("server:").getBytes());
                     } else {
-                        Log.i("Server Connector", "reconnecting with serverCode: " + serverCode);
-                        requestNewServerCode = true;
-                        out.write(serverCode.getBytes());
+                        Log.i("Server Connector", "reconnecting with serverCode: " + serverKey);
+                        requestNewServerKey = true;
+                        out.write(serverKey.getBytes());
                     }
                     String routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))
@@ -92,8 +92,8 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                     }
                     else
                     {
-                        serverCode = routerResponse;
-                        Log.i("Server Connector", serverCode);
+                        serverKey = routerResponse;
+                        Log.i("Server Connector", serverKey);
                     }
                     //in.close();
                 }
@@ -120,8 +120,8 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             }
         }
         Log.i("Server Connector", "connected! Yo");
-        Log.i("Server Connector", ("serverCode:" + serverCode));
-        response.add("" + serverCode);
+        Log.i("Server Connector", ("serverCode:" + serverKey));
+        response.add("" + serverKey);
         return response;
     }
     protected void onProgressUpdate()

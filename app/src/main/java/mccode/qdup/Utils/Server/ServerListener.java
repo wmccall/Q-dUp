@@ -1,6 +1,5 @@
 package mccode.qdup.Utils.Server;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,9 +8,6 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import mccode.qdup.MainActivity;
-import mccode.qdup.ServerActivity;
-import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Listeners.MessageListener;
 
 import static mccode.qdup.MainActivity.routerSocket;

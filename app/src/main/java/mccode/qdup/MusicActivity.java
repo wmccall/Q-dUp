@@ -435,7 +435,7 @@ public class MusicActivity extends Activity implements
                     scrollView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     queueOrSearch.setText("Queue");
-                    addSong.setText("Add Song");
+                    addSong.setText("Search");
                     if(isServer) {
                         playPause.setVisibility(View.VISIBLE);
                         nextButton.setVisibility(View.VISIBLE);

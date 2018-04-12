@@ -166,6 +166,7 @@ public class QueueActivity extends Activity implements
                 e.printStackTrace();
             }
             finish();
+            overridePendingTransition(0, 0);
         }
         return super.onKeyDown(keyCode, event);
     }

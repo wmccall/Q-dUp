@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ConstraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ProgressBar
+        android:id="@+id/SearchProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/SearchView"
+        app:layout_constraintLeft_toLeftOf="@+id/SearchView"
+        app:layout_constraintRight_toRightOf="@+id/SearchView"
+        app:layout_constraintTop_toTopOf="@+id/SearchView"
+        app:layout_constraintVertical_bias="0.14999998" />
+
+    <TextView
+        android:id="@+id/SearchServerText"
+        android:layout_width="100dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Server Key: "
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/SearchServerKey"
+        android:layout_width="255dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="monospace"
+        android:text="tempkey"
+        android:textAlignment="viewStart"
+        android:textColor="@color/colorAccent"
+        android:textIsSelectable="true"
+        android:textSize="23sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@+id/SearchServerText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/SearchText"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Search"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SearchServerText" />
+
+    <Button
+        android:id="@+id/SearchButton"
+        android:layout_width="88dp"
+        android:layout_height="49dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
+        android:text="Search"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SearchViewQueueButton" />
+
+    <ScrollView
+        android:id="@+id/SearchView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SearchBar">
+
+        <LinearLayout
+            android:id="@+id/SearchButtonLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/SearchViewQueueButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
+        android:text="View Queue"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/SearchServerText"
+        app:layout_constraintRight_toRightOf="@+id/SearchServerText"
+        app:layout_constraintTop_toBottomOf="@+id/SearchServerText" />
+
+    <EditText
+        android:id="@+id/SearchBar"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:textColor="@color/white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/SearchButton"
+        app:layout_constraintTop_toBottomOf="@+id/SearchViewQueueButton" />
+
+
+</android.support.constraint.ConstraintLayout>

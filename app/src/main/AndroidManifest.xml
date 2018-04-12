@@ -16,8 +16,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="mccode.qdup.MusicActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"></activity>
+        <activity android:name="mccode.qdup.QueueActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+        <activity android:name="mccode.qdup.SearchActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>

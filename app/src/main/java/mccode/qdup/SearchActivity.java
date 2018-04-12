@@ -73,7 +73,7 @@ public class SearchActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        appType = "QueueActivity-" + (isServer ? "Server" : "Client");
+        appType = "SearchActivity-" + (isServer ? "Server" : "Client");
         Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
         initializeScreenElements();
@@ -180,7 +180,7 @@ public class SearchActivity extends Activity implements
         Log.d(appType, "Initializing screen elements");
         setContentView(R.layout.search);
         hookUpElementsWithFrontEnd();
-        showAndHideElementsBasedOffOfServerOrClient();
+        showAndHideElements();
     }
 
     public void hookUpElementsWithFrontEnd(){
@@ -204,15 +204,15 @@ public class SearchActivity extends Activity implements
 
     }
 
-    public void showAndHideElementsBasedOffOfServerOrClient(){
+    public void showAndHideElements(){
 //        Log.d(appType, "Showing and hiding elements for the " + (isServer ? "server" : "client"));
         searchLoadingCircle.setVisibility(View.GONE);
     }
 
     public void createButtonListeners(){
         Log.d(appType, "Creating button listeners");
-        searchSwitchToQueueButton.setOnClickListener(createSearchSwitchToQueueOnClickListener());
-        searchButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
+        searchSwitchToQueueButton.setOnClickListener(createSearchSwitchToQueueButtonOnClickListener());
+        searchButton.setOnClickListener(createSearchButtonOnClickListener(searchListener));
     }
 
 
@@ -279,8 +279,8 @@ public class SearchActivity extends Activity implements
         };
     }
 
-    public View.OnClickListener createFindButtonOnClickListener(final SearchListener searchListener){
-        Log.d(appType, "Creating FindButton's OnClickListener");
+    public View.OnClickListener createSearchButtonOnClickListener(final SearchListener searchListener){
+        Log.d(appType, "Creating searchButton's OnClickListener");
         return new View.OnClickListener() {
             //TODO: update this to query the database for songs
             @Override
@@ -301,8 +301,8 @@ public class SearchActivity extends Activity implements
         };
     }
 
-    public View.OnClickListener createSearchSwitchToQueueOnClickListener(){
-        Log.d(appType, "Creating AddSong's on Click Listener");
+    public View.OnClickListener createSearchSwitchToQueueButtonOnClickListener(){
+        Log.d(appType, "Creating searchSwitchToQueueButton's on Click Listener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));

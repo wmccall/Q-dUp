@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.spotify.sdk.android.player.ConnectionStateCallback;
@@ -222,15 +221,15 @@ public class QueueActivity extends Activity implements
     public void createButtonListeners(boolean isServer){
         Log.d(appType, "Creating button listeners");
         if(isServer){
-            queuePlayPause.setOnClickListener(createPlayPauseOnClickListener());
-            queueNextSongButton.setOnClickListener(createNextButtonOnClickListener());
-            queuePreviousSongButton.setOnClickListener(createBackButtonOnClickListener());
+            queuePlayPause.setOnClickListener(createQueuePlayPauseOnClickListener());
+            queueNextSongButton.setOnClickListener(createQueueNextButtonOnClickListener());
+            queuePreviousSongButton.setOnClickListener(createQueuePreviousSongButtonOnClickListener());
             musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
         }
         queueSwitchToSearchButton.setOnClickListener(createQueueSwitchToSearchOnClickListener());
     }
 
-    public View.OnClickListener createPlayPauseOnClickListener(){
+    public View.OnClickListener createQueuePlayPauseOnClickListener(){
         Log.d(appType, "Creating queuePlayPause button's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
@@ -251,7 +250,7 @@ public class QueueActivity extends Activity implements
         };
     }
 
-    public View.OnClickListener createNextButtonOnClickListener(){
+    public View.OnClickListener createQueueNextButtonOnClickListener(){
         Log.d(appType, "Creating queueNextSongButton's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
@@ -276,7 +275,7 @@ public class QueueActivity extends Activity implements
         };
     }
 
-    public View.OnClickListener createBackButtonOnClickListener(){
+    public View.OnClickListener createQueuePreviousSongButtonOnClickListener(){
         Log.d(appType, "Creating queuePreviousSongButton OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
@@ -302,7 +301,7 @@ public class QueueActivity extends Activity implements
     }
 
     public View.OnClickListener createQueueSwitchToSearchOnClickListener(){
-        Log.d(appType, "Creating AddSong's on Click Listener");
+        Log.d(appType, "Creating queueSwitchToSearch's on Click Listener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));

@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mccode.qdup.QueueActivity;
 import mccode.qdup.R;
-import mccode.qdup.MusicActivity;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.QueryModels.Item;
@@ -34,11 +34,11 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     private final List<Item> mItems = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
-    private MusicActivity activity;
+    private QueueActivity activity;
     private int currentPlaying = -1;
     private boolean repeating = false;
 
-    public HostRecyclerListAdapter(MusicActivity activity) {
+    public HostRecyclerListAdapter(QueueActivity activity) {
         this.activity = activity;
     }
 

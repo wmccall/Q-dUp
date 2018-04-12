@@ -239,14 +239,16 @@ public class MainActivity extends Activity implements
                 if (!result.get(0).equals("NA")) {
                     serverKey = result.get(0);
                     if (serverOrClientButton.isChecked()) {
-                        Log.d("MainActivity", "Starting MusicActivity as a Server");
+                        Log.d("MainActivity", "Starting QueueActivity as a Server");
                         isServer = true;
-                        Intent intent = new Intent(MainActivity.this, MusicActivity.class);
+                        Intent intent = new Intent(MainActivity.this, QueueActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
                     } else {
-                        Log.d("MainActivity", "Starting MusicActivity as a Client");
+                        Log.d("MainActivity", "Starting QueueActivity as a Client");
                         isServer = false;
-                        Intent intent = new Intent(MainActivity.this, MusicActivity.class);
+                        Intent intent = new Intent(MainActivity.this, QueueActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
                     }
                 }

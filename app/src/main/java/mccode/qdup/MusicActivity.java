@@ -62,24 +62,30 @@ public class MusicActivity extends Activity implements
     private boolean alreadyChanged = false;
     private String appType;
 
-    TextView serverKeyView;
-    Button playPause;
-    Button nextButton;
-    Button backButton;
-    Button addSong;
-    TextView queueOrSearch;
-    ProgressBar loadingCircle;
-    LinearLayout searchResultView;
     int colorBackground;
     int colorBackgroundClicked;
     int colorPrimary;
     int colorFaded;
     int colorPrimaryClicked;
-    EditText search;
-    Button findButton;
-    ScrollView scrollView;
-    RecyclerView recyclerView;
-    HostRecyclerListAdapter adapter;
+
+    TextView queueServerKeyView;
+    Button queuePlayPause;
+    Button queueNextSongButton;
+    Button queuePreviousSongButton;
+    Button queueSwitchToSearchButton;
+    ProgressBar queueLoadingCircle;
+    RecyclerView queueView;
+    HostRecyclerListAdapter queueViewAdapter;
+
+    ProgressBar searchLoadingCircle;
+    Button searchSwitchToQueueButton;
+    TextView searchServerKeyView;
+    LinearLayout searchResultView;
+    EditText searchBar;
+    Button searchButton;
+    ScrollView searchView;
+
+
     ItemTouchHelper.Callback callback;
     ItemTouchHelper touchHelper;
 
@@ -94,7 +100,6 @@ public class MusicActivity extends Activity implements
         appType = "MusicActivity-" + (isServer ? "Server" : "Client");
         Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.music_activity);
         initializeScreenElements(isServer);
         setupTrackCreatorListenerAndSearchListener();
         createButtonListeners(isServer);
@@ -198,6 +203,7 @@ public class MusicActivity extends Activity implements
 
     public void initializeScreenElements(boolean isServer){
         Log.d(appType, "Initializing screen elements");
+        setContentView(R.layout.queue);
         hookUpElementsWithFrontEnd();
         setupRecyclerView();
         showAndHideElementsBasedOffOfServerOrClient(isServer);
@@ -213,73 +219,78 @@ public class MusicActivity extends Activity implements
         colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
 
         // server and client
-        serverKeyView = (TextView) findViewById(R.id.ServerKey);
-        serverKeyView.setText(serverKey);
-        addSong = (Button) findViewById(R.id.AddSong);
-        queueOrSearch = (TextView) findViewById(R.id.QueueText);
-        loadingCircle = (ProgressBar) findViewById(R.id.progressBar);
-        searchResultView = (LinearLayout) findViewById(R.id.ButtonLocation);
-        search = (EditText) findViewById(R.id.search_bar);
-        findButton = (Button) findViewById(R.id.find_button);
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
-        recyclerView = (RecyclerView) findViewById(R.id.QueueBox);
+        queueServerKeyView = (TextView) findViewById(R.id.QueueServerKey);
+        searchServerKeyView = (TextView) findViewById(R.id.SearchServerKey);
+        queueServerKeyView.setText(serverKey);
+        queueSwitchToSearchButton = (Button) findViewById(R.id.QueueViewSearchButton);
+        queueLoadingCircle = (ProgressBar) findViewById(R.id.QueueProgressBar);
+        searchResultView = (LinearLayout) findViewById(R.id.SearchButtonLocation);
+        searchBar = (EditText) findViewById(R.id.SearchBar);
+        searchButton = (Button) findViewById(R.id.SearchButton);
+        searchView = (ScrollView) findViewById(R.id.SearchView);
+        queueView = (RecyclerView) findViewById(R.id.QueueBox);
+        searchLoadingCircle = (ProgressBar) findViewById(R.id.SearchProgressBar);
+//        setContentView(R.layout.search);
+//        searchSwitchToQueueButton = (Button) findViewById(R.id.SearchViewQueueButton);
+//        setContentView(R.layout.queue);
 
         // server only
-        playPause = (Button) findViewById(R.id.PlayPause);
-        nextButton = (Button) findViewById(R.id.Skip);
-        backButton = (Button) findViewById(R.id.Back);
+        queuePlayPause = (Button) findViewById(R.id.QueuePlayPauseSong);
+        queueNextSongButton = (Button) findViewById(R.id.QueueNextSong);
+        queuePreviousSongButton = (Button) findViewById(R.id.QueuePreviousSong);
     }
 
     private void setupRecyclerView(){
         Log.d(appType, "Setting up the RecyclerView");
-        adapter = new HostRecyclerListAdapter(this);
-        callback = new HostItemTouchHelper(adapter);
+        queueViewAdapter = new HostRecyclerListAdapter(this);
+        callback = new HostItemTouchHelper(queueViewAdapter);
         touchHelper = new ItemTouchHelper(callback);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(adapter);
-        touchHelper.attachToRecyclerView(recyclerView);
+        queueView.setLayoutManager(new LinearLayoutManager(queueView.getContext()));
+        queueView.setAdapter(queueViewAdapter);
+        touchHelper.attachToRecyclerView(queueView);
     }
 
     public void showAndHideElementsBasedOffOfServerOrClient(boolean isServer){
         Log.d(appType, "Showing and hiding elements for the " + (isServer ? "server" : "client"));
-        loadingCircle.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
-        findButton.setVisibility(View.GONE);
-        scrollView.setVisibility(View.GONE);
+        queueLoadingCircle.setVisibility(View.GONE);
+//        searchBar.setVisibility(View.GONE);
+//        searchButton.setVisibility(View.GONE);
+//        searchView.setVisibility(View.GONE);
         if(!isServer){
-            playPause.setVisibility(View.GONE);
-            nextButton.setVisibility(View.GONE);
-            backButton.setVisibility(View.GONE);
+            queuePlayPause.setVisibility(View.GONE);
+            queueNextSongButton.setVisibility(View.GONE);
+            queuePreviousSongButton.setVisibility(View.GONE);
         }
     }
 
     public void createButtonListeners(boolean isServer){
         Log.d(appType, "Creating button listeners");
         if(isServer){
-            playPause.setOnClickListener(createPlayPauseOnClickListener());
-            nextButton.setOnClickListener(createNextButtonOnClickListener());
-            backButton.setOnClickListener(createBackButtonOnClickListener());
+            queuePlayPause.setOnClickListener(createPlayPauseOnClickListener());
+            queueNextSongButton.setOnClickListener(createNextButtonOnClickListener());
+            queuePreviousSongButton.setOnClickListener(createBackButtonOnClickListener());
             musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
         }
-        addSong.setOnClickListener(createAddSongOnClickListener());
-        findButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
+        queueSwitchToSearchButton.setOnClickListener(createQueueSwitchToSearchOnClickListener());
+//        searchSwitchToQueueButton.setOnClickListener(createSearchSwitchToQueueOnClickListener());
+//        searchButton.setOnClickListener(createFindButtonOnClickListener(searchListener));
     }
 
     public View.OnClickListener createPlayPauseOnClickListener(){
-        Log.d(appType, "Creating playPause button's OnClickListener");
+        Log.d(appType, "Creating queuePlayPause button's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(appType, "Changing playPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "play" : "pause"));
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, playPause);
+                Log.d(appType, "Changing queuePlayPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "play" : "pause"));
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queuePlayPause);
                 if(musicPlayer.getPlaybackState().isPlaying){
-                    playPause.setText("Play");
+                    queuePlayPause.setText("Play");
                     musicPlayer.pause(null);
                 }else{
-                    playPause.setText("Pause");
-                    if(adapter.isCurrValid())
+                    queuePlayPause.setText("Pause");
+                    if(queueViewAdapter.isCurrValid())
                         musicPlayer.resume(null);
                     else
-                        musicPlayer.playUri(null, adapter.playFromBeginning(), 0, 0);
+                        musicPlayer.playUri(null, queueViewAdapter.playFromBeginning(), 0, 0);
                     alreadyChanged = true;
                 }
             }
@@ -287,22 +298,22 @@ public class MusicActivity extends Activity implements
     }
 
     public View.OnClickListener createNextButtonOnClickListener(){
-        Log.d(appType, "Creating nextButton's OnClickListener");
+        Log.d(appType, "Creating queueNextSongButton's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, nextButton);
-                String temp = adapter.next();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queueNextSongButton);
+                String temp = queueViewAdapter.next();
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Going to next song");
                     musicPlayer.playUri(null, temp, 0, 0);
-                    setText(playPause, "Pause");
+                    setText(queuePlayPause, "Pause");
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped last song; stopped playing songs");
                         musicPlayer.pause(null);
-                        setText(playPause, "Play");
+                        setText(queuePlayPause, "Play");
                         musicPlayer.skipToNext(null);
                     }
                 }
@@ -352,7 +363,7 @@ public class MusicActivity extends Activity implements
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        loadingCircle.setVisibility(View.GONE);
+                        queueLoadingCircle.setVisibility(View.GONE);
                     }
                 });
             }
@@ -360,23 +371,23 @@ public class MusicActivity extends Activity implements
     }
 
     public View.OnClickListener createBackButtonOnClickListener(){
-        Log.d(appType, "Creating backButton OnClickListener");
+        Log.d(appType, "Creating queuePreviousSongButton OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Clicked the back button");
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, backButton);
-                String temp = adapter.prev();
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queuePreviousSongButton);
+                String temp = queueViewAdapter.prev();
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Skipping to previous track");
                     musicPlayer.playUri(null, temp, 0, 0);
-                    setText(playPause, "Pause");
+                    setText(queuePlayPause, "Pause");
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped back past first song; stopped playing songs");
                         musicPlayer.pause(null);
-                        setText(playPause, "Play");
+                        setText(queuePlayPause, "Play");
                         musicPlayer.skipToNext(null);
                     }
                 }
@@ -405,13 +416,13 @@ public class MusicActivity extends Activity implements
             //TODO: update this to query the database for songs
             @Override
             public void onClick(View v) {
-                String p = search.getText().toString().trim();
+                String p = searchBar.getText().toString().trim();
                 if (p.length()>0) {
                     Log.d(appType, "Searching for songs");
                     //musicPlayer.pause(null);
-                    animateButtonClick(colorPrimary, colorPrimaryClicked, 250, findButton);
+                    animateButtonClick(colorPrimary, colorPrimaryClicked, 250, searchButton);
                     searchResultView.removeAllViews();
-                    loadingCircle.setVisibility(View.VISIBLE);
+                    queueLoadingCircle.setVisibility(View.VISIBLE);
                     p = p.replaceAll("\\s{2,}", " ").trim();
                     p = p.replaceAll(" ", "%20");
                     SearchReader search = new SearchReader();
@@ -422,38 +433,25 @@ public class MusicActivity extends Activity implements
         };
     }
 
-    public View.OnClickListener createAddSongOnClickListener(){
+    public View.OnClickListener createQueueSwitchToSearchOnClickListener(){
         Log.d(appType, "Creating AddSong's on Click Listener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, addSong);
-                if(adding){
-                    loadingCircle.setVisibility(View.GONE);
-                    search.setVisibility(View.GONE);
-                    findButton.setVisibility(View.GONE);
-                    scrollView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    queueOrSearch.setText("Queue");
-                    addSong.setText("Search");
-                    if(isServer) {
-                        playPause.setVisibility(View.VISIBLE);
-                        nextButton.setVisibility(View.VISIBLE);
-                        backButton.setVisibility(View.VISIBLE);
-                    }
-                    adding = false;
-                }else{
-                    search.setVisibility(View.VISIBLE);
-                    findButton.setVisibility(View.VISIBLE);
-                    scrollView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                    queueOrSearch.setText("Search");
-                    addSong.setText("View Queue");
-                    playPause.setVisibility(View.GONE);
-                    nextButton.setVisibility(View.GONE);
-                    backButton.setVisibility(View.GONE);
-                    adding = true;
-                }
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queueSwitchToSearchButton);
+                setContentView(R.layout.search);
+                setContentView(R.layout.queue);
+            }
+        };
+    }
+
+    public View.OnClickListener createSearchSwitchToQueueOnClickListener(){
+        Log.d(appType, "Creating AddSong's on Click Listener");
+        return new View.OnClickListener(){
+            public void onClick(View v){
+                Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));
+                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, searchSwitchToQueueButton);
+                setContentView(R.layout.queue);
             }
         };
     }
@@ -474,10 +472,10 @@ public class MusicActivity extends Activity implements
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        adapter.addItem(i, generateButtonText(i).toString());
+                                        queueViewAdapter.addItem(i, generateButtonText(i).toString());
                                         if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
-                                            musicPlayer.playUri(null, adapter.next(), 0, 0);
-                                            setText(playPause, "Pause");
+                                            musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
+                                            setText(queuePlayPause, "Pause");
                                             alreadyChanged = true;
                                         }
                                     }
@@ -489,7 +487,7 @@ public class MusicActivity extends Activity implements
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        adapter.addItem(i, generateButtonText(i).toString());
+                                        queueViewAdapter.addItem(i, generateButtonText(i).toString());
                                     }
                                 });
                                 break;
@@ -500,7 +498,7 @@ public class MusicActivity extends Activity implements
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.swap(m.getVal1(), m.getVal2());
+                                    queueViewAdapter.swap(m.getVal1(), m.getVal2());
                                 }
                             });
                             break;
@@ -510,7 +508,7 @@ public class MusicActivity extends Activity implements
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.remove(m.getVal1());
+                                    queueViewAdapter.remove(m.getVal1());
                                 }
                             });
                             break;
@@ -520,7 +518,7 @@ public class MusicActivity extends Activity implements
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.changePlaying(m.getVal1());
+                                    queueViewAdapter.changePlaying(m.getVal1());
                                 }
                             });
                             break;
@@ -542,12 +540,12 @@ public class MusicActivity extends Activity implements
                 Log.d(appType, "Received player event: " + playerEvent.toString());
                 if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
                     if(!alreadyChanged) {
-                        String temp = adapter.next();
+                        String temp = queueViewAdapter.next();
                         if (!temp.equals("")) {
                             musicPlayer.playUri(null, temp, 0, 0);
-                            setText(playPause, "Pause");
+                            setText(queuePlayPause, "Pause");
                         } else {
-                            setText(playPause, "Play");
+                            setText(queuePlayPause, "Play");
                         }
                         alreadyChanged = true;
                     }
@@ -571,17 +569,17 @@ public class MusicActivity extends Activity implements
                 public void onClick(View view) {
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                     count++;
-                    adapter.addItem(i, generateButtonText(i).toString());
+                    queueViewAdapter.addItem(i, generateButtonText(i).toString());
                     if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
-                        musicPlayer.playUri(null, adapter.next(), 0, 0);
-                        setText(playPause, "Pause");
+                        musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
+                        setText(queuePlayPause, "Pause");
                         alreadyChanged = true;
                     }
 
                     Message m = new Message(i);
                     Log.d(appType, "sending message: " + m.getCode().toString());
                     sendMessage(m);
-                    //recyclerView.addView(btn, params);
+                    //queueView.addView(btn, params);
 
                 }
             };

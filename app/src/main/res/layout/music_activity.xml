@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/Server"
+        android:id="@+id/ServerText"
         android:layout_width="100dp"
         android:layout_height="28dp"
         android:layout_marginBottom="8dp"
@@ -51,7 +51,7 @@
         android:textSize="23sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/Server"
+        app:layout_constraintLeft_toRightOf="@+id/ServerText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
@@ -173,9 +173,9 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="@+id/Server"
-        app:layout_constraintRight_toRightOf="@+id/Server"
-        app:layout_constraintTop_toBottomOf="@+id/Server" />
+        app:layout_constraintLeft_toLeftOf="@+id/ServerText"
+        app:layout_constraintRight_toRightOf="@+id/ServerText"
+        app:layout_constraintTop_toBottomOf="@+id/ServerText" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/QueueBox"

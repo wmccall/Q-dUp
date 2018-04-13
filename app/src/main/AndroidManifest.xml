@@ -9,17 +9,17 @@
         android:roundIcon="@mipmap/colorful_icon_4"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="mccode.qdup.MainActivity"
+        <activity android:name="mccode.qdup.Activities.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="mccode.qdup.QueueActivity"
+        <activity android:name="mccode.qdup.Activities.QueueActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
-        <activity android:name="mccode.qdup.SearchActivity"
+        <activity android:name="mccode.qdup.Activities.SearchActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
         <activity

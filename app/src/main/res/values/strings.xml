@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Q\'d Up</string>
     <string name="find">Find</string>
+    <string name="tempkey">tempkey</string>
+    <string name="server_key">Server Key:</string>
+    <string name="search">Search</string>
+    <string name="view_queue">View Queue</string>
+    <string name="queue">Queue</string>
+    <string name="previous">Previous</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
 </resources>

@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.MessageListener;
 
-import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Activities.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/14/2017.

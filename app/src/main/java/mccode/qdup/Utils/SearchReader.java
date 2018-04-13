@@ -1,4 +1,4 @@
-package mccode.qdup;
+package mccode.qdup.Utils;
 
 import android.os.AsyncTask;
 
@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import mccode.qdup.Activities.MainActivity;
 import mccode.qdup.Utils.Listeners.SearchListener;
 
 /**

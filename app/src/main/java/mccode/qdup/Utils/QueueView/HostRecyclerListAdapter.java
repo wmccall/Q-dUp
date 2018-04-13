@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import mccode.qdup.QueueActivity;
+import mccode.qdup.Activities.QueueActivity;
 import mccode.qdup.R;
+import mccode.qdup.Utils.GeneralNetworkingUtils;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.QueryModels.Item;
 
-import static mccode.qdup.MainActivity.isServer;
+import static mccode.qdup.Activities.MainActivity.isServer;
 
 /**
  * Author: Connor McAuliffe
@@ -90,7 +91,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
                             notifyItemChanged(last);
                         }
                     });
-                    activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
+                    GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
                 }
 
             });
@@ -122,7 +123,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
             notifyItemRemoved(position);
 
-            activity.sendMessage(new Message(MessageCode.REMOVE, position));
+            GeneralNetworkingUtils.sendMessage(new Message(MessageCode.REMOVE, position));
         }
     }
 
@@ -142,7 +143,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
                 }
             }
             updateCurrentPlaying(fromPosition, toPosition);
-            activity.sendMessage(new Message(fromPosition, toPosition));
+            GeneralNetworkingUtils.sendMessage(new Message(fromPosition, toPosition));
 
 
             notifyItemMoved(fromPosition, toPosition);
@@ -219,7 +220,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
 
         }
-        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
+        GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
     }
 
@@ -246,7 +247,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             notifyItemChanged(currentPlaying);
             notifyItemChanged(last);
         }
-        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
+        GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
 
     }
@@ -361,6 +362,14 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
             notifyItemRemoved(position);
         }
+    }
+
+    public List<Item> getmItems(){
+        return mItems;
+    }
+
+    public int getCurrentPlaying(){
+        return currentPlaying;
     }
 }
 

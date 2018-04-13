@@ -1,4 +1,4 @@
-package mccode.qdup;
+package mccode.qdup.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -31,6 +31,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import mccode.qdup.R;
 import mccode.qdup.Utils.Client.ClientConnector;
 import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Server.ServerConnector;

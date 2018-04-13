@@ -8,14 +8,15 @@ import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.MainActivity.getClientPort;
-import static mccode.qdup.MainActivity.getRouterUrl;
+import static mccode.qdup.Activities.MainActivity.getClientPort;
+import static mccode.qdup.Activities.MainActivity.getRouterUrl;
 //import static mccode.qdup.MainActivity.mp;
-import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Activities.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/12/2017.
@@ -116,6 +117,14 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
 //                    {
 //
 //                    }
+                }
+                catch (NoSuchElementException e){
+                    if(!attempted)
+                    {
+                        Log.e("Client Connector", "Waiting for router");
+                        attempted = true;
+                        connected = false;
+                    }
                 }
             }
         }

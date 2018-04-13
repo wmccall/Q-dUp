@@ -44,6 +44,10 @@ public class Message {
         }
     }
 
+    public Message(MessageCode c){
+        code = c;
+    }
+
     /**
      * message constructor for a swap
      * @param idx1 original index

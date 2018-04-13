@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 
-import static mccode.qdup.MainActivity.jsonConverter;
+import static mccode.qdup.Activities.MainActivity.jsonConverter;
 
 /**
  * ResponseWrapper takes a response from the searchReader and gives the track creator listener a

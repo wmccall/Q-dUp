@@ -1,4 +1,4 @@
-package mccode.qdup;
+package mccode.qdup.Activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -33,18 +33,16 @@ import java.util.ArrayList;
 import mccode.qdup.QueryModels.Item;
 import mccode.qdup.QueryModels.ResponseWrapper;
 import mccode.qdup.QueryModels.TrackResponse;
-import static mccode.qdup.QueueActivity.*;
+
+import mccode.qdup.R;
+import mccode.qdup.Utils.GeneralNetworkingUtils;
+import mccode.qdup.Utils.SearchReader;
 import mccode.qdup.Utils.Listeners.SearchListener;
 import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Server.ServerWriter;
 
 
-import static mccode.qdup.MainActivity.isServer;
-import static mccode.qdup.MainActivity.jsonConverter;
-import static mccode.qdup.MainActivity.musicPlayer;
-import static mccode.qdup.MainActivity.routerSocket;
-import static mccode.qdup.MainActivity.serverKey;
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 
 public class SearchActivity extends Activity implements
@@ -73,13 +71,13 @@ public class SearchActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        appType = "SearchActivity-" + (isServer ? "Server" : "Client");
+        appType = "SearchActivity-" + (MainActivity.isServer ? "Server" : "Client");
         Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
         initializeScreenElements();
         setupTrackCreatorListenerAndSearchListener();
         createButtonListeners();
-        Log.d(appType, "Assigned Server Key: " + serverKey);
+        Log.d(appType, "Assigned Server Key: " + MainActivity.serverKey);
     }
 
     @Override
@@ -158,10 +156,10 @@ public class SearchActivity extends Activity implements
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK))
         {
-            informRouterOfQuit();
-            musicPlayer.pause(null);
+            GeneralNetworkingUtils.informRouterOfQuit();
+            MainActivity.musicPlayer.pause(null);
             try {
-                routerSocket.close();
+                MainActivity.routerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -195,7 +193,7 @@ public class SearchActivity extends Activity implements
 
         // server and client
         searchServerKeyView = (TextView) findViewById(R.id.SearchServerKey);
-        searchServerKeyView.setText(serverKey);
+        searchServerKeyView.setText(MainActivity.serverKey);
         searchResultView = (LinearLayout) findViewById(R.id.SearchButtonLocation);
         searchBar = (EditText) findViewById(R.id.SearchBar);
         searchButton = (Button) findViewById(R.id.SearchButton);
@@ -316,21 +314,21 @@ public class SearchActivity extends Activity implements
 
     public View.OnClickListener createSongButtonOnClickListener(final Button btn, final Item i){
         Log.d(appType, "Creating SongButton's OnClickListener");
-        if(isServer){
+        if(MainActivity.isServer){
             return new View.OnClickListener() {
                 public void onClick(View view) {
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                     count++;
-                    queueViewAdapter.addItem(i, generateButtonText(i).toString());
-                    if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
-                        musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
-                        setText(queuePlayPause, "Pause");
-                        alreadyChanged = true;
+                    QueueActivity.queueViewAdapter.addItem(i, generateButtonText(i).toString());
+                    if (MainActivity.musicPlayer.getMetadata().currentTrack == null && !MainActivity.musicPlayer.getPlaybackState().isPlaying) {
+                        MainActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
+                        setText(QueueActivity.queuePlayPause, getResources().getString(R.string.pause));
+                        QueueActivity.alreadyChanged = true;
                     }
 
                     Message m = new Message(i);
                     Log.d(appType, "sending message: " + m.getCode().toString());
-                    sendMessage(m);
+                    GeneralNetworkingUtils.sendMessage(m);
                 }
             };
         } else {
@@ -339,7 +337,7 @@ public class SearchActivity extends Activity implements
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                     Message m = new Message(i);
                     Log.d(appType, "sending message: " + m.getCode().toString());
-                    sendMessage(m);
+                    GeneralNetworkingUtils.sendMessage(m);
                 }
             };
         }
@@ -389,20 +387,6 @@ public class SearchActivity extends Activity implements
         }
 
         return text;
-    }
-
-    public void sendMessage(Message m){
-        Log.d(appType, "Sending a message to the router");
-        try {
-            new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, jsonConverter.writeValueAsString(m));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void informRouterOfQuit(){
-        Log.d(appType, "Informing the router that the server is quitting");
-        new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
     }
 }
 

@@ -156,15 +156,7 @@ public class SearchActivity extends Activity implements
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK))
         {
-            GeneralNetworkingUtils.informRouterOfQuit();
-            MainActivity.musicPlayer.pause(null);
-            try {
-                MainActivity.routerSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             finish();
-            overridePendingTransition(0, 0);
         }
         return super.onKeyDown(keyCode, event);
     }

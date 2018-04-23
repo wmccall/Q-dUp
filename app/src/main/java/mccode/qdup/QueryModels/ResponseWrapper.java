@@ -1,4 +1,4 @@
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,9 +7,9 @@ import android.view.View;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mccode.qdup.TrackCreatorListener;
+import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 
-import static mccode.qdup.MainActivity.jsonConverter;
+import static mccode.qdup.Activities.MainActivity.jsonConverter;
 
 /**
  * ResponseWrapper takes a response from the searchReader and gives the track creator listener a

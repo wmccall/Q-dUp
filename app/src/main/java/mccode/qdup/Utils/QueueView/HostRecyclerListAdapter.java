@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mccode.qdup.Activities.QueueActivity;
 import mccode.qdup.R;
-import mccode.qdup.ServerActivity;
+import mccode.qdup.Utils.GeneralNetworkingUtils;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
-import mccode.qdup.models.Item;
+import mccode.qdup.QueryModels.Item;
+
+import static mccode.qdup.Activities.MainActivity.isServer;
 
 /**
  * Author: Connor McAuliffe
@@ -32,11 +35,11 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     private final List<Item> mItems = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
-    private ServerActivity activity;
+    private QueueActivity activity;
     private int currentPlaying = -1;
     private boolean repeating = false;
 
-    public HostRecyclerListAdapter(ServerActivity activity) {
+    public HostRecyclerListAdapter(QueueActivity activity) {
         this.activity = activity;
     }
 
@@ -57,49 +60,48 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
         holder.textView.setText(mDisplays.get(position));
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        if(isServer) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                final int last = currentPlaying;
-                if(currentPlaying >=0 && currentPlaying <mItems.size()) {
-                    ItemViewHolder currPlayHolder;
+                @Override
+                public void onClick(View v) {
+                    final int last = currentPlaying;
+                    if (currentPlaying >= 0 && currentPlaying < mItems.size()) {
+                        ItemViewHolder currPlayHolder;
 
-                    currPlayHolder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
-                    if(currPlayHolder != null) {
-                        final ItemViewHolder finalHolder = currPlayHolder;
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                finalHolder.textView.setTextColor(Color.parseColor("#ffffff"));
-                            }
-                        });
+                        currPlayHolder = (ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                        if (currPlayHolder != null) {
+                            final ItemViewHolder finalHolder = currPlayHolder;
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finalHolder.textView.setTextColor(Color.parseColor("#ffffff"));
+                                }
+                            });
+                        }
+
                     }
-
+                    currentPlaying = holder.getAdapterPosition();
+                    activity.playSong(mItems.get(currentPlaying).getUri());
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.textView.setTextColor(Color.parseColor("#6de873"));
+                            notifyItemChanged(currentPlaying);
+                            notifyItemChanged(last);
+                        }
+                    });
+                    GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
                 }
-                currentPlaying = holder.getAdapterPosition();
-                activity.playSong(mItems.get(currentPlaying).getUri());
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        holder.textView.setTextColor(Color.parseColor("#6de873"));
-                        notifyItemChanged(currentPlaying);
-                        notifyItemChanged(last);
-                    }
-                });
-                activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
-            }
 
-        });
+            });
+        }
         if(position == currentPlaying){
             holder.textView.setTextColor(Color.parseColor("#6de873"));
         }
         else {
             holder.textView.setTextColor(Color.parseColor("#ffffff"));
         }
-
-
-
     }
 
     @Override
@@ -109,42 +111,46 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
 
     @Override
     public void onItemDismiss(int position){
+        if(isServer) {
+            mDisplays.remove(position);
+            mItems.remove(position);
+            if (position < currentPlaying) {
+                currentPlaying--;
+            }
+            if (position == currentPlaying) {
+                currentPlaying--;
+                activity.playSong(next());
+            }
+            notifyItemRemoved(position);
 
-        mDisplays.remove(position);
-        mItems.remove(position);
-        if(position < currentPlaying){
-            currentPlaying--;
+            GeneralNetworkingUtils.sendMessage(new Message(MessageCode.REMOVE, position));
         }
-        if(position == currentPlaying){
-            currentPlaying--;
-            activity.playSong(next());
-        }
-        notifyItemRemoved(position);
-
-        activity.sendMessage(new Message(MessageCode.REMOVE, position));
     }
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition){
-        if(fromPosition < toPosition){
-            for (int i = fromPosition; i < toPosition; i++){
-                Collections.swap(mDisplays, i, i+1);
-                Collections.swap(mItems, i, i+1);
+        if(isServer) {
+            if (fromPosition < toPosition) {
+                for (int i = fromPosition; i < toPosition; i++) {
+                    Collections.swap(mDisplays, i, i + 1);
+                    Collections.swap(mItems, i, i + 1);
+                }
+
+            } else {
+                for (int i = fromPosition; i > toPosition; i--) {
+                    Collections.swap(mDisplays, i, i - 1);
+                    Collections.swap(mItems, i, i - 1);
+                }
             }
+            updateCurrentPlaying(fromPosition, toPosition);
+            GeneralNetworkingUtils.sendMessage(new Message(fromPosition, toPosition));
 
+
+            notifyItemMoved(fromPosition, toPosition);
+            return true;
+        } else {
+            return false;
         }
-        else{
-            for(int i = fromPosition; i > toPosition; i--){
-                Collections.swap(mDisplays, i, i-1);
-                Collections.swap(mItems, i, i-1);
-            }
-        }
-        updateCurrentPlaying(fromPosition, toPosition);
-        activity.sendMessage(new Message(fromPosition, toPosition));
-
-
-        notifyItemMoved(fromPosition, toPosition);
-        return true;
     }
 
     /**
@@ -172,7 +178,6 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
         mDisplays.add(string);
         mItems.add(item);
         this.notifyItemInserted(mDisplays.size()-1);
-
     }
 
     public String next(){
@@ -215,7 +220,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
 
         }
-        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
+        GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
     }
 
@@ -242,7 +247,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             notifyItemChanged(currentPlaying);
             notifyItemChanged(last);
         }
-        activity.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
+        GeneralNetworkingUtils.sendMessage(new Message(MessageCode.CHANGE_PLAYING, currentPlaying));
         return result;
 
     }
@@ -281,6 +286,90 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
         public void onItemClear() {
             itemView.setBackgroundColor(0);
         }
+    }
+
+    public void swap(int fromPosition, int toPosition){
+        if(!isServer) {
+            if (fromPosition < toPosition) {
+                for (int i = fromPosition; i < toPosition; i++) {
+                    Collections.swap(mDisplays, i, i + 1);
+                    Collections.swap(mItems, i, i + 1);
+                }
+
+            } else {
+                for (int i = fromPosition; i > toPosition; i--) {
+                    Collections.swap(mDisplays, i, i - 1);
+                    Collections.swap(mItems, i, i - 1);
+                }
+            }
+            updateCurrentPlaying(fromPosition, toPosition);
+
+
+            notifyItemMoved(fromPosition, toPosition);
+        }
+    }
+
+    public void changePlaying(int idx) {
+        if (!isServer) {
+            if (currentPlaying >= mItems.size()) {
+                return;
+            }
+            HostRecyclerListAdapter.ItemViewHolder holder;
+            if (currentPlaying >= 0) {
+                holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                if (holder != null) {
+                    final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finalHolder.textView.setTextColor(Color.parseColor("#ffffff"));
+                        }
+                    });
+                }
+
+            }
+            final int last = currentPlaying;
+            currentPlaying = idx;
+            if (repeating) {
+                currentPlaying = currentPlaying % mItems.size();
+            }
+            if (currentPlaying < mItems.size()) {
+                holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+                if (holder != null) {
+                    final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finalHolder.textView.setTextColor(Color.parseColor("#6de873"));
+                            notifyItemChanged(currentPlaying);
+                            notifyItemChanged(last);
+                        }
+                    });
+                }
+
+            }
+        }
+    }
+    public void remove(int position){
+        if(!isServer) {
+            mDisplays.remove(position);
+            mItems.remove(position);
+            if (position < currentPlaying) {
+                currentPlaying--;
+            }
+            if (position == currentPlaying) {
+                currentPlaying--;
+            }
+            notifyItemRemoved(position);
+        }
+    }
+
+    public List<Item> getmItems(){
+        return mItems;
+    }
+
+    public int getCurrentPlaying(){
+        return currentPlaying;
     }
 }
 

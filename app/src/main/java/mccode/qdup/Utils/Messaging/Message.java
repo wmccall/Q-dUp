@@ -1,6 +1,6 @@
 package mccode.qdup.Utils.Messaging;
 
-import mccode.qdup.models.Item;
+import mccode.qdup.QueryModels.Item;
 
 import java.security.InvalidParameterException;
 
@@ -42,6 +42,10 @@ public class Message {
         else{
             throw new InvalidParameterException("This Message format is for a REMOVE or CHANGE PLAYING message only");
         }
+    }
+
+    public Message(MessageCode c){
+        code = c;
     }
 
     /**

@@ -1,5 +1,5 @@
 
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import java.io.Serializable;
 import java.util.HashMap;

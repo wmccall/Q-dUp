@@ -1,5 +1,7 @@
 package mccode.qdup.Utils.QueueView;
 
+import android.support.v7.widget.helper.ItemTouchHelper;
+
 /**
  * Author: Connor McAuliffe
  * Created: 12/6/2017

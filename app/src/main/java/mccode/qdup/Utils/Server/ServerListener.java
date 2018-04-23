@@ -1,6 +1,5 @@
 package mccode.qdup.Utils.Server;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,12 +8,9 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import mccode.qdup.MainActivity;
-import mccode.qdup.ServerActivity;
-import mccode.qdup.Utils.Listeners.ConnectListener;
 import mccode.qdup.Utils.Listeners.MessageListener;
 
-import static mccode.qdup.MainActivity.routerSocket;
+import static mccode.qdup.Activities.MainActivity.routerSocket;
 
 /**
  * Created by Will on 6/14/2017.
@@ -37,17 +33,19 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
         Scanner in;
         try {
             in = new Scanner(routerSocket.getInputStream());
-            try{
-                response = in.nextLine();
-                //Log.i("Server Listener", response);
-                listener.onMessageSucceeded(response);
-                response = "";
-            }catch(NoSuchElementException e){
-                Log.e("Server Listener", "no line found, but its okay");
-                in.close();
-                response = "err";
-                listener.onMessageSucceeded(response);
-                return null;
+            while(true) {
+                try {
+                    response = in.nextLine();
+                    Log.i("Server Listener", response);
+                    listener.onMessageSucceeded(response);
+                    response = "";
+                } catch (NoSuchElementException e) {
+                    Log.e("Server Listener", "no line found, but its okay");
+                    in.close();
+                    response = "err";
+                    listener.onMessageSucceeded(response);
+                    return null;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

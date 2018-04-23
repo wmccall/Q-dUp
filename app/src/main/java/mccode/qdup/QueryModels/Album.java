@@ -1,14 +1,10 @@
 
-package mccode.qdup.models;
+package mccode.qdup.QueryModels;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import mccode.qdup.models.Artist;
-import mccode.qdup.models.External_urls_;
-import mccode.qdup.models.Image;
 
 public class Album implements Serializable
 {

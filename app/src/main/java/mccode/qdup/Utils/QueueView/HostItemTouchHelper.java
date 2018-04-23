@@ -5,6 +5,8 @@ package mccode.qdup.Utils.QueueView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
+import static mccode.qdup.Activities.MainActivity.isServer;
+
 /**
  * Author: Connor McAuliffe
  * Created: 12/6/2017
@@ -21,12 +23,12 @@ public class HostItemTouchHelper extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return isServer;
     }
 
     @Override
     public boolean isItemViewSwipeEnabled() {
-        return true;
+        return isServer;
     }
 
     @Override
@@ -39,14 +41,18 @@ public class HostItemTouchHelper extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
-        mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-        return true;
+        if(isServer) {
+            mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        if (isServer) mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
     }
 
     @Override

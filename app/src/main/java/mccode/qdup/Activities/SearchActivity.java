@@ -27,7 +27,6 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import mccode.qdup.QueryModels.Item;
@@ -40,7 +39,6 @@ import mccode.qdup.Utils.SearchReader;
 import mccode.qdup.Utils.Listeners.SearchListener;
 import mccode.qdup.Utils.Listeners.TrackCreatorListener;
 import mccode.qdup.Utils.Messaging.Message;
-import mccode.qdup.Utils.Server.ServerWriter;
 
 
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
@@ -58,26 +56,26 @@ public class SearchActivity extends Activity implements
     int colorFaded;
     int colorPrimaryClicked;
 
-    ProgressBar searchLoadingCircle;
-    Button searchSwitchToQueueButton;
-    TextView searchServerKeyView;
-    LinearLayout searchResultView;
-    EditText searchBar;
-    Button searchButton;
-    ScrollView searchView;
+    private static ProgressBar searchLoadingCircle;
+    private static Button searchSwitchToQueueButton;
+    private static TextView searchServerKeyView;
+    private static LinearLayout searchResultView;
+    private static EditText searchBar;
+    private static Button searchButton;
+    public static ScrollView searchView;
 
     TrackCreatorListener trackCreatorListener;
     SearchListener searchListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        appType = "SearchActivity-" + (MainActivity.isServer ? "Server" : "Client");
+        appType = "McCode-SearchActivity-" + (PortalActivity.isServer ? "Server" : "Client");
         Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
         initializeScreenElements();
         setupTrackCreatorListenerAndSearchListener();
         createButtonListeners();
-        Log.d(appType, "Assigned Server Key: " + MainActivity.serverKey);
+        Log.d(appType, "Assigned Server Key: " + PortalActivity.serverKey);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class SearchActivity extends Activity implements
     protected void onDestroy() {
         count = 0;
         adding = false;
-        // VERY IMPORTANT! This must always be called or else you will leak resources
+        Log.d(appType, "onDestroy running");
         Spotify.destroyPlayer(this);
         super.onDestroy();
     }
@@ -169,13 +167,14 @@ public class SearchActivity extends Activity implements
 
     public void initializeScreenElements(){
         Log.d(appType, "Initializing screen elements");
-        setContentView(R.layout.search);
+        setContentView(R.layout.search_layout);
         hookUpElementsWithFrontEnd();
         showAndHideElements();
     }
 
     public void hookUpElementsWithFrontEnd(){
         Log.d(appType, "Hooking up elements with frontend");
+
         // colors
         colorBackground = ContextCompat.getColor(getApplicationContext(), R.color.background);
         colorBackgroundClicked = ContextCompat.getColor(getApplicationContext(), R.color.backgroundClicked);
@@ -185,7 +184,7 @@ public class SearchActivity extends Activity implements
 
         // server and client
         searchServerKeyView = (TextView) findViewById(R.id.SearchServerKey);
-        searchServerKeyView.setText(MainActivity.serverKey);
+        searchServerKeyView.setText(PortalActivity.serverKey);
         searchResultView = (LinearLayout) findViewById(R.id.SearchButtonLocation);
         searchBar = (EditText) findViewById(R.id.SearchBar);
         searchButton = (Button) findViewById(R.id.SearchButton);
@@ -306,14 +305,14 @@ public class SearchActivity extends Activity implements
 
     public View.OnClickListener createSongButtonOnClickListener(final Button btn, final Item i){
         Log.d(appType, "Creating SongButton's OnClickListener");
-        if(MainActivity.isServer){
+        if(PortalActivity.isServer){
             return new View.OnClickListener() {
                 public void onClick(View view) {
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                     count++;
                     QueueActivity.queueViewAdapter.addItem(i, generateButtonText(i).toString());
-                    if (MainActivity.musicPlayer.getMetadata().currentTrack == null && !MainActivity.musicPlayer.getPlaybackState().isPlaying) {
-                        MainActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
+                    if (PortalActivity.musicPlayer.getMetadata().currentTrack == null && !PortalActivity.musicPlayer.getPlaybackState().isPlaying) {
+                        PortalActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
                         setText(QueueActivity.queuePlayPause, getResources().getString(R.string.pause));
                         QueueActivity.alreadyChanged = true;
                     }

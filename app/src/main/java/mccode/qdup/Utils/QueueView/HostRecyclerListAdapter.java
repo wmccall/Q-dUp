@@ -20,7 +20,7 @@ import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.QueryModels.Item;
 
-import static mccode.qdup.Activities.MainActivity.isServer;
+import static mccode.qdup.Activities.PortalActivity.isServer;
 
 /**
  * Author: Connor McAuliffe

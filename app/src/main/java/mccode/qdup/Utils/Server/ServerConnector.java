@@ -12,11 +12,11 @@ import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.Activities.MainActivity.getServerPort;
-import static mccode.qdup.Activities.MainActivity.getRouterUrl;
-import static mccode.qdup.Activities.MainActivity.routerSocket;
-import static mccode.qdup.Activities.MainActivity.serverKey;
-import static mccode.qdup.Activities.MainActivity.requestNewServerKey;
+import static mccode.qdup.Activities.PortalActivity.getServerPort;
+import static mccode.qdup.Activities.PortalActivity.getRouterUrl;
+import static mccode.qdup.Activities.PortalActivity.routerSocket;
+import static mccode.qdup.Activities.PortalActivity.serverKey;
+import static mccode.qdup.Activities.PortalActivity.requestNewServerKey;
 
 /**
  * Created by Will on 6/13/2017.

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import mccode.qdup.Activities.MainActivity;
+import mccode.qdup.Activities.PortalActivity;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.Utils.Server.ServerWriter;
@@ -34,7 +34,7 @@ public class GeneralNetworkingUtils {
     public static void sendMessage(Message m){
         Log.d(appType, "Sending a message to the router");
         try {
-            new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MainActivity.jsonConverter.writeValueAsString(m));
+            new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PortalActivity.jsonConverter.writeValueAsString(m));
         } catch (IOException e) {
             e.printStackTrace();
         }

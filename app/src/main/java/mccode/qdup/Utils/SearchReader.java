@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import mccode.qdup.Activities.MainActivity;
+import mccode.qdup.Activities.AuthActivity;
 import mccode.qdup.Utils.Listeners.SearchListener;
 
 /**
@@ -39,7 +39,7 @@ public class SearchReader extends AsyncTask<String, Integer, ArrayList<String>> 
         try{
             assert url != null;
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization", "Bearer " + MainActivity.responseToken);
+            conn.setRequestProperty("Authorization", "Bearer " + AuthActivity.responseToken);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(conn.getInputStream()));
 

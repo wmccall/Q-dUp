@@ -5,7 +5,7 @@ package mccode.qdup.Utils.QueueView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-import static mccode.qdup.Activities.MainActivity.isServer;
+import static mccode.qdup.Activities.PortalActivity.isServer;
 
 /**
  * Author: Connor McAuliffe

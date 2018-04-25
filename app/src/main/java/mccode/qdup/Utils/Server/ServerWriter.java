@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import static mccode.qdup.Activities.MainActivity.routerSocket;
+import static mccode.qdup.Activities.PortalActivity.routerSocket;
 
 /**
  * Created by Will on 6/14/2017.

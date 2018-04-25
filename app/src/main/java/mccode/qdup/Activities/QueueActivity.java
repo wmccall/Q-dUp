@@ -118,9 +118,11 @@ public class QueueActivity extends Activity implements
             }
         } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPause){
             queueViewAdapter.pause();
+            setText(queuePlayPause, getResources().getString(R.string.play));
             GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PAUSE));
         } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPlay){
             queueViewAdapter.play();
+            setText(queuePlayPause, getResources().getString(R.string.pause));
             GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PLAY));
         }
     }

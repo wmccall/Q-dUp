@@ -8,6 +8,8 @@ public enum MessageCode {
     REMOVE,
     SWAP,
     CHANGE_PLAYING,
+    PAUSE,
+    PLAY,
     REQUEST_ALL,
     QUIT,
 }

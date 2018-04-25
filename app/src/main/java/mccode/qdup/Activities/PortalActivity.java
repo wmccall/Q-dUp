@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 
-import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -41,7 +40,6 @@ public class PortalActivity extends Activity{
     public static boolean requestNewServerKey = true;                           //flag if going to need a new serverKey
     public static ObjectMapper jsonConverter = new ObjectMapper();              //jsonConverter to do json parsing
     public static Socket routerSocket;                                          //socket connection to the router
-    public static Player musicPlayer;                                           //Spotify music player
     public static boolean isServer;
 
     //Buttons

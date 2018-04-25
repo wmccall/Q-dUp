@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Player;
@@ -60,6 +61,7 @@ public class QueueActivity extends Activity implements
     private static Button queueSwitchToSearchButton;
     private static RecyclerView queueView;
     public static HostRecyclerListAdapter queueViewAdapter;
+    public static Player musicPlayer;                                           //Spotify music player
 
     ItemTouchHelper.Callback callback;
     ItemTouchHelper touchHelper;
@@ -99,22 +101,27 @@ public class QueueActivity extends Activity implements
 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d(appType, "Playback event received: " + playerEvent.name());
-        switch (playerEvent) {
-            // Handle event type as necessary
-//            case kSpPlaybackNotifyTrackChanged:
-//                position++;
-//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
-//                if(position>0){
-//                    ((Button) findViewById(position-1)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.faded));
-//                }
-//                break;
-//            case kSpPlaybackNotifyPlay:
-//                position++;
-//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
-//                break;
-            default:
-                break;
+        Log.d(appType, "Received player event: " + playerEvent.toString());
+        if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
+            if(!alreadyChanged) {
+                String temp = queueViewAdapter.next();
+                if (!temp.equals("")) {
+                    musicPlayer.playUri(null, temp, 0, 0);
+                    setText(queuePlayPause, getResources().getString(R.string.pause));
+                } else {
+                    setText(queuePlayPause, getResources().getString(R.string.play));
+                }
+                alreadyChanged = true;
+            }
+            else{
+                alreadyChanged = false;
+            }
+        } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPause){
+            queueViewAdapter.pause();
+            GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PAUSE));
+        } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPlay){
+            queueViewAdapter.play();
+            GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PLAY));
         }
     }
 
@@ -159,7 +166,7 @@ public class QueueActivity extends Activity implements
         if ((keyCode == KeyEvent.KEYCODE_BACK))
         {
             GeneralNetworkingUtils.informRouterOfQuit();
-            PortalActivity.musicPlayer.pause(null);
+            musicPlayer.pause(null);
             try {
                 PortalActivity.routerSocket.close();
             } catch (IOException e) {
@@ -220,12 +227,12 @@ public class QueueActivity extends Activity implements
     }
 
     public void createButtonListeners(boolean isServer){
-        Log.d(appType, "Creating button listeners");
+        Log.d(appType, "Creating button listeners: " + (isServer ? "server" : "client"));
         if(isServer){
             queuePlayPause.setOnClickListener(createQueuePlayPauseOnClickListener());
             queueNextSongButton.setOnClickListener(createQueueNextButtonOnClickListener());
             queuePreviousSongButton.setOnClickListener(createQueuePreviousSongButtonOnClickListener());
-            PortalActivity.musicPlayer.addNotificationCallback(createPlayerNotificationCallback());
+            setupPlayer();
         }
         queueSwitchToSearchButton.setOnClickListener(createQueueSwitchToSearchOnClickListener());
     }
@@ -234,17 +241,17 @@ public class QueueActivity extends Activity implements
         Log.d(appType, "Creating queuePlayPause button's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(appType, "Changing queuePlayPause button to" + (PortalActivity.musicPlayer.getPlaybackState().isPlaying ? "Play" : "Pause"));
+                Log.d(appType, "Changing queuePlayPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "Play" : "Pause"));
                 animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queuePlayPause);
-                if(PortalActivity.musicPlayer.getPlaybackState().isPlaying){
+                if(musicPlayer.getPlaybackState().isPlaying){
                     queuePlayPause.setText(getResources().getString(R.string.play));
-                    PortalActivity.musicPlayer.pause(null);
+                    musicPlayer.pause(null);
                 }else{
                     queuePlayPause.setText(getResources().getString(R.string.pause));
                     if(queueViewAdapter.isCurrValid())
-                        PortalActivity.musicPlayer.resume(null);
+                        musicPlayer.resume(null);
                     else
-                        PortalActivity.musicPlayer.playUri(null, queueViewAdapter.playFromBeginning(), 0, 0);
+                        musicPlayer.playUri(null, queueViewAdapter.playFromBeginning(), 0, 0);
                     alreadyChanged = true;
                 }
             }
@@ -260,15 +267,15 @@ public class QueueActivity extends Activity implements
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Going to next song");
-                    PortalActivity.musicPlayer.playUri(null, temp, 0, 0);
+                    musicPlayer.playUri(null, temp, 0, 0);
                     setText(queuePlayPause, getResources().getString(R.string.pause));
                 }
                 else{
-                    if(PortalActivity.musicPlayer.getPlaybackState().isPlaying) {
+                    if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped last song; stopped playing songs");
-                        PortalActivity.musicPlayer.pause(null);
+                        musicPlayer.pause(null);
                         setText(queuePlayPause, getResources().getString(R.string.play));
-                        PortalActivity.musicPlayer.skipToNext(null);
+                        musicPlayer.skipToNext(null);
                     }
                 }
 
@@ -286,15 +293,15 @@ public class QueueActivity extends Activity implements
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Skipping to previous track");
-                    PortalActivity.musicPlayer.playUri(null, temp, 0, 0);
+                    musicPlayer.playUri(null, temp, 0, 0);
                     setText(queuePlayPause, getResources().getString(R.string.pause));
                 }
                 else{
-                    if(PortalActivity.musicPlayer.getPlaybackState().isPlaying) {
+                    if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped back past first song; stopped playing songs");
-                        PortalActivity.musicPlayer.pause(null);
+                        musicPlayer.pause(null);
                         setText(queuePlayPause, getResources().getString(R.string.play));
-                        PortalActivity.musicPlayer.skipToNext(null);
+                        musicPlayer.skipToNext(null);
                     }
                 }
             }
@@ -331,8 +338,8 @@ public class QueueActivity extends Activity implements
                                     @Override
                                     public void run() {
                                         queueViewAdapter.addItem(i, generateButtonText(i).toString());
-                                        if (PortalActivity.musicPlayer.getMetadata().currentTrack == null && !PortalActivity.musicPlayer.getPlaybackState().isPlaying) {
-                                            PortalActivity.musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
+                                        if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
+                                            musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
                                             setText(queuePlayPause, getResources().getString(R.string.pause));
                                             alreadyChanged = true;
                                         }
@@ -381,6 +388,16 @@ public class QueueActivity extends Activity implements
                             });
                             break;
                         }
+                        case PAUSE:{
+                            Log.d(appType, "Received message of PAUSE type");
+                            queueViewAdapter.pause();
+                            break;
+                        }
+                        case PLAY:{
+                            Log.d(appType, "Received message of PLAY type");
+                            queueViewAdapter.play();
+                            break;
+                        }
                         case REQUEST_ALL:{
                             Log.d(appType, "Received message of REQUEST_ALL type");
                             for (Item i: queueViewAdapter.getmItems()
@@ -397,36 +414,6 @@ public class QueueActivity extends Activity implements
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-            }
-        };
-    }
-
-    public Player.NotificationCallback createPlayerNotificationCallback(){
-        Log.d(appType, "Creating a PlayerNotificationCallback");
-        return new Player.NotificationCallback() {
-            @Override
-            public void onPlaybackEvent(PlayerEvent playerEvent) {
-                Log.d(appType, "Received player event: " + playerEvent.toString());
-                if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged){
-                    if(!alreadyChanged) {
-                        String temp = queueViewAdapter.next();
-                        if (!temp.equals("")) {
-                            PortalActivity.musicPlayer.playUri(null, temp, 0, 0);
-                            setText(queuePlayPause, getResources().getString(R.string.pause));
-                        } else {
-                            setText(queuePlayPause, getResources().getString(R.string.play));
-                        }
-                        alreadyChanged = true;
-                    }
-                    else{
-                        alreadyChanged = false;
-                    }
-                }
-            }
-
-            @Override
-            public void onPlaybackError(Error error) {
 
             }
         };
@@ -487,8 +474,27 @@ public class QueueActivity extends Activity implements
 
     public void playSong(String uri){
         Log.d(appType, "Playing a song");
-        PortalActivity.musicPlayer.playUri(null, uri, 0,0);
+        musicPlayer.playUri(null, uri, 0,0);
         alreadyChanged = true;
+    }
+
+    private void setupPlayer(){
+        Log.d(appType, "Setting up the spotify player");
+        Config playerConfig = new Config(this, AuthActivity.authenticationResponse.getAccessToken(), AuthActivity.CLIENT_ID);
+        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+            @Override
+            public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                Log.d(appType, "spotifyPlayer.onInitialized");
+                musicPlayer = spotifyPlayer;
+                musicPlayer.addConnectionStateCallback(QueueActivity.this);
+                musicPlayer.addNotificationCallback(QueueActivity.this);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e(appType, "Could not initialize player: " + throwable.getMessage());
+            }
+        });
     }
 }
 

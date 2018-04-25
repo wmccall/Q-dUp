@@ -21,11 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.spotify.sdk.android.player.ConnectionStateCallback;
-import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
-import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.ArrayList;
 
@@ -43,8 +39,7 @@ import mccode.qdup.Utils.Messaging.Message;
 
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
 
-public class SearchActivity extends Activity implements
-        SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
+public class SearchActivity extends Activity{
 
     public static int count = 0;
     boolean adding = false;
@@ -91,62 +86,6 @@ public class SearchActivity extends Activity implements
         Log.d(appType, "onDestroy running");
         Spotify.destroyPlayer(this);
         super.onDestroy();
-    }
-
-    @Override
-    public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d(appType, "Playback event received: " + playerEvent.name());
-        switch (playerEvent) {
-            // Handle event type as necessary
-//            case kSpPlaybackNotifyTrackChanged:
-//                position++;
-//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
-//                if(position>0){
-//                    ((Button) findViewById(position-1)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.faded));
-//                }
-//                break;
-//            case kSpPlaybackNotifyPlay:
-//                position++;
-//                ((Button) findViewById(position)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
-//                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onPlaybackError(Error error) {
-        Log.d(appType, "Playback error received: " + error.name());
-        switch (error) {
-            // Handle error type as necessary
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onLoggedIn() {
-        Log.d(appType, "User logged in");
-    }
-
-    @Override
-    public void onLoggedOut() {
-        Log.d(appType, "User logged out");
-    }
-
-    @Override
-    public void onLoginFailed(Error error) {
-        Log.d(appType, "Login failed");
-    }
-
-    @Override
-    public void onTemporaryError() {
-        Log.d(appType, "Temporary error occurred");
-    }
-
-    @Override
-    public void onConnectionMessage(String message) {
-        Log.d(appType, "Received connection message: " + message);
     }
 
     @Override
@@ -311,8 +250,8 @@ public class SearchActivity extends Activity implements
                     animateButtonClick(colorBackground, colorBackgroundClicked, 250, btn);
                     count++;
                     QueueActivity.queueViewAdapter.addItem(i, generateButtonText(i).toString());
-                    if (PortalActivity.musicPlayer.getMetadata().currentTrack == null && !PortalActivity.musicPlayer.getPlaybackState().isPlaying) {
-                        PortalActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
+                    if (QueueActivity.musicPlayer.getMetadata().currentTrack == null && !QueueActivity.musicPlayer.getPlaybackState().isPlaying) {
+                        QueueActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
                         setText(QueueActivity.queuePlayPause, getResources().getString(R.string.pause));
                         QueueActivity.alreadyChanged = true;
                     }

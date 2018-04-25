@@ -350,6 +350,41 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
         }
     }
+
+    public void pause(){
+        HostRecyclerListAdapter.ItemViewHolder holder;
+        if (currentPlaying >= 0) {
+            holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if (holder != null) {
+                final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#9dd29f"));
+                    }
+                });
+            }
+
+        }
+    }
+
+    public void play(){
+        HostRecyclerListAdapter.ItemViewHolder holder;
+        if (currentPlaying >= 0) {
+            holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if (holder != null) {
+                final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#6de873"));
+                    }
+                });
+            }
+
+        }
+    }
+
     public void remove(int position){
         if(!isServer) {
             mDisplays.remove(position);

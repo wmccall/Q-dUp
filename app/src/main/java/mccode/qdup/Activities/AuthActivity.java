@@ -24,10 +24,10 @@ import mccode.qdup.R;
 
 public class AuthActivity extends Activity implements Player.NotificationCallback, ConnectionStateCallback {
 
-    private static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
+    public static final String CLIENT_ID = "dfa2a91d372d42db9cb74bed20fb5630"; //for Spotify
     private static final String REDIRECT_URI = "mccode-qdup://callback";        //callback for Spotify
     private static final int REQUEST_CODE = 1337;                       // Request code that will be used to verify if the result comes from correct activity
-    private static AuthenticationResponse authenticationResponse = null;               //Spotify authentication response
+    public static AuthenticationResponse authenticationResponse = null;               //Spotify authentication response
     private String appType = "McCode-AuthActivity";
 
     public static String responseToken = "";
@@ -142,9 +142,10 @@ public class AuthActivity extends Activity implements Player.NotificationCallbac
         Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
             @Override
             public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                PortalActivity.musicPlayer = spotifyPlayer;
-                PortalActivity.musicPlayer.addConnectionStateCallback(AuthActivity.this);
-                PortalActivity.musicPlayer.addNotificationCallback(AuthActivity.this);
+                Log.d(appType, "spotifyPlayer.onInitialized");
+                QueueActivity.musicPlayer = spotifyPlayer;
+                QueueActivity.musicPlayer.addConnectionStateCallback(AuthActivity.this);
+                QueueActivity.musicPlayer.addNotificationCallback(AuthActivity.this);
             }
 
             @Override
@@ -168,13 +169,11 @@ public class AuthActivity extends Activity implements Player.NotificationCallbac
         Intent intent = new Intent(AuthActivity.this, PortalActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-        finish();
     }
 
     private void startErrorActivity(){
         Intent intent = new Intent(AuthActivity.this, ErrorActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-        finish();
     }
 }

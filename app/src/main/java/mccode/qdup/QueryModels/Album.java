@@ -1,12 +1,12 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class Album implements Serializable
+public class Album implements Parcelable
 {
 
     private String album_type;
@@ -21,8 +21,37 @@ public class Album implements Serializable
     private String release_date_precision;
     private String type;
     private String uri;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -2975985792619395837L;
+    public final static Parcelable.Creator<Album> CREATOR = new Creator<Album>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Album createFromParcel(Parcel in) {
+            return new Album(in);
+        }
+
+        public Album[] newArray(int size) {
+            return (new Album[size]);
+        }
+
+    }
+    ;
+
+    protected Album(Parcel in) {
+        this.album_type = ((String) in.readValue((String.class.getClassLoader())));
+        in.readList(this.artists, (mccode.qdup.QueryModels.Artist.class.getClassLoader()));
+        in.readList(this.available_markets, (java.lang.String.class.getClassLoader()));
+        this.external_urls = ((External_urls_) in.readValue((External_urls_.class.getClassLoader())));
+        this.href = ((String) in.readValue((String.class.getClassLoader())));
+        this.id = ((String) in.readValue((String.class.getClassLoader())));
+        in.readList(this.images, (mccode.qdup.QueryModels.Image.class.getClassLoader()));
+        this.name = ((String) in.readValue((String.class.getClassLoader())));
+        this.release_date = ((String) in.readValue((String.class.getClassLoader())));
+        this.release_date_precision = ((String) in.readValue((String.class.getClassLoader())));
+        this.type = ((String) in.readValue((String.class.getClassLoader())));
+        this.uri = ((String) in.readValue((String.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -158,12 +187,23 @@ public class Album implements Serializable
         this.uri = uri;
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(album_type);
+        dest.writeList(artists);
+        dest.writeList(available_markets);
+        dest.writeValue(external_urls);
+        dest.writeValue(href);
+        dest.writeValue(id);
+        dest.writeList(images);
+        dest.writeValue(name);
+        dest.writeValue(release_date);
+        dest.writeValue(release_date_precision);
+        dest.writeValue(type);
+        dest.writeValue(uri);
     }
 
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    public int describeContents() {
+        return  0;
     }
 
 }

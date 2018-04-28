@@ -1,18 +1,38 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class Image implements Serializable
+public class Image implements Parcelable
 {
 
     private Integer height;
     private String url;
     private Integer width;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 2006858772088237901L;
+    public final static Parcelable.Creator<Image> CREATOR = new Creator<Image>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Image createFromParcel(Parcel in) {
+            return new Image(in);
+        }
+
+        public Image[] newArray(int size) {
+            return (new Image[size]);
+        }
+
+    }
+    ;
+
+    protected Image(Parcel in) {
+        this.height = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.url = ((String) in.readValue((String.class.getClassLoader())));
+        this.width = ((Integer) in.readValue((Integer.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -42,22 +62,12 @@ public class Image implements Serializable
         this.height = height;
     }
 
-    public Image withHeight(Integer height) {
-        this.height = height;
-        return this;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public Image withUrl(String url) {
-        this.url = url;
-        return this;
     }
 
     public Integer getWidth() {
@@ -68,22 +78,14 @@ public class Image implements Serializable
         this.width = width;
     }
 
-    public Image withWidth(Integer width) {
-        this.width = width;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(height);
+        dest.writeValue(url);
+        dest.writeValue(width);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public Image withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

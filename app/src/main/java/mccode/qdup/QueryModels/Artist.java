@@ -1,11 +1,11 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class Artist implements Serializable
+public class Artist implements Parcelable
 {
 
     private External_urls external_urls;
@@ -14,8 +14,31 @@ public class Artist implements Serializable
     private String name;
     private String type;
     private String uri;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 4408550435184883578L;
+    public final static Parcelable.Creator<Artist> CREATOR = new Creator<Artist>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Artist createFromParcel(Parcel in) {
+            return new Artist(in);
+        }
+
+        public Artist[] newArray(int size) {
+            return (new Artist[size]);
+        }
+
+    }
+    ;
+
+    protected Artist(Parcel in) {
+        this.external_urls = ((External_urls) in.readValue((External_urls.class.getClassLoader())));
+        this.href = ((String) in.readValue((String.class.getClassLoader())));
+        this.id = ((String) in.readValue((String.class.getClassLoader())));
+        this.name = ((String) in.readValue((String.class.getClassLoader())));
+        this.type = ((String) in.readValue((String.class.getClassLoader())));
+        this.uri = ((String) in.readValue((String.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -51,22 +74,12 @@ public class Artist implements Serializable
         this.external_urls = external_urls;
     }
 
-    public Artist withExternal_urls(External_urls external_urls) {
-        this.external_urls = external_urls;
-        return this;
-    }
-
     public String getHref() {
         return href;
     }
 
     public void setHref(String href) {
         this.href = href;
-    }
-
-    public Artist withHref(String href) {
-        this.href = href;
-        return this;
     }
 
     public String getId() {
@@ -77,22 +90,12 @@ public class Artist implements Serializable
         this.id = id;
     }
 
-    public Artist withId(String id) {
-        this.id = id;
-        return this;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Artist withName(String name) {
-        this.name = name;
-        return this;
     }
 
     public String getType() {
@@ -103,11 +106,6 @@ public class Artist implements Serializable
         this.type = type;
     }
 
-    public Artist withType(String type) {
-        this.type = type;
-        return this;
-    }
-
     public String getUri() {
         return uri;
     }
@@ -116,22 +114,17 @@ public class Artist implements Serializable
         this.uri = uri;
     }
 
-    public Artist withUri(String uri) {
-        this.uri = uri;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(external_urls);
+        dest.writeValue(href);
+        dest.writeValue(id);
+        dest.writeValue(name);
+        dest.writeValue(type);
+        dest.writeValue(uri);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public Artist withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

@@ -161,7 +161,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
      * @param to the upper index of the swapper values
      */
     private void updateCurrentPlaying(int from, int to){
-
+        Log.d("McCode-RecyclerAdapter", "Updating current playing");
         if(currentPlaying == from){
             currentPlaying = to;
         }

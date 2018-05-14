@@ -410,6 +410,7 @@ public class QueueActivity extends Activity implements
                             break;
                         }
                         case QUIT:{
+                            Log.d(appType, "Received message of QUIT type");
                             finish();
                         }
                     }

@@ -1,16 +1,34 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class TrackResponse implements Serializable
+public class TrackResponse implements Parcelable
 {
 
     private Tracks tracks;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 4497914800914680396L;
+    public final static Parcelable.Creator<TrackResponse> CREATOR = new Creator<TrackResponse>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public TrackResponse createFromParcel(Parcel in) {
+            return new TrackResponse(in);
+        }
+
+        public TrackResponse[] newArray(int size) {
+            return (new TrackResponse[size]);
+        }
+
+    }
+    ;
+
+    protected TrackResponse(Parcel in) {
+        this.tracks = ((Tracks) in.readValue((Tracks.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -36,22 +54,12 @@ public class TrackResponse implements Serializable
         this.tracks = tracks;
     }
 
-    public TrackResponse withTracks(Tracks tracks) {
-        this.tracks = tracks;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(tracks);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public TrackResponse withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

@@ -1,16 +1,34 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class External_urls implements Serializable
+public class External_urls implements Parcelable
 {
 
     private String spotify;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -6992500396595992958L;
+    public final static Parcelable.Creator<External_urls> CREATOR = new Creator<External_urls>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public External_urls createFromParcel(Parcel in) {
+            return new External_urls(in);
+        }
+
+        public External_urls[] newArray(int size) {
+            return (new External_urls[size]);
+        }
+
+    }
+    ;
+
+    protected External_urls(Parcel in) {
+        this.spotify = ((String) in.readValue((String.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -36,22 +54,12 @@ public class External_urls implements Serializable
         this.spotify = spotify;
     }
 
-    public External_urls withSpotify(String spotify) {
-        this.spotify = spotify;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(spotify);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public External_urls withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

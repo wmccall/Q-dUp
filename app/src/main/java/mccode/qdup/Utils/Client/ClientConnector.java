@@ -13,10 +13,10 @@ import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.Activities.MainActivity.getClientPort;
-import static mccode.qdup.Activities.MainActivity.getRouterUrl;
-//import static mccode.qdup.MainActivity.mp;
-import static mccode.qdup.Activities.MainActivity.routerSocket;
+import static mccode.qdup.Activities.PortalActivity.getClientPort;
+import static mccode.qdup.Activities.PortalActivity.getRouterUrl;
+//import static mccode.qdup.PortalActivity.mp;
+import static mccode.qdup.Activities.PortalActivity.routerSocket;
 
 /**
  * Created by Will on 6/12/2017.

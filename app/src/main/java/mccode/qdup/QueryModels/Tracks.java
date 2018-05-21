@@ -1,12 +1,12 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class Tracks implements Serializable
+public class Tracks implements Parcelable
 {
 
     private String href;
@@ -16,8 +16,32 @@ public class Tracks implements Serializable
     private Integer offset;
     private Object previous;
     private Integer total;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 6530690084933129786L;
+    public final static Parcelable.Creator<Tracks> CREATOR = new Creator<Tracks>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Tracks createFromParcel(Parcel in) {
+            return new Tracks(in);
+        }
+
+        public Tracks[] newArray(int size) {
+            return (new Tracks[size]);
+        }
+
+    }
+    ;
+
+    protected Tracks(Parcel in) {
+        this.href = ((String) in.readValue((String.class.getClassLoader())));
+        in.readList(this.items, (mccode.qdup.QueryModels.Item.class.getClassLoader()));
+        this.limit = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.next = ((String) in.readValue((String.class.getClassLoader())));
+        this.offset = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.previous = ((Object) in.readValue((Object.class.getClassLoader())));
+        this.total = ((Integer) in.readValue((Integer.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -55,22 +79,12 @@ public class Tracks implements Serializable
         this.href = href;
     }
 
-    public Tracks withHref(String href) {
-        this.href = href;
-        return this;
-    }
-
     public List<Item> getItems() {
         return items;
     }
 
     public void setItems(List<Item> items) {
         this.items = items;
-    }
-
-    public Tracks withItems(List<Item> items) {
-        this.items = items;
-        return this;
     }
 
     public Integer getLimit() {
@@ -81,22 +95,12 @@ public class Tracks implements Serializable
         this.limit = limit;
     }
 
-    public Tracks withLimit(Integer limit) {
-        this.limit = limit;
-        return this;
-    }
-
     public String getNext() {
         return next;
     }
 
     public void setNext(String next) {
         this.next = next;
-    }
-
-    public Tracks withNext(String next) {
-        this.next = next;
-        return this;
     }
 
     public Integer getOffset() {
@@ -107,22 +111,12 @@ public class Tracks implements Serializable
         this.offset = offset;
     }
 
-    public Tracks withOffset(Integer offset) {
-        this.offset = offset;
-        return this;
-    }
-
     public Object getPrevious() {
         return previous;
     }
 
     public void setPrevious(Object previous) {
         this.previous = previous;
-    }
-
-    public Tracks withPrevious(Object previous) {
-        this.previous = previous;
-        return this;
     }
 
     public Integer getTotal() {
@@ -133,22 +127,18 @@ public class Tracks implements Serializable
         this.total = total;
     }
 
-    public Tracks withTotal(Integer total) {
-        this.total = total;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(href);
+        dest.writeList(items);
+        dest.writeValue(limit);
+        dest.writeValue(next);
+        dest.writeValue(offset);
+        dest.writeValue(previous);
+        dest.writeValue(total);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public Tracks withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

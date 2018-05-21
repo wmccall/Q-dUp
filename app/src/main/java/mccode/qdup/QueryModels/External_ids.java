@@ -1,16 +1,34 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class External_ids implements Serializable
+public class External_ids implements Parcelable
 {
 
     private String isrc;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 6449473715479390211L;
+    public final static Parcelable.Creator<External_ids> CREATOR = new Creator<External_ids>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public External_ids createFromParcel(Parcel in) {
+            return new External_ids(in);
+        }
+
+        public External_ids[] newArray(int size) {
+            return (new External_ids[size]);
+        }
+
+    }
+    ;
+
+    protected External_ids(Parcel in) {
+        this.isrc = ((String) in.readValue((String.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -36,22 +54,12 @@ public class External_ids implements Serializable
         this.isrc = isrc;
     }
 
-    public External_ids withIsrc(String isrc) {
-        this.isrc = isrc;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(isrc);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public External_ids withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

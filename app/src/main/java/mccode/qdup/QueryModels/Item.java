@@ -1,12 +1,12 @@
 
 package mccode.qdup.QueryModels;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 
-public class Item implements Serializable
+public class Item implements Parcelable
 {
 
     private Album album;
@@ -19,14 +19,49 @@ public class Item implements Serializable
     private External_urls___ external_urls;
     private String href;
     private String id;
+    private Boolean is_local;
     private String name;
     private Integer popularity;
     private String preview_url;
     private Integer track_number;
     private String type;
     private String uri;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = 3815739687441664603L;
+    public final static Parcelable.Creator<Item> CREATOR = new Creator<Item>() {
+
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Item createFromParcel(Parcel in) {
+            return new Item(in);
+        }
+
+        public Item[] newArray(int size) {
+            return (new Item[size]);
+        }
+
+    }
+    ;
+
+    protected Item(Parcel in) {
+        this.album = ((Album) in.readValue((Album.class.getClassLoader())));
+        in.readList(this.artists, (mccode.qdup.QueryModels.Artist_.class.getClassLoader()));
+        in.readList(this.available_markets, (java.lang.String.class.getClassLoader()));
+        this.disc_number = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.duration_ms = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.explicit = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+        this.external_ids = ((External_ids) in.readValue((External_ids.class.getClassLoader())));
+        this.external_urls = ((External_urls___) in.readValue((External_urls___.class.getClassLoader())));
+        this.href = ((String) in.readValue((String.class.getClassLoader())));
+        this.id = ((String) in.readValue((String.class.getClassLoader())));
+        this.is_local = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+        this.name = ((String) in.readValue((String.class.getClassLoader())));
+        this.popularity = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.preview_url = ((String) in.readValue((String.class.getClassLoader())));
+        this.track_number = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.type = ((String) in.readValue((String.class.getClassLoader())));
+        this.uri = ((String) in.readValue((String.class.getClassLoader())));
+    }
 
     /**
      * No args constructor for use in serialization
@@ -53,8 +88,9 @@ public class Item implements Serializable
      * @param name
      * @param href
      * @param popularity
+     * @param is_local
      */
-    public Item(Album album, List<Artist_> artists, List<String> available_markets, Integer disc_number, Integer duration_ms, Boolean explicit, External_ids external_ids, External_urls___ external_urls, String href, String id, String name, Integer popularity, String preview_url, Integer track_number, String type, String uri) {
+    public Item(Album album, List<Artist_> artists, List<String> available_markets, Integer disc_number, Integer duration_ms, Boolean explicit, External_ids external_ids, External_urls___ external_urls, String href, String id, Boolean is_local, String name, Integer popularity, String preview_url, Integer track_number, String type, String uri) {
         super();
         this.album = album;
         this.artists = artists;
@@ -66,6 +102,7 @@ public class Item implements Serializable
         this.external_urls = external_urls;
         this.href = href;
         this.id = id;
+        this.is_local = is_local;
         this.name = name;
         this.popularity = popularity;
         this.preview_url = preview_url;
@@ -82,22 +119,12 @@ public class Item implements Serializable
         this.album = album;
     }
 
-    public Item withAlbum(Album album) {
-        this.album = album;
-        return this;
-    }
-
     public List<Artist_> getArtists() {
         return artists;
     }
 
     public void setArtists(List<Artist_> artists) {
         this.artists = artists;
-    }
-
-    public Item withArtists(List<Artist_> artists) {
-        this.artists = artists;
-        return this;
     }
 
     public List<String> getAvailable_markets() {
@@ -108,22 +135,12 @@ public class Item implements Serializable
         this.available_markets = available_markets;
     }
 
-    public Item withAvailable_markets(List<String> available_markets) {
-        this.available_markets = available_markets;
-        return this;
-    }
-
     public Integer getDisc_number() {
         return disc_number;
     }
 
     public void setDisc_number(Integer disc_number) {
         this.disc_number = disc_number;
-    }
-
-    public Item withDisc_number(Integer disc_number) {
-        this.disc_number = disc_number;
-        return this;
     }
 
     public Integer getDuration_ms() {
@@ -134,22 +151,12 @@ public class Item implements Serializable
         this.duration_ms = duration_ms;
     }
 
-    public Item withDuration_ms(Integer duration_ms) {
-        this.duration_ms = duration_ms;
-        return this;
-    }
-
     public Boolean getExplicit() {
         return explicit;
     }
 
     public void setExplicit(Boolean explicit) {
         this.explicit = explicit;
-    }
-
-    public Item withExplicit(Boolean explicit) {
-        this.explicit = explicit;
-        return this;
     }
 
     public External_ids getExternal_ids() {
@@ -160,22 +167,12 @@ public class Item implements Serializable
         this.external_ids = external_ids;
     }
 
-    public Item withExternal_ids(External_ids external_ids) {
-        this.external_ids = external_ids;
-        return this;
-    }
-
     public External_urls___ getExternal_urls() {
         return external_urls;
     }
 
     public void setExternal_urls(External_urls___ external_urls) {
         this.external_urls = external_urls;
-    }
-
-    public Item withExternal_urls(External_urls___ external_urls) {
-        this.external_urls = external_urls;
-        return this;
     }
 
     public String getHref() {
@@ -186,11 +183,6 @@ public class Item implements Serializable
         this.href = href;
     }
 
-    public Item withHref(String href) {
-        this.href = href;
-        return this;
-    }
-
     public String getId() {
         return id;
     }
@@ -199,9 +191,12 @@ public class Item implements Serializable
         this.id = id;
     }
 
-    public Item withId(String id) {
-        this.id = id;
-        return this;
+    public Boolean getIs_local() {
+        return is_local;
+    }
+
+    public void setIs_local(Boolean is_local) {
+        this.is_local = is_local;
     }
 
     public String getName() {
@@ -212,22 +207,12 @@ public class Item implements Serializable
         this.name = name;
     }
 
-    public Item withName(String name) {
-        this.name = name;
-        return this;
-    }
-
     public Integer getPopularity() {
         return popularity;
     }
 
     public void setPopularity(Integer popularity) {
         this.popularity = popularity;
-    }
-
-    public Item withPopularity(Integer popularity) {
-        this.popularity = popularity;
-        return this;
     }
 
     public String getPreview_url() {
@@ -238,22 +223,12 @@ public class Item implements Serializable
         this.preview_url = preview_url;
     }
 
-    public Item withPreview_url(String preview_url) {
-        this.preview_url = preview_url;
-        return this;
-    }
-
     public Integer getTrack_number() {
         return track_number;
     }
 
     public void setTrack_number(Integer track_number) {
         this.track_number = track_number;
-    }
-
-    public Item withTrack_number(Integer track_number) {
-        this.track_number = track_number;
-        return this;
     }
 
     public String getType() {
@@ -264,11 +239,6 @@ public class Item implements Serializable
         this.type = type;
     }
 
-    public Item withType(String type) {
-        this.type = type;
-        return this;
-    }
-
     public String getUri() {
         return uri;
     }
@@ -277,22 +247,28 @@ public class Item implements Serializable
         this.uri = uri;
     }
 
-    public Item withUri(String uri) {
-        this.uri = uri;
-        return this;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(album);
+        dest.writeList(artists);
+        dest.writeList(available_markets);
+        dest.writeValue(disc_number);
+        dest.writeValue(duration_ms);
+        dest.writeValue(explicit);
+        dest.writeValue(external_ids);
+        dest.writeValue(external_urls);
+        dest.writeValue(href);
+        dest.writeValue(id);
+        dest.writeValue(is_local);
+        dest.writeValue(name);
+        dest.writeValue(popularity);
+        dest.writeValue(preview_url);
+        dest.writeValue(track_number);
+        dest.writeValue(type);
+        dest.writeValue(uri);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
-    public Item withAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-        return this;
+    public int describeContents() {
+        return  0;
     }
 
 }

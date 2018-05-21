@@ -20,7 +20,7 @@ import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.QueryModels.Item;
 
-import static mccode.qdup.Activities.MainActivity.isServer;
+import static mccode.qdup.Activities.PortalActivity.isServer;
 
 /**
  * Author: Connor McAuliffe
@@ -161,7 +161,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
      * @param to the upper index of the swapper values
      */
     private void updateCurrentPlaying(int from, int to){
-
+        Log.d("McCode-RecyclerAdapter", "Updating current playing");
         if(currentPlaying == from){
             currentPlaying = to;
         }
@@ -350,6 +350,41 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             }
         }
     }
+
+    public void pause(){
+        HostRecyclerListAdapter.ItemViewHolder holder;
+        if (currentPlaying >= 0) {
+            holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if (holder != null) {
+                final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#9dd29f"));
+                    }
+                });
+            }
+
+        }
+    }
+
+    public void play(){
+        HostRecyclerListAdapter.ItemViewHolder holder;
+        if (currentPlaying >= 0) {
+            holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
+            if (holder != null) {
+                final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalHolder.textView.setTextColor(Color.parseColor("#6de873"));
+                    }
+                });
+            }
+
+        }
+    }
+
     public void remove(int position){
         if(!isServer) {
             mDisplays.remove(position);

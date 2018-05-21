@@ -2,6 +2,8 @@ package mccode.qdup.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,8 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
+
+
 
 import mccode.qdup.R;
 
@@ -38,6 +42,7 @@ public class AuthActivity extends Activity implements Player.NotificationCallbac
         Log.d(appType, "OnCreate running");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_layout);
+        getAppSignature();
         logIn();
     }
 
@@ -175,5 +180,18 @@ public class AuthActivity extends Activity implements Player.NotificationCallbac
         Intent intent = new Intent(AuthActivity.this, ErrorActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+    }
+
+    private void getAppSignature(){
+        Signature[] sigs = new Signature[0];
+        try {
+            sigs = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), PackageManager.GET_SIGNATURES).signatures;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        for (Signature sig : sigs)
+        {
+            Log.i(appType, "Signature hashcode : " + sig.hashCode());
+        }
     }
 }

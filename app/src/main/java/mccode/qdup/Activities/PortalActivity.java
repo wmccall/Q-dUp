@@ -33,7 +33,8 @@ public class PortalActivity extends Activity{
     private ServerConnector serverConnector;                                    //tool to connect the server to the router
     private ClientConnector clientConnector;                                    //tool to connect the client to the router
 
-    public static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
+//    public static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
+    public static final String ROUTER_URL = "ec2-52-15-188-227.us-east-2.compute.amazonaws.com";
     public static int CLIENT_PORT = 16455;                                     //client port number on the router
     public static int SERVER_PORT = 16456;                                     //server port number on the router
     public static String serverKey = "";                                        //string that holds the server serverKey

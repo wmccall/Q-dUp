@@ -39,6 +39,8 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     private int currentPlaying = -1;
     private boolean repeating = false;
 
+    private String appType = "McCode-HostRecyclerListAdapter";
+
     public HostRecyclerListAdapter(QueueActivity activity) {
         this.activity = activity;
     }
@@ -161,7 +163,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
      * @param to the upper index of the swapper values
      */
     private void updateCurrentPlaying(int from, int to){
-        Log.d("McCode-RecyclerAdapter", "Updating current playing");
+        Log.d(appType, "Updating current playing");
         if(currentPlaying == from){
             currentPlaying = to;
         }
@@ -225,7 +227,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     }
 
     public String prev(){
-        Log.d("Adapter", "curr" + currentPlaying);
+        Log.d(appType, "curr" + currentPlaying);
         if(currentPlaying== -1){
             return "";
         }

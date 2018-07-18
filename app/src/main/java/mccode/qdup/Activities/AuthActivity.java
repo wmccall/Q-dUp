@@ -191,7 +191,7 @@ public class AuthActivity extends Activity implements Player.NotificationCallbac
         }
         for (Signature sig : sigs)
         {
-            Log.i(appType, "Signature hashcode : " + sig.hashCode());
+            Log.d(appType, "Signature hashcode: " + sig.hashCode());
         }
     }
 }

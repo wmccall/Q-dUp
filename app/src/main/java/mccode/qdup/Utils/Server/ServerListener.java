@@ -21,6 +21,8 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
 
     private String response = "";
 
+    private String appType = "McCode-ServerListener";
+
     public  ServerListener(){
 
     }
@@ -36,11 +38,11 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
             while(true) {
                 try {
                     response = in.nextLine();
-                    Log.i("Server Listener", response);
+                    Log.d(appType, response);
                     listener.onMessageSucceeded(response);
                     response = "";
                 } catch (NoSuchElementException e) {
-                    Log.e("Server Listener", "no line found, but its okay");
+                    Log.e(appType, "no line found, but its okay");
                     in.close();
                     response = "err";
                     listener.onMessageSucceeded(response);
@@ -49,10 +51,10 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("Server Listener", "Closing server listener: io exception");
+            Log.e(appType, "Closing server listener: io exception");
         } catch (RuntimeException e){
             e.printStackTrace();
-            Log.e("Server Listener", "Closing server listener: runtime");
+            Log.e(appType, "Closing server listener: runtime");
         }
 
 

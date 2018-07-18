@@ -83,10 +83,10 @@ public class PortalActivity extends Activity{
 //        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 //        for (Thread t: threadSet
 //                ) {
-//            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
+//            Log.d(appType, (t.getId() + ": " + t.getName() + "-" ));
 //            for (StackTraceElement s :t.getStackTrace()
 //                    ) {
-//                Log.d("Main Activity", s.toString());
+//                Log.d("AppType", s.toString());
 //            }
 //        }
     }

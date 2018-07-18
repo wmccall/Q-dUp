@@ -30,6 +30,7 @@ public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boole
     public void setView(View view){
         this.v = view;
     }
+    private String appType = "McCode-ResponseWrapper";
 
     @SafeVarargs
     @Override
@@ -38,7 +39,7 @@ public class ResponseWrapper extends AsyncTask<ArrayList<String>, Integer, Boole
         for(String s : strings[0]){
             tot += s;
         }
-        Log.d("Response:",tot);
+        Log.d(appType,tot);
         try{
             response = jsonConverter.readValue(tot, TrackResponse.class);
         } catch (IOException e) { e.printStackTrace(); }

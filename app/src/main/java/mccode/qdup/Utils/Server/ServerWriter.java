@@ -31,7 +31,7 @@ public class ServerWriter extends AsyncTask<String, Integer, ArrayList<String>>
     {
         PrintStream out;
         try {
-            out = new PrintStream(routerSocket.getOutputStream());
+            out = new PrintStream(routerSocket.getOutputStream(), true);
             //System.out.println(strings[0]);
             out.write((strings[0].replace("\n", "").replace("\r", "") + "\n").getBytes());
         } catch (IOException e) {

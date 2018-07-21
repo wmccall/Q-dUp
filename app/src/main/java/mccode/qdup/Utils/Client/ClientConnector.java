@@ -32,10 +32,11 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
     {
         this.key = s;
     }
-
     public void setOnConnectListener(ConnectListener listener){
         this.listener = listener;
     }
+
+    private String appType = "McCode-ClientConnector";
 
     @Override
     protected ArrayList<String> doInBackground(String... strings)
@@ -57,13 +58,13 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 /**TODO:
                  * remove print statement and show on phone
                  */
-                Log.i("Client Connector", "Connected to router");
+                Log.d(appType, "Connected to router");
             }
             catch (IOException e)
             {
                 if(!attempted)
                 {
-                    Log.e("Client Connector", "Waiting for router");
+                    Log.e(appType, "Waiting for router");
                     attempted = true;
                 }
 //                try
@@ -81,7 +82,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 try
                 {
                     PrintStream out = new PrintStream(routerSocket.getOutputStream());
-                    out.write((this.key).toUpperCase().getBytes());
+                    out.write((this.key + "\n").toUpperCase().getBytes());
                     Scanner in = new Scanner(routerSocket.getInputStream());
                     routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))
@@ -105,7 +106,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                     //Log.e("Client Connector", e.toString());
                     if(!attempted)
                     {
-                        Log.e("Client Connector", "Waiting for router");
+                        Log.e(appType, "Waiting for router");
                         attempted = true;
                         connected = false;
                     }
@@ -121,7 +122,7 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 catch (NoSuchElementException e){
                     if(!attempted)
                     {
-                        Log.e("Client Connector", "Waiting for router");
+                        Log.e(appType, "Waiting for router");
                         attempted = true;
                         connected = false;
                     }

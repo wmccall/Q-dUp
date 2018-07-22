@@ -34,7 +34,7 @@ import mccode.qdup.Utils.Messaging.MessageCode;
 import mccode.qdup.Utils.QueueView.HostItemTouchHelper;
 import mccode.qdup.Utils.Listeners.MessageListener;
 import mccode.qdup.Utils.QueueView.HostRecyclerListAdapter;
-import mccode.qdup.Utils.Server.ServerListener;
+import mccode.qdup.Utils.RouterInteraction.RouterListener;
 import mccode.qdup.QueryModels.Item;
 
 import static mccode.qdup.Utils.GeneralUIUtils.animateButtonClick;
@@ -68,7 +68,7 @@ public class QueueActivity extends Activity implements
 
     MessageListener messageListener;
 
-    ServerListener serverListener;
+    RouterListener routerListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -392,12 +392,22 @@ public class QueueActivity extends Activity implements
                         }
                         case PAUSE:{
                             Log.d(appType, "Received message of PAUSE type");
-                            queueViewAdapter.pause();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    queueViewAdapter.pause();
+                                }
+                            });
                             break;
                         }
                         case PLAY:{
                             Log.d(appType, "Received message of PLAY type");
-                            queueViewAdapter.play();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    queueViewAdapter.play();
+                                }
+                            });
                             break;
                         }
                         case REQUEST_ALL:{
@@ -425,9 +435,9 @@ public class QueueActivity extends Activity implements
     public void createAndRunRouterListener(){
         Log.d(appType, "Creating and running routerListener");
         messageListener = createMessageListener();
-        serverListener = new ServerListener();
-        serverListener.setOnServerListnerListener(messageListener);
-        serverListener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        routerListener = new RouterListener();
+        routerListener.setOnServerListnerListener(messageListener);
+        routerListener.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void setText(final Button b, final String text){

@@ -10,7 +10,7 @@ import java.net.Socket;
 import mccode.qdup.Activities.PortalActivity;
 import mccode.qdup.Utils.Messaging.Message;
 import mccode.qdup.Utils.Messaging.MessageCode;
-import mccode.qdup.Utils.Server.ServerWriter;
+import mccode.qdup.Utils.RouterInteraction.RouterWriter;
 
 import static mccode.qdup.Activities.QueueActivity.appType;
 
@@ -31,10 +31,11 @@ public class GeneralNetworkingUtils {
         }
     }
 
-    public static void sendMessage(Message m){
+    public static void sendMessage(Object m){
         Log.d(appType, "Sending a message to the router");
         try {
-            new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PortalActivity.jsonConverter.writeValueAsString(m));
+            new RouterWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                    PortalActivity.jsonConverter.writeValueAsString(m));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,6 +44,6 @@ public class GeneralNetworkingUtils {
     public static void informRouterOfQuit(){
         Log.d(appType, "Informing the router that the server is quitting");
         sendMessage(new Message(MessageCode.QUIT));
-        new ServerWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
+        new RouterWriter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Quit");
     }
 }

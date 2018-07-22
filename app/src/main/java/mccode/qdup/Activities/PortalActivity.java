@@ -22,21 +22,23 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import mccode.qdup.R;
-import mccode.qdup.Utils.Client.ClientConnector;
+import mccode.qdup.Utils.Requester.RequesterConnector;
+import mccode.qdup.Utils.Host.HostConnector;
 import mccode.qdup.Utils.Listeners.ConnectListener;
-import mccode.qdup.Utils.Server.ServerConnector;
 
 import static mccode.qdup.Utils.GeneralUIUtils.*;
 
 public class PortalActivity extends Activity{
     //Program Fields
-    private ServerConnector serverConnector;                                    //tool to connect the server to the router
-    private ClientConnector clientConnector;                                    //tool to connect the client to the router
+    private HostConnector hostConnector;                                    //tool to connect the server to the router
+    private RequesterConnector requesterConnector;                                    //tool to connect the client to the router
 
-    public static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
+//    public static final String ROUTER_URL = "mccoderouter.ddns.net";           //hostname of the router
+    public static final String ROUTER_URL = "ec2-52-15-188-227.us-east-2.compute.amazonaws.com";
     public static int CLIENT_PORT = 16455;                                     //client port number on the router
     public static int SERVER_PORT = 16456;                                     //server port number on the router
     public static String serverKey = "";                                        //string that holds the server serverKey
+    public static String privateKey = "";                                        //string that holds the server serverKey
     public static boolean requestNewServerKey = true;                           //flag if going to need a new serverKey
     public static ObjectMapper jsonConverter = new ObjectMapper();              //jsonConverter to do json parsing
     public static Socket routerSocket;                                          //socket connection to the router
@@ -82,10 +84,10 @@ public class PortalActivity extends Activity{
 //        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 //        for (Thread t: threadSet
 //                ) {
-//            Log.d("Main Activity", (t.getId() + ": " + t.getName() + "-" ));
+//            Log.d(appType, (t.getId() + ": " + t.getName() + "-" ));
 //            for (StackTraceElement s :t.getStackTrace()
 //                    ) {
-//                Log.d("Main Activity", s.toString());
+//                Log.d("AppType", s.toString());
 //            }
 //        }
     }
@@ -149,15 +151,15 @@ public class PortalActivity extends Activity{
                 animateButtonClick(colorPrimary, colorFaded, 250, confirmType);
                 if(serverOrClientButton.isChecked()){
                     Log.d(appType, "Connecting to the router as a Server");
-                    serverConnector = new ServerConnector();
-                    serverConnector.setOnConnectListener(connectListener);
-                    serverConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    hostConnector = new HostConnector();
+                    hostConnector.setOnConnectListener(connectListener);
+                    hostConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }else{
                     Log.d(appType, "Connecting to the router as a Client");
                     serverKey = keySearch.getText().toString();
-                    clientConnector = new ClientConnector(serverKey);
-                    clientConnector.setOnConnectListener(connectListener);
-                    clientConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    requesterConnector = new RequesterConnector(serverKey);
+                    requesterConnector.setOnConnectListener(connectListener);
+                    requesterConnector.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         };

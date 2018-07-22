@@ -293,7 +293,7 @@ public class SearchActivity extends Activity{
     private SpannableString generateButtonText(Item i){
         SpannableString text;
         if(i!=null){
-            Log.i(appType, "Generating button text");
+            Log.d(appType, "Generating button text");
             String artists;
             int size = i.getArtists().size();
             artists = i.getArtists().get(0).getName();

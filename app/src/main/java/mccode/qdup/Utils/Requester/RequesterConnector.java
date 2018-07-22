@@ -1,10 +1,10 @@
-package mccode.qdup.Utils.Client;
+package mccode.qdup.Utils.Requester;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -15,37 +15,35 @@ import mccode.qdup.Utils.Listeners.ConnectListener;
 
 import static mccode.qdup.Activities.PortalActivity.getClientPort;
 import static mccode.qdup.Activities.PortalActivity.getRouterUrl;
-//import static mccode.qdup.PortalActivity.mp;
+import static mccode.qdup.Activities.PortalActivity.privateKey;
+import static mccode.qdup.Activities.PortalActivity.serverKey;
 import static mccode.qdup.Activities.PortalActivity.routerSocket;
 
 /**
  * Created by Will on 6/12/2017.
  */
 
-public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String>> {
+public class RequesterConnector extends AsyncTask<String, Integer, ArrayList<String>> {
 
     private ArrayList<String> response = new ArrayList<String>();
     String key;
     ConnectListener listener;
 
-    public ClientConnector(String s)
+    public RequesterConnector(String s)
     {
         this.key = s;
     }
-
     public void setOnConnectListener(ConnectListener listener){
         this.listener = listener;
     }
 
+    private String appType = "McCode-RequesterConnector";
+
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
-        //String connectKey = strings[0];
-        //Socket socket = new Socket();
         boolean connected = false;
         boolean attempted = false;
-        int port = 0;
-        boolean exists = false;
         String routerResponse = "";
         routerSocket = new Socket();
         while(!connected)
@@ -57,31 +55,23 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                 /**TODO:
                  * remove print statement and show on phone
                  */
-                Log.i("Client Connector", "Connected to router");
+                Log.d(appType, "Connected to router");
             }
             catch (IOException e)
             {
                 if(!attempted)
                 {
-                    Log.e("Client Connector", "Waiting for router");
+                    Log.e(appType, "Waiting for router");
                     attempted = true;
                 }
-//                try
-//                {
-//                    this.wait(1000);
-//                }
-//                catch(InterruptedException f)
-//                {
-//
-//                }
             }
 
             if(connected)
             {
                 try
                 {
-                    PrintStream out = new PrintStream(routerSocket.getOutputStream());
-                    out.write((this.key).toUpperCase().getBytes());
+                    PrintWriter out = new PrintWriter(routerSocket.getOutputStream(), true);
+                    out.println(this.key.toUpperCase());
                     Scanner in = new Scanner(routerSocket.getInputStream());
                     routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))
@@ -95,33 +85,24 @@ public class ClientConnector extends AsyncTask<String, Integer, ArrayList<String
                     }
                     else
                     {
-                        response.add(routerResponse);
+                        serverKey = routerResponse;
+                        privateKey = in.nextLine();
+                        response.add(privateKey);
                     }
-//                    in.close();
-//                    out.close();
                 }
                 catch (IOException e)
                 {
-                    //Log.e("Client Connector", e.toString());
                     if(!attempted)
                     {
-                        Log.e("Client Connector", "Waiting for router");
+                        Log.e(appType, "Waiting for router");
                         attempted = true;
                         connected = false;
                     }
-//                    try
-//                    {
-//                        this.wait(1000);
-//                    }
-//                    catch(InterruptedException f)
-//                    {
-//
-//                    }
                 }
                 catch (NoSuchElementException e){
                     if(!attempted)
                     {
-                        Log.e("Client Connector", "Waiting for router");
+                        Log.e(appType, "Waiting for router");
                         attempted = true;
                         connected = false;
                     }

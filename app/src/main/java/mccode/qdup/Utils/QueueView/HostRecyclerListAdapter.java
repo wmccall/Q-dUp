@@ -38,6 +38,9 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     private QueueActivity activity;
     private int currentPlaying = -1;
     private boolean repeating = false;
+    private boolean isPlaying = false;
+
+    private String appType = "McCode-HostRecyclerListAdapter";
 
     public HostRecyclerListAdapter(QueueActivity activity) {
         this.activity = activity;
@@ -83,6 +86,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
                     }
                     currentPlaying = holder.getAdapterPosition();
                     activity.playSong(mItems.get(currentPlaying).getUri());
+                    isPlaying = true;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -97,7 +101,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             });
         }
         if(position == currentPlaying){
-            holder.textView.setTextColor(Color.parseColor("#6de873"));
+            holder.textView.setTextColor(Color.parseColor(isPlaying ? "#6de873" : "#9dd29f"));
         }
         else {
             holder.textView.setTextColor(Color.parseColor("#ffffff"));
@@ -161,7 +165,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
      * @param to the upper index of the swapper values
      */
     private void updateCurrentPlaying(int from, int to){
-        Log.d("McCode-RecyclerAdapter", "Updating current playing");
+        Log.d(appType, "Updating current playing");
         if(currentPlaying == from){
             currentPlaying = to;
         }
@@ -225,7 +229,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
     }
 
     public String prev(){
-        Log.d("Adapter", "curr" + currentPlaying);
+        Log.d(appType, "curr" + currentPlaying);
         if(currentPlaying== -1){
             return "";
         }
@@ -340,7 +344,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            finalHolder.textView.setTextColor(Color.parseColor("#6de873"));
+                            finalHolder.textView.setTextColor(Color.parseColor(isPlaying ? "#6de873" : "#9dd29f"));
                             notifyItemChanged(currentPlaying);
                             notifyItemChanged(last);
                         }
@@ -357,6 +361,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
             if (holder != null) {
                 final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                isPlaying = false;
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -374,6 +379,7 @@ public class HostRecyclerListAdapter extends RecyclerView.Adapter<HostRecyclerLi
             holder = (HostRecyclerListAdapter.ItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(currentPlaying);
             if (holder != null) {
                 final HostRecyclerListAdapter.ItemViewHolder finalHolder = holder;
+                isPlaying = true;
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

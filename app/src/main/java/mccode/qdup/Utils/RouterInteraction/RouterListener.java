@@ -1,4 +1,4 @@
-package mccode.qdup.Utils.Server;
+package mccode.qdup.Utils.RouterInteraction;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,12 +16,14 @@ import static mccode.qdup.Activities.PortalActivity.routerSocket;
  * Created by Will on 6/14/2017.
  */
 
-public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>> {
+public class RouterListener extends AsyncTask<String, Integer, ArrayList<String>> {
     MessageListener listener;
 
     private String response = "";
 
-    public  ServerListener(){
+    private String appType = "McCode-RouterListener";
+
+    public RouterListener(){
 
     }
 
@@ -36,11 +38,11 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
             while(true) {
                 try {
                     response = in.nextLine();
-                    Log.i("Server Listener", response);
+                    Log.d(appType, response);
                     listener.onMessageSucceeded(response);
                     response = "";
                 } catch (NoSuchElementException e) {
-                    Log.e("Server Listener", "no line found, but its okay");
+                    Log.e(appType, "no line found, but its okay");
                     in.close();
                     response = "err";
                     listener.onMessageSucceeded(response);
@@ -49,10 +51,10 @@ public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("Server Listener", "Closing server listener: io exception");
+            Log.e(appType, "Closing server listener: io exception");
         } catch (RuntimeException e){
             e.printStackTrace();
-            Log.e("Server Listener", "Closing server listener: runtime");
+            Log.e(appType, "Closing server listener: runtime");
         }
 
 

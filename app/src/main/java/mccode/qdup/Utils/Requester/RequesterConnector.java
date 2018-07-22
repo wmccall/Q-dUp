@@ -1,49 +1,56 @@
-package mccode.qdup.Utils.Server;
+package mccode.qdup.Utils.Requester;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import mccode.qdup.Utils.Listeners.ConnectListener;
 
-import static mccode.qdup.Activities.PortalActivity.getServerPort;
+import static mccode.qdup.Activities.PortalActivity.getClientPort;
 import static mccode.qdup.Activities.PortalActivity.getRouterUrl;
-import static mccode.qdup.Activities.PortalActivity.routerSocket;
+import static mccode.qdup.Activities.PortalActivity.privateKey;
 import static mccode.qdup.Activities.PortalActivity.serverKey;
-import static mccode.qdup.Activities.PortalActivity.requestNewServerKey;
+import static mccode.qdup.Activities.PortalActivity.routerSocket;
 
 /**
- * Created by Will on 6/13/2017.
+ * Created by Will on 6/12/2017.
  */
 
-public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String>> {
+public class RequesterConnector extends AsyncTask<String, Integer, ArrayList<String>> {
+
     private ArrayList<String> response = new ArrayList<String>();
+    String key;
     ConnectListener listener;
-    private static int localPort = 50000;
+
+    public RequesterConnector(String s)
+    {
+        this.key = s;
+    }
     public void setOnConnectListener(ConnectListener listener){
         this.listener = listener;
     }
-    private String appType = "McCode-ServerConnector";
+
+    private String appType = "McCode-RequesterConnector";
+
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
-        //Socket socket = new Socket();
-        routerSocket = new Socket();
         boolean connected = false;
         boolean attempted = false;
+        String routerResponse = "";
+        routerSocket = new Socket();
         while(!connected)
         {
             try
             {
-                Log.d(appType, "Connecting to router");
-                routerSocket = new Socket();
-                routerSocket.connect(new InetSocketAddress(getRouterUrl(), getServerPort()));
+                routerSocket.connect(new InetSocketAddress(getRouterUrl(), getClientPort()));
                 connected = true;
                 /**TODO:
                  * remove print statement and show on phone
@@ -52,44 +59,26 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
             }
             catch (IOException e)
             {
-                Log.e(appType, e.toString());
                 if(!attempted)
                 {
-                    Log.d(appType, "Waiting for router; 1");
+                    Log.e(appType, "Waiting for router");
                     attempted = true;
                 }
-                try
-                {
-                    synchronized (this){
-                        this.wait(1000);
-                    }
-                }
-                catch(InterruptedException f)
-                {
-                    Log.e(appType, "interrupted 1");
-                }
             }
+
             if(connected)
             {
                 try
                 {
-                    PrintStream out = new PrintStream(routerSocket.getOutputStream());
+                    PrintWriter out = new PrintWriter(routerSocket.getOutputStream(), true);
+                    out.println(this.key.toUpperCase());
                     Scanner in = new Scanner(routerSocket.getInputStream());
-
-                    if(requestNewServerKey){
-                        Log.d(appType, "Getting new serverCode from router");
-                        out.write(("server:\n").getBytes());
-                    } else {
-                        Log.d(appType, "reconnecting with serverCode: " + serverKey);
-                        requestNewServerKey = true;
-                        out.write(serverKey.getBytes());
-                    }
-                    Log.d(appType, "Waiting for router response");
-                    String routerResponse = in.nextLine();
+                    routerResponse = in.nextLine();
                     if (routerResponse.equals("NA"))
                     {
                         response.add(routerResponse);
                         in.close();
+                        out.close();
                         routerSocket.close();
                         routerSocket = new Socket();
                         return response;
@@ -97,35 +86,29 @@ public class ServerConnector extends AsyncTask<String, Integer, ArrayList<String
                     else
                     {
                         serverKey = routerResponse;
-                        Log.d(appType, serverKey);
+                        privateKey = in.nextLine();
+                        response.add(privateKey);
                     }
-                    //in.close();
                 }
                 catch (IOException e)
                 {
-                    Log.e(appType, e.toString());
                     if(!attempted)
                     {
-                        Log.d(appType, "Waiting for router; 2");
+                        Log.e(appType, "Waiting for router");
                         attempted = true;
                         connected = false;
                     }
-                    try
+                }
+                catch (NoSuchElementException e){
+                    if(!attempted)
                     {
-                        synchronized (this){
-                            this.wait(1000);
-                        }
-                    }
-                    catch(InterruptedException f)
-                    {
-                        Log.e(appType, "interrupted 2");
+                        Log.e(appType, "Waiting for router");
+                        attempted = true;
+                        connected = false;
                     }
                 }
             }
         }
-        Log.d(appType, "connected!");
-        Log.d(appType, ("serverCode:" + serverKey));
-        response.add("" + serverKey);
         return response;
     }
     protected void onProgressUpdate()

@@ -1,4 +1,4 @@
-package mccode.qdup.Utils.Server;
+package mccode.qdup.Utils.RouterInteraction;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,14 +16,14 @@ import static mccode.qdup.Activities.PortalActivity.routerSocket;
  * Created by Will on 6/14/2017.
  */
 
-public class ServerListener extends AsyncTask<String, Integer, ArrayList<String>> {
+public class RouterListener extends AsyncTask<String, Integer, ArrayList<String>> {
     MessageListener listener;
 
     private String response = "";
 
-    private String appType = "McCode-ServerListener";
+    private String appType = "McCode-RouterListener";
 
-    public  ServerListener(){
+    public RouterListener(){
 
     }
 

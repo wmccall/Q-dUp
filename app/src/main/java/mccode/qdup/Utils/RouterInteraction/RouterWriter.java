@@ -1,9 +1,10 @@
-package mccode.qdup.Utils.Server;
+package mccode.qdup.Utils.RouterInteraction;
 
 import android.os.AsyncTask;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import static mccode.qdup.Activities.PortalActivity.routerSocket;
@@ -14,12 +15,12 @@ import static mccode.qdup.Activities.PortalActivity.routerSocket;
  * Writes from the client to the router when sending a song over to the server
  */
 
-public class ServerWriter extends AsyncTask<String, Integer, ArrayList<String>>
+public class RouterWriter extends AsyncTask<String, Integer, ArrayList<String>>
 {
     private ArrayList<String> response = new ArrayList<String>();
     //ConnectListener listener;
 
-    public ServerWriter(){
+    public RouterWriter(){
     }
 
     //public void setOnClientWriterListener(ConnectListener listener){
@@ -29,11 +30,11 @@ public class ServerWriter extends AsyncTask<String, Integer, ArrayList<String>>
     @Override
     protected ArrayList<String> doInBackground(String... strings)
     {
-        PrintStream out;
+        PrintWriter out;
         try {
-            out = new PrintStream(routerSocket.getOutputStream(), true);
+            out = new PrintWriter(routerSocket.getOutputStream(), true);
             //System.out.println(strings[0]);
-            out.write((strings[0].replace("\n", "").replace("\r", "") + "\n").getBytes());
+            out.println((strings[0].replace("\n", "").replace("\r", "")));
         } catch (IOException e) {
             // TODO catch write error
             System.out.println("Closing server writer");

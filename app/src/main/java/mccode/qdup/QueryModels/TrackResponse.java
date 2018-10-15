@@ -1,34 +1,13 @@
 
 package mccode.qdup.QueryModels;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TrackResponse implements Parcelable
-{
+public class TrackResponse {
 
     private Tracks tracks;
-    public final static Parcelable.Creator<TrackResponse> CREATOR = new Creator<TrackResponse>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public TrackResponse createFromParcel(Parcel in) {
-            return new TrackResponse(in);
-        }
-
-        public TrackResponse[] newArray(int size) {
-            return (new TrackResponse[size]);
-        }
-
-    }
-    ;
-
-    protected TrackResponse(Parcel in) {
-        this.tracks = ((Tracks) in.readValue((Tracks.class.getClassLoader())));
-    }
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * No args constructor for use in serialization
@@ -54,12 +33,22 @@ public class TrackResponse implements Parcelable
         this.tracks = tracks;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(tracks);
+    public TrackResponse withTracks(Tracks tracks) {
+        this.tracks = tracks;
+        return this;
     }
 
-    public int describeContents() {
-        return  0;
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public TrackResponse withAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

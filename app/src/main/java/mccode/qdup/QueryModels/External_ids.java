@@ -1,34 +1,13 @@
 
 package mccode.qdup.QueryModels;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+import java.util.HashMap;
+import java.util.Map;
 
-public class External_ids implements Parcelable
-{
+public class External_ids {
 
     private String isrc;
-    public final static Parcelable.Creator<External_ids> CREATOR = new Creator<External_ids>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public External_ids createFromParcel(Parcel in) {
-            return new External_ids(in);
-        }
-
-        public External_ids[] newArray(int size) {
-            return (new External_ids[size]);
-        }
-
-    }
-    ;
-
-    protected External_ids(Parcel in) {
-        this.isrc = ((String) in.readValue((String.class.getClassLoader())));
-    }
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * No args constructor for use in serialization
@@ -54,12 +33,22 @@ public class External_ids implements Parcelable
         this.isrc = isrc;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(isrc);
+    public External_ids withIsrc(String isrc) {
+        this.isrc = isrc;
+        return this;
     }
 
-    public int describeContents() {
-        return  0;
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public External_ids withAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

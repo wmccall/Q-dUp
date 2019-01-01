@@ -2,6 +2,7 @@ package mccode.qdup.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -46,6 +48,7 @@ public class QueueActivity extends Activity implements
     private boolean adding = false;
 
     public static boolean alreadyChanged = false;
+    private static boolean playing = false;
     public static String appType;
 
     int colorBackground;
@@ -54,6 +57,7 @@ public class QueueActivity extends Activity implements
     int colorFaded;
     int colorPrimaryClicked;
 
+    private static ViewGroup constraintLayout;
     private static TextView queueServerKeyView;
     public static Button queuePlayPause;
     private static Button queueNextSongButton;
@@ -107,9 +111,9 @@ public class QueueActivity extends Activity implements
                 String temp = queueViewAdapter.next();
                 if (!temp.equals("")) {
                     musicPlayer.playUri(null, temp, 0, 0);
-                    setText(queuePlayPause, getResources().getString(R.string.pause));
+                    changePlayingIcon(queuePlayPause, true);
                 } else {
-                    setText(queuePlayPause, getResources().getString(R.string.play));
+                    changePlayingIcon(queuePlayPause, false);
                 }
                 alreadyChanged = true;
             }
@@ -118,11 +122,11 @@ public class QueueActivity extends Activity implements
             }
         } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPause){
             queueViewAdapter.pause();
-            setText(queuePlayPause, getResources().getString(R.string.play));
+            changePlayingIcon(queuePlayPause, false);
             GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PAUSE));
         } else if (playerEvent == PlayerEvent.kSpPlaybackNotifyPlay){
             queueViewAdapter.play();
-            setText(queuePlayPause, getResources().getString(R.string.pause));
+            changePlayingIcon(queuePlayPause, true);
             GeneralNetworkingUtils.sendMessage(new Message(MessageCode.PLAY));
         }
     }
@@ -244,12 +248,11 @@ public class QueueActivity extends Activity implements
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Changing queuePlayPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "Play" : "Pause"));
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queuePlayPause);
                 if(musicPlayer.getPlaybackState().isPlaying){
-                    queuePlayPause.setText(getResources().getString(R.string.play));
+                    changePlayingIcon(queuePlayPause, false);
                     musicPlayer.pause(null);
                 }else{
-                    queuePlayPause.setText(getResources().getString(R.string.pause));
+                    changePlayingIcon(queuePlayPause, true);
                     if(queueViewAdapter.isCurrValid())
                         musicPlayer.resume(null);
                     else
@@ -264,19 +267,19 @@ public class QueueActivity extends Activity implements
         Log.d(appType, "Creating queueNextSongButton's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queueNextSongButton);
+                animateForwardBackIcon(queueNextSongButton, true);
                 String temp = queueViewAdapter.next();
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Going to next song");
                     musicPlayer.playUri(null, temp, 0, 0);
-                    setText(queuePlayPause, getResources().getString(R.string.pause));
+                    changePlayingIcon(queuePlayPause, true);
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped last song; stopped playing songs");
                         musicPlayer.pause(null);
-                        setText(queuePlayPause, getResources().getString(R.string.play));
+                        changePlayingIcon(queuePlayPause, false);
                         musicPlayer.skipToNext(null);
                     }
                 }
@@ -290,19 +293,19 @@ public class QueueActivity extends Activity implements
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Clicked the back button");
-                animateButtonClick(colorPrimary, colorPrimaryClicked, 250, queuePreviousSongButton);
+                animateForwardBackIcon(queuePreviousSongButton, false);
                 String temp = queueViewAdapter.prev();
                 alreadyChanged = true;
                 if (!temp.equals("")){
                     Log.d(appType, "Skipping to previous track");
                     musicPlayer.playUri(null, temp, 0, 0);
-                    setText(queuePlayPause, getResources().getString(R.string.pause));
+                    changePlayingIcon(queuePlayPause, true);
                 }
                 else{
                     if(musicPlayer.getPlaybackState().isPlaying) {
                         Log.d(appType, "Skipped back past first song; stopped playing songs");
                         musicPlayer.pause(null);
-                        setText(queuePlayPause, getResources().getString(R.string.play));
+                        changePlayingIcon(queuePlayPause, false);
                         musicPlayer.skipToNext(null);
                     }
                 }
@@ -342,7 +345,7 @@ public class QueueActivity extends Activity implements
                                         queueViewAdapter.addItem(i, generateButtonText(i).toString());
                                         if (musicPlayer.getMetadata().currentTrack == null && !musicPlayer.getPlaybackState().isPlaying) {
                                             musicPlayer.playUri(null, queueViewAdapter.next(), 0, 0);
-                                            setText(queuePlayPause, getResources().getString(R.string.pause));
+                                            changePlayingIcon(queuePlayPause, true);
                                             alreadyChanged = true;
                                         }
                                     }
@@ -446,6 +449,45 @@ public class QueueActivity extends Activity implements
             @Override
             public void run() {
                 b.setText(text);
+            }
+        });
+    }
+
+    private void changePlayingIcon(final Button queuePlayPause, final boolean playToPause){
+        Log.d(appType, "Setting button's Image");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (playToPause) {
+                    queuePlayPause.setBackgroundResource(R.drawable.play_to_pause_animation);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) queuePlayPause.getBackground();
+                    frameAnimation.start();
+                }else{
+                    queuePlayPause.setBackgroundResource(R.drawable.pause_to_play_animation);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) queuePlayPause.getBackground();
+                    frameAnimation.start();
+                }
+            }
+        });
+    }
+
+    private void animateForwardBackIcon(final Button forwardOrBack, final boolean isForward){
+        Log.d(appType, "Setting button's Image");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(isForward) {
+                    forwardOrBack.setBackgroundResource(R.drawable.forward_animation);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) forwardOrBack.getBackground();
+                    frameAnimation.stop();
+                    frameAnimation.start();
+                }else{
+                    forwardOrBack.setBackgroundResource(R.drawable.back_animation);
+                    forwardOrBack.refreshDrawableState();
+                    AnimationDrawable frameAnimation = (AnimationDrawable) forwardOrBack.getBackground();
+                    frameAnimation.stop();
+                    frameAnimation.start();
+                }
             }
         });
     }

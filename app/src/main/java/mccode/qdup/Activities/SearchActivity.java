@@ -3,6 +3,8 @@ package mccode.qdup.Activities;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +18,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -252,7 +255,7 @@ public class SearchActivity extends Activity{
                     QueueActivity.queueViewAdapter.addItem(i, generateButtonText(i).toString());
                     if (QueueActivity.musicPlayer.getMetadata().currentTrack == null && !QueueActivity.musicPlayer.getPlaybackState().isPlaying) {
                         QueueActivity.musicPlayer.playUri(null, QueueActivity.queueViewAdapter.next(), 0, 0);
-                        setText(QueueActivity.queuePlayPause, getResources().getString(R.string.pause));
+                        changePlayingIcon(QueueActivity.queuePlayPause, true);
                         QueueActivity.alreadyChanged = true;
                     }
 
@@ -274,12 +277,30 @@ public class SearchActivity extends Activity{
 
     }
 
-    private void setText(final Button b, final String text){
+    private void setImage(final ImageButton b, final int resource){
         Log.d(appType, "Setting button's text");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                b.setText(text);
+                b.setImageResource(resource);
+            }
+        });
+    }
+
+    private void changePlayingIcon(final Button queuePlayPause, final boolean playToPause){
+        Log.d(appType, "Setting button's Image");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (playToPause) {
+                    queuePlayPause.setBackgroundResource(R.drawable.play_to_pause_animation);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) queuePlayPause.getBackground();
+                    frameAnimation.start();
+                }else{
+                    queuePlayPause.setBackgroundResource(R.drawable.pause_to_play_animation);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) queuePlayPause.getBackground();
+                    frameAnimation.start();
+                }
             }
         });
     }

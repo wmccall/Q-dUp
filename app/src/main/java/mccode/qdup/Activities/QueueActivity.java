@@ -17,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.spotify.sdk.android.player.Config;
@@ -59,6 +60,7 @@ public class QueueActivity extends Activity implements
 
     private static ViewGroup constraintLayout;
     private static TextView queueServerKeyView;
+    private static ProgressBar queueTrackProgressBar;
     public static Button queuePlayPause;
     private static Button queueNextSongButton;
     private static Button queuePreviousSongButton;
@@ -82,6 +84,31 @@ public class QueueActivity extends Activity implements
         initializeScreenElements(PortalActivity.isServer);
         createButtonListeners(PortalActivity.isServer);
         createAndRunRouterListener();
+        Thread progreassUpdater = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    long total;
+                    long pos;
+                    try {
+                        total = musicPlayer.getMetadata().currentTrack.durationMs;
+                        pos = musicPlayer.getPlaybackState().positionMs;
+                    } catch (Exception e) {
+                        total = 100;
+                        pos = 0;
+                    }
+                    queueTrackProgressBar.setMax((int) total);
+                    queueTrackProgressBar.setProgress((int) pos);
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        progreassUpdater.start();
         if(!PortalActivity.isServer){
             GeneralNetworkingUtils.sendMessage(new Message(MessageCode.REQUEST_ALL));
         }
@@ -211,6 +238,7 @@ public class QueueActivity extends Activity implements
         queuePlayPause = (Button) findViewById(R.id.QueuePlayPauseSong);
         queueNextSongButton = (Button) findViewById(R.id.QueueNextSong);
         queuePreviousSongButton = (Button) findViewById(R.id.QueuePreviousSong);
+        queueTrackProgressBar = (ProgressBar) findViewById(R.id.QueueTrackProgressBar);
     }
 
     private void setupRecyclerView(){
@@ -229,6 +257,7 @@ public class QueueActivity extends Activity implements
             queuePlayPause.setVisibility(View.GONE);
             queueNextSongButton.setVisibility(View.GONE);
             queuePreviousSongButton.setVisibility(View.GONE);
+            queueTrackProgressBar.setVisibility(View.GONE);
         }
     }
 

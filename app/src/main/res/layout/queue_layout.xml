@@ -95,15 +95,25 @@
         app:layout_constraintRight_toRightOf="@+id/QueueServerText"
         app:layout_constraintTop_toBottomOf="@+id/QueueServerText" />
 
+    <ProgressBar
+        android:id="@+id/QueueTrackProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:progress="0"
+        app:layout_constraintBottom_toTopOf="@+id/QueuePlayPauseSong"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/QueueBox"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="4dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/QueuePlayPauseSong"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/QueueTrackProgressBar"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

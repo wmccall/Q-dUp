@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="28dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/server_key"
         android:textColor="@color/white"
         android:textSize="24sp"
@@ -20,10 +20,10 @@
 
     <TextView
         android:id="@+id/QueueServerKey"
-        android:layout_width="255dp"
+        android:layout_width="wrap_content"
         android:layout_height="28dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
         android:fontFamily="monospace"
         android:text="@string/tempkey"
         android:textColor="@color/colorAccent"

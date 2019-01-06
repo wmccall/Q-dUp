@@ -3,6 +3,7 @@ package mccode.qdup.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -57,6 +58,8 @@ public class QueueActivity extends Activity implements
     int colorPrimary;
     int colorFaded;
     int colorPrimaryClicked;
+    Drawable buttonPrimary;
+    Drawable buttonPrimaryClicked;
 
     private static ViewGroup constraintLayout;
     private static TextView queueServerKeyView;
@@ -227,6 +230,8 @@ public class QueueActivity extends Activity implements
         colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.faded);
         colorPrimaryClicked = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
+        buttonPrimary = ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_primary);
+        buttonPrimaryClicked = ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_primary_clicked);
 
         // server and client
         queueServerKeyView = (TextView) findViewById(R.id.QueueServerKey);
@@ -262,7 +267,7 @@ public class QueueActivity extends Activity implements
     }
 
     public void createButtonListeners(boolean isServer){
-        Log.d(appType, "Creating button listeners: " + (isServer ? "server" : "client"));
+        Log.d(appType, "Creating button_primary listeners: " + (isServer ? "server" : "client"));
         if(isServer){
             queuePlayPause.setOnClickListener(createQueuePlayPauseOnClickListener());
             queueNextSongButton.setOnClickListener(createQueueNextButtonOnClickListener());
@@ -273,10 +278,10 @@ public class QueueActivity extends Activity implements
     }
 
     public View.OnClickListener createQueuePlayPauseOnClickListener(){
-        Log.d(appType, "Creating queuePlayPause button's OnClickListener");
+        Log.d(appType, "Creating queuePlayPause button_primary's OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(appType, "Changing queuePlayPause button to" + (musicPlayer.getPlaybackState().isPlaying ? "Play" : "Pause"));
+                Log.d(appType, "Changing queuePlayPause button_primary to" + (musicPlayer.getPlaybackState().isPlaying ? "Play" : "Pause"));
                 if(musicPlayer.getPlaybackState().isPlaying){
                     changePlayingIcon(queuePlayPause, false);
                     musicPlayer.pause(null);
@@ -321,7 +326,7 @@ public class QueueActivity extends Activity implements
         Log.d(appType, "Creating queuePreviousSongButton OnClickListener");
         return new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(appType, "Clicked the back button");
+                Log.d(appType, "Clicked the back button_primary");
                 animateForwardBackIcon(queuePreviousSongButton, false);
                 String temp = queueViewAdapter.prev();
                 alreadyChanged = true;
@@ -473,7 +478,7 @@ public class QueueActivity extends Activity implements
     }
 
     private void setText(final Button b, final String text){
-        Log.d(appType, "Setting button's text");
+        Log.d(appType, "Setting button_primary's text");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -483,7 +488,7 @@ public class QueueActivity extends Activity implements
     }
 
     private void changePlayingIcon(final Button queuePlayPause, final boolean playToPause){
-        Log.d(appType, "Setting button's Image");
+        Log.d(appType, "Setting button_primary's Image");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -501,7 +506,7 @@ public class QueueActivity extends Activity implements
     }
 
     private void animateForwardBackIcon(final Button forwardOrBack, final boolean isForward){
-        Log.d(appType, "Setting button's Image");
+        Log.d(appType, "Setting button_primary's Image");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -530,7 +535,7 @@ public class QueueActivity extends Activity implements
     private SpannableString generateButtonText(Item i){
         SpannableString text;
         if(i!=null){
-            Log.d(appType, "Generating button text");
+            Log.d(appType, "Generating button_primary text");
             String artists;
             int size = i.getArtists().size();
             artists = i.getArtists().get(0).getName();

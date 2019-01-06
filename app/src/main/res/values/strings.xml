@@ -10,4 +10,7 @@
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="next">Next</string>
+    <string name="continue_text">Continue</string>
+    <string name="join">Join</string>
+    <string name="host">Host</string>
 </resources>

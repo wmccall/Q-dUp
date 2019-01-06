@@ -142,7 +142,7 @@ public class SearchActivity extends Activity{
     }
 
     public void createButtonListeners(){
-        Log.d(appType, "Creating button listeners");
+        Log.d(appType, "Creating button_primary listeners");
         searchSwitchToQueueButton.setOnClickListener(createSearchSwitchToQueueButtonOnClickListener());
         searchButton.setOnClickListener(createSearchButtonOnClickListener(searchListener));
     }
@@ -278,7 +278,7 @@ public class SearchActivity extends Activity{
     }
 
     private void setImage(final ImageButton b, final int resource){
-        Log.d(appType, "Setting button's text");
+        Log.d(appType, "Setting button_primary's text");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -288,7 +288,7 @@ public class SearchActivity extends Activity{
     }
 
     private void changePlayingIcon(final Button queuePlayPause, final boolean playToPause){
-        Log.d(appType, "Setting button's Image");
+        Log.d(appType, "Setting button_primary's Image");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -314,7 +314,7 @@ public class SearchActivity extends Activity{
     private SpannableString generateButtonText(Item i){
         SpannableString text;
         if(i!=null){
-            Log.d(appType, "Generating button text");
+            Log.d(appType, "Generating button_primary text");
             String artists;
             int size = i.getArtists().size();
             artists = i.getArtists().get(0).getName();

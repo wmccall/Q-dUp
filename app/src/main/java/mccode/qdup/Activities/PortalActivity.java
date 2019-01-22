@@ -5,14 +5,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.spotify.sdk.android.player.Spotify;
 
@@ -45,9 +45,13 @@ public class PortalActivity extends Activity{
     public static boolean isServer;
 
     //Buttons
-    private CompoundButton serverOrClientButton;
-    private Button confirmType;
+    private ImageView qdUpImage;
+    private TextView qdUpText;
+    private View hostDivider;
+    private Button hostButton;
+    private View joinDivider;
     private EditText keySearch;
+    private Button joinButton;
 
     private int colorPrimary;
     private int colorFaded;
@@ -94,62 +98,59 @@ public class PortalActivity extends Activity{
 
     public void initializeScreenElements(){
         Log.d(appType, "Initializing Screen Elements");
-        setContentView(R.layout.portal_layout);
+        setContentView(R.layout.new_portal_layout);
         hookUpElementsWithFrontEnd();
         setupOnClickListeners();
-        setServerOrClientButtonFunctionality(AuthActivity.isPremium);
-
     }
 
     public void hookUpElementsWithFrontEnd(){
         Log.d(appType, "Hooking up elements with front end");
-        serverOrClientButton = (CompoundButton) findViewById(R.id.serverOrClient);
-        confirmType = (Button) findViewById(R.id.confirmType);
-        keySearch = (EditText) findViewById(R.id.key_search);
+        qdUpImage = (ImageView) findViewById(R.id.qdUpImage);
+        qdUpText = (TextView) findViewById(R.id.searchServerText);
+        hostDivider = findViewById(R.id.hostDivider);
+        hostButton = (Button) findViewById(R.id.hostButton);
+        joinDivider = findViewById(R.id.joinDivider);
+        joinButton = (Button) findViewById(R.id.joinButton);
+        keySearch = (EditText) findViewById(R.id.keySearch);
         colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         colorFaded = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryClicked);
         mainView = (ViewGroup) findViewById(R.id.mainView);
+        if(!AuthActivity.isPremium){
+            hostButton.setVisibility(View.GONE);
+            hostDivider.setVisibility(View.GONE);
+        }
     }
 
     public void setupOnClickListeners(){
         Log.d(appType, "Setting up OnClickListeners for buttons");
-        ConnectListener connectListener = createConnectListener();
-        OnClickListener confirmTypeOnClickListener = createConfirmTypeOnClickListener(connectListener);
-        confirmType.setOnClickListener(confirmTypeOnClickListener);
+        hostButton.setOnClickListener(createConfirmTypeOnClickListener(createConnectListener(true), true));
+        joinButton.setOnClickListener(createConfirmTypeOnClickListener(createConnectListener(false), true));
     }
 
-    public ConnectListener createConnectListener(){
+    public ConnectListener createConnectListener(final boolean isServer){
         Log.d(appType, "Creating the connect listener");
         return new ConnectListener() {
             @Override
             public void onConnectSucceeded(ArrayList<String> result) {
                 if (!result.get(0).equals("NA")) {
                     serverKey = result.get(0);
-                    if (serverOrClientButton.isChecked()) {
-                        Log.d(appType, "Starting QueueActivity as a Server");
-                        isServer = true;
-                        Intent intent = new Intent(PortalActivity.this, QueueActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(intent);
-                    } else {
-                        Log.d(appType, "Starting QueueActivity as a Client");
-                        isServer = false;
-                        Intent intent = new Intent(PortalActivity.this, QueueActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(intent);
-                    }
+                    Log.d(appType, "Starting QueueActivity as a Server");
+                    PortalActivity.isServer = isServer;
+                    Intent intent = new Intent(PortalActivity.this, QueueActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
                 }
             }
         };
     }
 
-    public OnClickListener createConfirmTypeOnClickListener(final ConnectListener connectListener){
+    public OnClickListener createConfirmTypeOnClickListener(final ConnectListener connectListener, final boolean isServer){
         Log.d(appType, "Creating confirmType's OnClickListener");
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                animateButtonClick(colorPrimary, colorFaded, 250, confirmType);
-                if(serverOrClientButton.isChecked()){
+                animateButtonClick(colorPrimary, colorFaded, 250, isServer ? hostButton : joinButton);
+                if(isServer){
                     Log.d(appType, "Connecting to the router as a Server");
                     hostConnector = new HostConnector();
                     hostConnector.setOnConnectListener(connectListener);
@@ -163,27 +164,6 @@ public class PortalActivity extends Activity{
                 }
             }
         };
-    }
-
-    public OnClickListener createServerOrClientOnClickListener(){
-        Log.d(appType, "Creating serverOrClient's OnClickListener");
-        return new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.d(appType, "Changing from " + (serverOrClientButton.isChecked() ? "Client to Server" : "Server to Client"));
-                animateButtonClick(colorPrimary, colorFaded, 250, serverOrClientButton);
-                TransitionManager.beginDelayedTransition(mainView);
-                keySearch.setVisibility(serverOrClientButton.isChecked() ? View.GONE : View.VISIBLE);
-            }
-        };
-    }
-
-    public void setServerOrClientButtonFunctionality(boolean premium){
-        Log.d(appType, "Setting serverOrClient's functionality to " + (premium ? "functional" : "nonfunctional"));
-        if(premium) {
-            serverOrClientButton.setOnClickListener(createServerOrClientOnClickListener());
-        }else{
-            serverOrClientButton.setEnabled(false);
-        }
     }
 
     public static String getRouterUrl(){

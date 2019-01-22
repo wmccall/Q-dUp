@@ -234,7 +234,7 @@ public class SearchActivity extends Activity{
     }
 
     public View.OnClickListener createSearchSwitchToQueueButtonOnClickListener(){
-        Log.d(appType, "Creating searchSwitchToQueueButton's on Click Listener");
+        Log.d(appType, "Creating searchSwitchToQueueButton'git ads on Click Listener");
         return new View.OnClickListener(){
             public void onClick(View v){
                 Log.d(appType, "Changing layout from " + (adding ? "adding songs to viewing queue" : "viewing queue to adding songs"));
